@@ -5,200 +5,136 @@ var mysql = require('promise-mysql');
 //var db;
 var config = require('../config/db-config');
 //var getDbConnection = require('../config/db-connection');
-//var Promise = require('bluebird');
+var Promise = require('bluebird');
+var fn = require('./cdr_import_functions');
 
 var timestamp = new Date();
-
-var pool = mysql.createPool( {
-	host: 'localhost',
-	user: config.DATABASE_USER,
-	password: config.DATABASE_PASS,
-	database: config.DATABASE_URI,
-  connectionLimt: 10
-});
-
-var monitorlogfile ="IMC_Monitor.log";
-var monitorcsvfile ="Monitor.sansay.csv";
-
 
 
 fsp.readdir('../seed/cdr')
 .then(function(_files) {
-	return _files.filter(isCDR);
+	return _files.filter(fn.isCDR);
 })
 .then( function(files) {
 	for (var i = 0; i < 1; i++) {
 		console.log(files[i]);
-		fsp.readFile('../seed/cdr/' + files[i], 'ascii')
+		var batchNum;
+		var insertData = [];
+		fn.getNextBatchNum()
+		.then(function(_num) {
+			batchNum = _num;
+			return fsp.readFile('../seed/cdr/' + files[i], 'ascii');
+		})
 		.then(function(data) {
 			var lines = data.split('\n');
-				lines.forEach( function(line) {
-					var lineData = line.split(';');
+			lines.forEach( function(line) {
+				var lineData = line.split(';');
 
-					if (lineData.length === 71) {
-						var hexDisconnectCause = decToHex(lineData[11]);
-						var setupTime = convertDate(lineData[6]);
-						var connectTime = convertDate(lineData[7]);
-						var disconnectTime = convertDate(lineData[8]);
-						var originCallingNumb = lineData[15];
-						var originCalledNumb = lineData[17];
-						var originInPackets = lineData[25];
-						var originOutPackets = lineData[26];
-						var originInOctets = lineData[27];
-						var originOutOctets = lineData[28];
-						var originInPacketLoss = lineData[29];
-						var originInDelay = lineData[30];
-						var originInJitter = lineData[31];
-						var termCallingNumb = lineData[34];
-						var termCalledNumb = lineData[36];
-						var termInPackets = lineData[44];
-						var termOutPackets = lineData[45];
-						var termInOctets = lineData[46];
-						var termOutOctets = lineData[47];
-						var termInPacketLoss = lineData[48];
-						var termInDelay = lineData[49];
-						var termInJitter = lineData[50];
-						var routingDigits = lineData[52];
-						var callDuration = lineData[53];
-						var postDialDelay = lineData[54];
-						var confId = lineData[57];
+				if (lineData.length === 71) {
+					var disconnectCause = lineData[11],
+					setupTime = fn.convertDate(lineData[6]),
+					connectTime = fn.convertDate(lineData[7]),
+					disconnectTime = fn.convertDate(lineData[8]),
+					originCallingNumb = lineData[15],
+					originCalledNumb = lineData[17],
+					originInPackets = lineData[25],
+					originOutPackets = lineData[26],
+					originInOctets = lineData[27],
+					originOutOctets = lineData[28],
+					originInPacketLoss = lineData[29],
+					originInDelay = lineData[30],
+					originInJitter = lineData[31],
+					termCallingNumb = lineData[34],
+					termCalledNumb = lineData[36],
+					termInPackets = lineData[44],
+					termOutPackets = lineData[45],
+					termInOctets = lineData[46],
+					termOutOctets = lineData[47],
+					termInPacketLoss = lineData[48],
+					termInDelay = lineData[49],
+					termInJitter = lineData[50],
+					routingDigits = lineData[52],
+					callDuration = lineData[53],
+					postDialDelay = lineData[54],
+					confId = lineData[57];
 
-						var promiseArray = [];
+					var promiseArray = [];
 
-						promiseArray.push(findProtocolId(lineData[14]));
-						promiseArray.push(findOrCreateAddressId(lineData[16]));
-						promiseArray.push(findOrCreateGatewayId(lineData[18]));
-						promiseArray.push(findProtocolId(lineData[33]));
-						promiseArray.push(findOrCreateAddressId(lineData[37]));
-						promiseArray.push(findOrCreateAddressId(lineData[39]));
-						promiseArray.push(findOrCreateAddressId(lineData[20]));
+					promiseArray.push(fn.findProtocolId(lineData[14]));
+					promiseArray.push(fn.findOrCreateAddressId(lineData[16]));
+					promiseArray.push(fn.findOrCreateGatewayId(lineData[18]));
+					promiseArray.push(fn.findProtocolId(lineData[33]));
+					promiseArray.push(fn.findOrCreateAddressId(lineData[37]));
+					promiseArray.push(fn.findOrCreateAddressId(lineData[39]));
+					promiseArray.push(fn.findOrCreateAddressId(lineData[20]));
+					promiseArray.push(fn.calcRegionIdAndCountryId(lineData[52]));
 
-						Promise.all(promiseArray)
-						.then( function(results) {
-							var originProtocolId = results[0];
-							var originAddressId = results[1];
-							var gwId = results[2];
-							var termProtocolId = results[3];
-							var termAddressId = results[4];
-							var termRemoteMediaId = results[5];
-							var originRemoteMediaId = results[6];
+					return Promise.all(promiseArray)
+					.then( function(results) {
+						var originProtocolId = results[0],
+						originAddressId = results[1],
+						gwId = results[2],
+						termProtocolId = results[3],
+						termAddressId = results[4],
+						termRemoteMediaId = results[5],
+						originRemoteMediaId = results[6],
+						countryCode = results[7].countryCode,
+						regionId = results[7].regionId;
 
-							console.log(results);
-						});
+						// console.log(results);
+						insertData.push( "('" + [
+							batchNum,
+							setupTime,
+							connectTime,
+							disconnectTime,
+							disconnectCause,
+							originCallingNumb,
+							originCalledNumb,
+							originInPackets,
+							originOutPackets,
+							originInPacketLoss,
+							originInDelay,
+							originInJitter,
+							termCallingNumb,
+							termCalledNumb,
+							termInPackets,
+							termOutPackets,
+							termInOctets,
+							termOutOctets,
+							termInPacketLoss,
+							termInDelay,
+							termInJitter,
+							routingDigits,
+							callDuration,
+							postDialDelay,
+							confId,
+							originProtocolId,
+							originAddressId,
+							gwId,
+							termProtocolId,
+							termAddressId,
+							originRemoteMediaId,
+							termRemoteMediaId,
+							countryCode,
+							regionId
+						].join("','") + "')" );
+						console.log(insertData);
+					})
+					.catch(console.log);
+				}
+			}); //end forEach
 
-					}
-				});
-		})
-		.catch(console.log)
-	}
-	//console.log(files);
-});
-
-function findOrCreateAddressId(address) {
-	return pool.query("select id from accounting_ip where address like '" + address + "' limit 1")
-	.then(function(res) {
-		if (res.length > 0) return res[0].id;
-		else {
-			console.log('no id found: ', address);
-			return pool.query("insert into accounting_ip(address) select '" + address + "'")
-			.catch(function() {
-				return pool.query("select id from accounting_ip where address like '" + address + "' limit 1");
-			})
 			.then(function() {
-				return pool.query("select id from accounting_ip where address like '" + address + "' limit 1");
-			})
-			.then(function(_res) {
-				return findOrCreateMemberId(_res[0].id)
+				insertData = insertData.join(',');
+				console.log(insertData);
+				fn.insertCdrData(insertData)
 				.then(function() {
-					return _res[0].id;
-				});
-			});
-		}
-	})
+					console.log(files[i], ' data was imported');
+				})
+				.catch(console.log)
+			}) //end readFile
+			.catch(console.log)
+		} //end for loop
+		// fn.closePool();
+	}) //end function(files)
 	.catch(console.log)
-}
-function findOrCreateGatewayId(address) {
-	return pool.query("select id from accounting_gateways where address like '" + address + "' limit 1")
-	.then(function(res) {
-		if (res.length > 0) return res[0].id;
-		else {
-			console.log('no id found: ', address);
-			return pool.query("insert into accounting_gateways(address) select '" + address + "'")
-			.catch(function() {
-				return pool.query("select id from accounting_gateways where address like '" + address + "' limit 1");
-			})
-			.then(function() {
-				return pool.query("select id from accounting_gateways where address like '" + address + "' limit 1");
-			})
-			.then(function(_res) {
-				return _res[0].id;
-			});
-		}
-	})
-	.catch(console.log)
-}
-
-function findOrCreateMemberId(address_id) {
-	return pool.query("select member_id from accounting_members where address_id =" + address_id + " limit 1")
-	.then(function(res) {
-		if (res.length > 0) return res[0].member_id;
-		else {
-			console.log('no id found: ', address_id);
-			return pool.query("insert into accounting_members(member_id, address_id, type_id, vtr_id, intc_id) select 514, '" + address_id + "', 2, 3, 2")
-			.catch(function() {
-				return pool.query("select member_id from accounting_members where address_id =" + address_id + " limit 1");
-			})
-			.then(function() {
-				return pool.query("select member_id from accounting_members where address_id =" + address_id + " limit 1");
-			})
-			.then(function(_res) {
-				return _res[0].member_id;
-			});
-		}
-	})
-	.catch(console.log)
-}
-
-function findProtocolId(protocolType) {
-	return pool.query("select id from voip_protocol where protocol like '" + protocolType + "' limit 1")
-	.then(function(res) {
-		if (res.length > 0) return res[0].id;
-	})
-	.catch(console.log)
-}
-
-function decToHex(num) {
-	return (+num).toString(16);
-}
-
-function isCDR(fileName) {
-	return fileName.substr(-3) === 'cdr';
-}
-
-function convertDate(dateString) {
-	if (dateString === 'NA') return '';
-	var monthNumber = {
-		'Jan': '01',
-		'Feb': '02',
-		'Mar': '03',
-		'Apr': '04',
-		'May': '05',
-		'Jun': '06',
-		'Jul': '07',
-		'Aug': '08',
-		'Sep': '09',
-		'Oct': '10',
-		'Nov': '11',
-		'Dec': '12'
-	};
-	var dateData = dateString.split(' ');
-	return dateData[4] + '-' + monthNumber[dateData[1]] + '-' + dateData[2] + ' ' + dateData[3];
-}
-
-// Promise.using(getDbConnection(), function(conn) {
-// 	return conn.query('select * from accounting_intc')
-// })
-// .then( function(rows) {
-// 	console.log(rows);
-// })
-// .catch(console.log);
