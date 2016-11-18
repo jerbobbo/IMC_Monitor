@@ -51,8 +51,17 @@ fsp.readdir('../seed/cdr')
 						var originInJitter = lineData[31];
 						var termCallingNumb = lineData[34];
 						var termCalledNumb = lineData[36];
-
-
+						var termInPackets = lineData[44];
+						var termOutPackets = lineData[45];
+						var termInOctets = lineData[46];
+						var termOutOctets = lineData[47];
+						var termInPacketLoss = lineData[48];
+						var termInDelay = lineData[49];
+						var termInJitter = lineData[50];
+						var routingDigits = lineData[52];
+						var callDuration = lineData[53];
+						var postDialDelay = lineData[54];
+						var confId = lineData[57];
 
 						var promiseArray = [];
 
