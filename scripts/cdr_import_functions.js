@@ -10,33 +10,7 @@ var pool = mysql.createPool( {
   connectionLimt: 10
 });
 
-module.exports = {
-
-  findOrCreateAddressId: function(address) {
-  	return pool.query("select id from accounting_ip where address like '" + address + "' limit 1")
-  	.then(function(res) {
-  		if (res.length > 0) return res[0].id;
-  		else {
-  			console.log('no id found: ', address);
-  			return pool.query("insert into accounting_ip(address) select '" + address + "'")
-  			.catch(function() {
-  				return pool.query("select id from accounting_ip where address like '" + address + "' limit 1");
-  			})
-  			.then(function() {
-  				return pool.query("select id from accounting_ip where address like '" + address + "' limit 1");
-  			})
-  			.then(function(_res) {
-  				return findOrCreateMemberId(_res[0].id)
-  				.then(function() {
-  					return _res[0].id;
-  				});
-  			});
-  		}
-  	})
-  	.catch(console.log)
-  },
-
-  findOrCreateGatewayId: function(address) {
+  function findOrCreateGatewayId (address) {
   	return pool.query("select id from accounting_gateways where address like '" + address + "' limit 1")
   	.then(function(res) {
   		if (res.length > 0) return res[0].id;
@@ -55,9 +29,10 @@ module.exports = {
   		}
   	})
   	.catch(console.log)
-  },
+  }
 
-  findOrCreateMemberId: function(address_id) {
+  function findOrCreateMemberId (address_id, mediaAddress) {
+		if (mediaAddress) return;
   	return pool.query("select member_id from accounting_members where address_id =" + address_id + " limit 1")
   	.then(function(res) {
   		if (res.length > 0) return res[0].member_id;
@@ -76,55 +51,72 @@ module.exports = {
   		}
   	})
   	.catch(console.log)
-  },
+  }
 
-  findProtocolId: function(protocolType) {
+  function findOrCreateAddressId (address, mediaAddress) {
+    return pool.query("select id from accounting_ip where address like '" + address + "' limit 1")
+    .then(function(res) {
+      if (res.length > 0) return res[0].id;
+      else {
+        console.log('no id found: ', address);
+        return pool.query("insert into accounting_ip(address) select '" + address + "'")
+        .catch(function() {
+          return pool.query("select id from accounting_ip where address like '" + address + "' limit 1");
+        })
+        .then(function() {
+          return pool.query("select id from accounting_ip where address like '" + address + "' limit 1");
+        })
+        .then(function(_res) {
+          return findOrCreateMemberId(_res[0].id, mediaAddress)
+          .then(function() {
+            return _res[0].id;
+          });
+        });
+      }
+    })
+    .catch(console.log)
+  }
+
+  function findProtocolId (protocolType) {
   	return pool.query("select id from voip_protocol where protocol like '" + protocolType + "' limit 1")
   	.then(function(res) {
   		if (res.length > 0) return res[0].id;
   	})
   	.catch(console.log)
-  },
+  }
 
-  decToHex: function(num) {
+  function decToHex (num) {
   	return (+num).toString(16);
-  },
+  }
 
-  isCDR: function(fileName) {
+  function isCDR (fileName) {
   	return fileName.substr(-3) === 'cdr';
-  },
+  }
 
-  convertDate: function(dateString) {
-  	if (dateString === 'NA') return '';
-  	var monthNumber = {
-  		'Jan': '01',
-  		'Feb': '02',
-  		'Mar': '03',
-  		'Apr': '04',
-  		'May': '05',
-  		'Jun': '06',
-  		'Jul': '07',
-  		'Aug': '08',
-  		'Sep': '09',
-  		'Oct': '10',
-  		'Nov': '11',
-  		'Dec': '12'
-  	};
-  	var dateData = dateString.split(' ');
-  	return dateData[4] + '-' + monthNumber[dateData[1]] + '-' + dateData[2] + ' ' + dateData[3];
-  },
+  function convertDate (dateString) {
+  	if (dateString === 'NA') return 'NULL';
+  	return "STR_TO_DATE('" + dateString + "', '%a %b %d %H:%i:%s %Y')";
+  }
 
-  getNextBatchNum: function() {
+  function getNextBatchNum () {
   	return pool.query("select max(batchNum) as maxBatch from accounting_cdr")
   	.then(function(res) {
   		if (res.length > 0) return res[0].maxBatch + 1;
   		else return 1;
   	})
   	.catch(console.log)
-  },
+  }
 
-  calcRegionIdAndCountryId: function(routingDig) {
-  	routingDig = routingDig.substring(1);
+	function calcRoutingDigits (calledNum) {
+		if ( /^77|^78/.test(calledNum) )
+			return calledNum.substring(2);
+		return calledNum.substring(4);
+	}
+
+  function calcRegionIdAndCountryId (routingDig) {
+    var re = new RegExp("[0-9]");
+  	routingDig = routingDig.substring(routingDig.search(re));
+    //console.log(routingDig);
   	var countryCode;
   	var codeLength = 3;
 
@@ -139,25 +131,48 @@ module.exports = {
 
   	return pool.query("select regionid, CONCAT(prefix,regioncode) as routingDigits,prefix from accounting_region where prefix = '" + countryCode + "' order by regioncode desc")
   	.then(function(res) {
-  		var match;
-  		for (var i = 0; i < res.length && !match; i++) {
+			// console.log(routingDig, res);
+  		var match = 'NULL';
+  		for (var i = 0; i < res.length && match === 'NULL'; i++) {
   			var re = new RegExp("^" + res[i].routingDigits);
   			if (re.test(routingDig))
   				match = res[i].regionid;
   		}
+			// console.log('match: ', match);
   		return {
   			regionId: match,
   			countryCode: countryCode
   		};
   	})
   	.catch(console.log)
-  },
+  }
 
-  insertCdrData: function(insertData) {
+  function insertCdrData (insertData) {
     return pool.query('insert into accounting_cdr values ' + insertData);
-  },
+  }
 
-  closePool: function() {
+  function addQuotes (data) {
+    if (data && data !== 'NULL') {
+      return "'" + data + "'";
+    }
+  }
+
+  function closePool () {
     pool.end();
   }
+
+module.exports = {
+  findOrCreateMemberId: findOrCreateMemberId,
+  findOrCreateAddressId: findOrCreateAddressId,
+  findOrCreateGatewayId: findOrCreateGatewayId,
+  findProtocolId: findProtocolId,
+  isCDR: isCDR,
+  decToHex: decToHex,
+  convertDate: convertDate,
+  getNextBatchNum: getNextBatchNum,
+	calcRoutingDigits: calcRoutingDigits,
+  calcRegionIdAndCountryId: calcRegionIdAndCountryId,
+  insertCdrData: insertCdrData,
+  addQuotes: addQuotes,
+  closePool: closePool
 };
