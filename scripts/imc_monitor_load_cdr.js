@@ -11,16 +11,21 @@ var path = require('path');
 
 var timestamp = new Date();
 
-
-fsp.readdir('../seed/cdr')
+fn.initialize()
+.then(function() {
+	return fsp.readdir('../seed/cdr');
+})
 .then(function(_files) {
 	return _files.filter(fn.isCDR);
 })
 .then( function(files) {
-	return Promise.each( files.slice(3,4), importCDR );
+	//for testing on a failing cdr file, uncomment this line:
+	//return Promise.each( files.slice(4,5), importCDR );
+	return Promise.each( files, importCDR );
 })
 .then(function() {
 	console.log('all files imported');
+	fn.closeDb();
 })
 .catch(console.log)
 
@@ -40,7 +45,7 @@ function importCDR (file) {
 			var lineData = line.split(';');
 			var insertData = [];
 
-			if (lineData.length === 71 && lineData[57].length === 35) {
+			if (fn.validateLine(lineData)) {
 				var disconnectCause = +lineData[11],
 				setupTime = fn.convertDate(lineData[6]),
 				connectTime = fn.convertDate(lineData[7]),
@@ -69,7 +74,7 @@ function importCDR (file) {
 				postDialDelay = lineData[54],
 				confId = lineData[57];
 
-				console.log(lineData[14], lineData[33]);
+				//console.log(lineData[14], lineData[33]);
 
 				var promiseArray = [];
 
@@ -145,7 +150,7 @@ function importCDR (file) {
 				return elem !== undefined;
 			});
 			finalInsertData = finalInsertData.join(',');
-			// console.log(finalInsertData);
+			//console.log(finalInsertData);
 			return fn.insertCdrData(finalInsertData);
 		})
 		.then(function() {

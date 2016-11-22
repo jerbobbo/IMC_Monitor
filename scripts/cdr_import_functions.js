@@ -1,6 +1,7 @@
 'use strict';
 var mysql = require('promise-mysql');
 var config = require('../config/db-config');
+var Promise = require('bluebird');
 
 var pool = mysql.createPool( {
 	host: 'localhost',
@@ -31,8 +32,7 @@ var pool = mysql.createPool( {
   	.catch(console.log)
   }
 
-  function findOrCreateMemberId (address_id, mediaAddress) {
-		if (mediaAddress) return;
+  function findOrCreateMemberId (address_id) {
   	return pool.query("select member_id from accounting_members where address_id =" + address_id + " limit 1")
   	.then(function(res) {
   		if (res.length > 0) return res[0].member_id;
@@ -67,11 +67,10 @@ var pool = mysql.createPool( {
           return pool.query("select id from accounting_ip where address like '" + address + "' limit 1");
         })
         .then(function(_res) {
-          return findOrCreateMemberId(_res[0].id, mediaAddress)
-          .then(function() {
-            return _res[0].id;
-          });
-        });
+          if (!mediaAddress) findOrCreateMemberId(_res[0].id);
+					return _res[0].id
+				})
+				.catch(console.log)
       }
     })
     .catch(console.log)
@@ -147,6 +146,16 @@ var pool = mysql.createPool( {
   	.catch(console.log)
   }
 
+	function validateLine (line) {
+		if (line.length !== 71) return false;
+		if (line[57].length !== 35) return false;
+		if (line[14].length === 6 || line[33].length === 6) return false;
+		if (line[6] !== 'NA' && !/\w{3}\s\w{3}\s\d+\s\d{2}:\d{2}:\d{2}\s\d{4}/.test(line[6])) return false;
+		if (line[7] !== 'NA' && !/\w{3}\s\w{3}\s\d+\s\d{2}:\d{2}:\d{2}\s\d{4}/.test(line[7])) return false;
+		if (line[8] !== 'NA' && !/\w{3}\s\w{3}\s\d+\s\d{2}:\d{2}:\d{2}\s\d{4}/.test(line[8])) return false;
+		return true;
+	}
+
   function insertCdrData (insertData) {
     return pool.query('insert into accounting_cdr values ' + insertData);
   }
@@ -155,10 +164,26 @@ var pool = mysql.createPool( {
     if (data && data !== 'NULL') {
       return "'" + data + "'";
     }
+		return 'NULL';
   }
 
-  function closePool () {
-    pool.end();
+	function initialize () {
+		var dbQueries = ['SET autocommit=0','SET unique_checks=0','SET foreign_key_checks=0','set session bulk_insert_buffer_size = 1024 * 1024 * 512', 'set global innodb_buffer_pool_size = 1024 * 1024 * 512'];
+		return Promise.map(dbQueries, pool.query)
+		.catch(console.log);
+	}
+
+  function closeDb () {
+		var dbQueries = ['SET autocommit=1','SET unique_checks=1','SET foreign_key_checks=1'];
+		return Promise.map(dbQueries, pool.query)
+		.then(function() {
+			return pool.end();
+		})
+		.then(function() {
+			console.log('database connection closed');
+		})
+		.catch(console.log)
+
   }
 
 module.exports = {
@@ -172,7 +197,9 @@ module.exports = {
   getNextBatchNum: getNextBatchNum,
 	calcRoutingDigits: calcRoutingDigits,
   calcRegionIdAndCountryId: calcRegionIdAndCountryId,
+	validateLine: validateLine,
   insertCdrData: insertCdrData,
   addQuotes: addQuotes,
-  closePool: closePool
+	initialize: initialize,
+  closeDb: closeDb
 };
