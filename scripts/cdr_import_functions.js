@@ -11,6 +11,17 @@ var pool = mysql.createPool( {
   connectionLimt: 10
 });
 
+var regionTable = {};
+
+pool.query('select prefix, CONCAT(prefix,regioncode) as routingDigits, regionid ,prefix from accounting_region')
+.then(function(result) {
+	result.forEach(function(elem) {
+		if (!regionTable[elem.prefix]) regionTable[elem.prefix] = {};
+		regionTable[elem.prefix][elem.routingDigits] = elem.regionid;
+	});
+	//console.log(regionTable);
+});
+
   function findOrCreateGatewayId (address) {
   	return pool.query("select id from accounting_gateways where address like '" + address + "' limit 1")
   	.then(function(res) {
@@ -128,22 +139,22 @@ var pool = mysql.createPool( {
 
   	countryCode = routingDig.substring(0, codeLength);
 
-  	return pool.query("select regionid, CONCAT(prefix,regioncode) as routingDigits,prefix from accounting_region where prefix = '" + countryCode + "' order by regioncode desc")
-  	.then(function(res) {
 			// console.log(routingDig, res);
   		var match = 'NULL';
-  		for (var i = 0; i < res.length && match === 'NULL'; i++) {
-  			var re = new RegExp("^" + res[i].routingDigits);
-  			if (re.test(routingDig))
-  				match = res[i].regionid;
-  		}
-			// console.log('match: ', match);
+			if (regionTable[countryCode]) {
+				var countryTable = Object.keys(regionTable[countryCode]);
+				for (var i = countryTable.length - 1; i >= 0  && match === 'NULL'; i--) {
+					//console.log('countryCode: ', countryCode, 'key: ', countryTable[i], routingDig);
+					var regex = new RegExp("^" + countryTable[i]);
+					if (regex.test(routingDig))
+	  				match = regionTable[countryCode][countryTable[i]];
+				}
+			}
+			//console.log('match: ', match);
   		return {
   			regionId: match,
   			countryCode: countryCode
   		};
-  	})
-  	.catch(console.log)
   }
 
 	function validateLine (line) {

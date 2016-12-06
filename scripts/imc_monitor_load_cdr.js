@@ -1,6 +1,7 @@
 'use strict';
 
 var fsp = require('fs-promise');
+var fs = require('fs');
 var mysql = require('promise-mysql');
 //var db;
 var config = require('../config/db-config');
@@ -10,17 +11,23 @@ var fn = require('./cdr_import_functions');
 var path = require('path');
 
 var timestamp = new Date();
+var cdrDir = path.join(__dirname, '../seed/cdr/');
 
 fn.initialize()
 .then(function() {
-	return fsp.readdir('../seed/cdr');
+	return fsp.readdir(cdrDir);
 })
 .then(function(_files) {
 	return _files.filter(fn.isCDR);
 })
 .then( function(files) {
+
+	files.sort(function(a, b) {
+		return fs.statSync(cdrDir + a).mtime.getTime() - fs.statSync(cdrDir + b).mtime.getTime();
+	});
 	//for testing on a failing cdr file, uncomment this line:
 	//return Promise.each( files.slice(4,5), importCDR );
+	console.log(files);
 	return Promise.each( files, importCDR );
 })
 .then(function() {
