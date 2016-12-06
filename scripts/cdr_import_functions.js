@@ -13,11 +13,11 @@ var pool = mysql.createPool( {
 
 var regionTable = {};
 
-pool.query('select prefix, CONCAT(prefix,regioncode) as routingDigits, regionid ,prefix from accounting_region')
+pool.query('select prefix, CONCAT(prefix,regioncode) as routingDigits, regionid, prefix, regionNameId from accounting_region')
 .then(function(result) {
 	result.forEach(function(elem) {
 		if (!regionTable[elem.prefix]) regionTable[elem.prefix] = {};
-		regionTable[elem.prefix][elem.routingDigits] = elem.regionid;
+		regionTable[elem.prefix][elem.routingDigits] = { regionId: elem.regionid, regionNameId: elem.regionNameId };
 	});
 	//console.log(regionTable);
 });
@@ -109,7 +109,7 @@ pool.query('select prefix, CONCAT(prefix,regioncode) as routingDigits, regionid 
   }
 
   function getNextBatchNum () {
-  	return pool.query("select max(batchNum) as maxBatch from accounting_cdr")
+  	return pool.query("select max(batchNum) as maxBatch from accounting_summary")
   	.then(function(res) {
   		if (res.length > 0) return res[0].maxBatch + 1;
   		else return 1;
@@ -140,20 +140,24 @@ pool.query('select prefix, CONCAT(prefix,regioncode) as routingDigits, regionid 
   	countryCode = routingDig.substring(0, codeLength);
 
 			// console.log(routingDig, res);
-  		var match = 'NULL';
+  		var match = 'NULL', regionNameId = 'NULL';
 			if (regionTable[countryCode]) {
 				var countryTable = Object.keys(regionTable[countryCode]);
 				for (var i = countryTable.length - 1; i >= 0  && match === 'NULL'; i--) {
 					//console.log('countryCode: ', countryCode, 'key: ', countryTable[i], routingDig);
 					var regex = new RegExp("^" + countryTable[i]);
-					if (regex.test(routingDig))
-	  				match = regionTable[countryCode][countryTable[i]];
+					if (regex.test(routingDig)) {
+						match = regionTable[countryCode][countryTable[i]].regionId;
+						regionNameId = regionTable[countryCode][countryTable[i]].regionNameId;
+					}
+
 				}
 			}
 			//console.log('match: ', match);
   		return {
   			regionId: match,
-  			countryCode: countryCode
+  			countryCode: countryCode,
+				regionNameId: regionNameId
   		};
   }
 
@@ -168,7 +172,7 @@ pool.query('select prefix, CONCAT(prefix,regioncode) as routingDigits, regionid 
 	}
 
   function insertCdrData (insertData) {
-    return pool.query('insert into accounting_cdr values ' + insertData);
+    return pool.query('insert into accounting_import values ' + insertData);
   }
 
   function addQuotes (data) {
@@ -179,14 +183,24 @@ pool.query('select prefix, CONCAT(prefix,regioncode) as routingDigits, regionid 
   }
 
 	function initialize () {
-		var dbQueries = ['SET autocommit=0','SET unique_checks=0','SET foreign_key_checks=0','set session bulk_insert_buffer_size = 1024 * 1024 * 512', 'set global innodb_buffer_pool_size = 1024 * 1024 * 512'];
-		return Promise.map(dbQueries, pool.query)
+		var dbQueries = ['SET autocommit=0','SET unique_checks=0','SET foreign_key_checks=0','TRUNCATE TABLE accounting_import'];
+		return Promise.each(dbQueries, function(query) {
+			return pool.query(query)
+			.then(function() {
+				console.log('query succeeded: ', query);
+			})
+		})
 		.catch(console.log);
 	}
 
   function closeDb () {
 		var dbQueries = ['SET autocommit=1','SET unique_checks=1','SET foreign_key_checks=1'];
-		return Promise.map(dbQueries, pool.query)
+		return Promise.each(dbQueries, function(query) {
+			return pool.query(query)
+			.then(function() {
+				console.log('query succeeded: ', query);
+			})
+		})
 		.then(function() {
 			return pool.end();
 		})

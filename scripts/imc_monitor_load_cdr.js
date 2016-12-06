@@ -11,7 +11,7 @@ var fn = require('./cdr_import_functions');
 var path = require('path');
 
 var timestamp = new Date();
-var cdrDir = path.join(__dirname, '../seed/cdr/');
+var cdrDir = path.join(__dirname, '../seed/cdr/0005/');
 
 fn.initialize()
 .then(function() {
@@ -44,19 +44,20 @@ function importCDR (file) {
 	.then(function(_num) {
 		batchNum = _num;
 		console.log(file);
-		return fsp.readFile(path.join(__dirname, '../seed/cdr/' + file), 'ascii');
+		return fsp.readFile(path.join(cdrDir + file), 'ascii');
 	})
 	.then(function(data) {
 		var lines = data.split('\n');
+		if (lines.length === 0) console.log('file is empty');
 		return Promise.map( lines, function(line) {
 			var lineData = line.split(';');
 			var insertData = [];
-
 			if (fn.validateLine(lineData)) {
 				var disconnectCause = +lineData[11],
 				setupTime = fn.convertDate(lineData[6]),
 				connectTime = fn.convertDate(lineData[7]),
 				disconnectTime = fn.convertDate(lineData[8]),
+				disconnectDate = new Date(lineData[8]),
 				originCallingNumb = lineData[15],
 				originCalledNumb = lineData[17],
 				originInPackets = lineData[25],
@@ -81,7 +82,7 @@ function importCDR (file) {
 				postDialDelay = lineData[54],
 				confId = lineData[57];
 
-				//console.log(lineData[14], lineData[33]);
+				//console.log(disconnectDate);
 
 				var promiseArray = [];
 
@@ -104,7 +105,8 @@ function importCDR (file) {
 					termRemoteMediaId = results[5],
 					originRemoteMediaId = results[6],
 					countryCode = results[7].countryCode,
-					regionId = results[7].regionId;
+					regionId = results[7].regionId,
+					regionNameId = results[7].regionNameId;
 
 					// console.log(results);
 						insertData.push( "(" + [
@@ -143,8 +145,9 @@ function importCDR (file) {
 							originRemoteMediaId,
 							termRemoteMediaId,
 							fn.addQuotes(countryCode),
-							regionId
-						].join(",") + ")" );
+							regionId,
+							regionNameId
+						].join(",") + ",NULL,NULL)" );
 					return insertData;
 				});
 			}
@@ -153,11 +156,12 @@ function importCDR (file) {
 			}
 		})
 		.then(function(result) {
+			// if (result.length === 0) console.log('file was empty');
 			var finalInsertData = result.filter( function(elem) {
 				return elem !== undefined;
 			});
 			finalInsertData = finalInsertData.join(',');
-			//console.log(finalInsertData);
+			// console.log(finalInsertData);
 			return fn.insertCdrData(finalInsertData);
 		})
 		.then(function() {
