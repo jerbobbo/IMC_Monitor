@@ -194,12 +194,39 @@ pool.query('select prefix, CONCAT(prefix,regioncode) as routingDigits, regionid,
 	}
 
   function closeDb () {
-		var dbQueries = ['SET autocommit=1','SET unique_checks=1','SET foreign_key_checks=1'];
-		return Promise.each(dbQueries, function(query) {
-			return pool.query(query)
-			.then(function() {
-				console.log('query succeeded: ', query);
-			})
+		var dbQueries = [
+			`update accounting_import a
+			inner join accounting_members d on a.originAddressId = d.address_id
+			set a.lastOriginAttempt =
+			  (case when a.seizId =
+			    (select max(seizId)
+			      from (select * from accounting_import) b
+			      where b.confid = a.confid and b.originAddressId = a.originAddressId and b.disconnectTime in (
+			      select max(disconnectTime) from (select * from accounting_import) f where f.confId = a.confId))
+			      then 1 else 0 end)`,
+			`update accounting_import a
+			inner join accounting_members d on a.termAddressId = d.address_id
+			set a.lastTermAttempt =
+			  (case when a.seizId =
+			    (select max(seizId) from (select * from accounting_import) b
+			    where b.confid = a.confid
+			    and b.termAddressId in (select c.address_id from accounting_members c where c.member_id = d.member_id )
+			    and b.disconnectTime in (
+			    select max(disconnectTime) from (select * from accounting_import) f where f.confId = a.confId and f.termAddressId in (select g.address_id from accounting_members g where g.member_id = d.member_id) ))
+			    then 1 else 0 end)`,
+					'SET autocommit=1',
+					'SET unique_checks=1',
+					'SET foreign_key_checks=1'
+					];
+
+		return pool.getConnection()
+		.then(function(conn) {
+			return Promise.each(dbQueries, function(query) {
+				return conn.query(query);
+			});
+		})
+		.then(function(queries) {
+			console.log('queries succeeded: ', queries);
 		})
 		.then(function() {
 			return pool.end();

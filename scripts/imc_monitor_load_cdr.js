@@ -11,7 +11,7 @@ var fn = require('./cdr_import_functions');
 var path = require('path');
 
 var timestamp = new Date();
-var cdrDir = path.join(__dirname, '../seed/cdr/0005/');
+var cdrDir = path.join(__dirname, '../seed/cdr/1200/');
 
 fn.initialize()
 .then(function() {
@@ -54,6 +54,7 @@ function importCDR (file) {
 			var insertData = [];
 			if (fn.validateLine(lineData)) {
 				var disconnectCause = +lineData[11],
+				seizId = lineData[0],
 				setupTime = fn.convertDate(lineData[6]),
 				connectTime = fn.convertDate(lineData[7]),
 				disconnectTime = fn.convertDate(lineData[8]),
@@ -110,6 +111,7 @@ function importCDR (file) {
 
 					// console.log(results);
 						insertData.push( "(" + [
+							seizId,
 							batchNum,
 							setupTime,
 							connectTime,
