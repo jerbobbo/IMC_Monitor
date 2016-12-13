@@ -78,7 +78,7 @@ function importCDR (file) {
 				termInDelay = lineData[49],
 				termInJitter = lineData[50],
 				// routingDigits = lineData[52],
-				routingDigits = fn.calcRoutingDigits(originCalledNumb),
+				//routingDigits = fn.calcRoutingDigits(originCalledNumb),
 				callDuration = lineData[53],
 				postDialDelay = lineData[54],
 				confId = lineData[57];
@@ -88,26 +88,27 @@ function importCDR (file) {
 				var promiseArray = [];
 
 				promiseArray.push(fn.findProtocolId(lineData[14]));
-				promiseArray.push(fn.findOrCreateAddressId(lineData[16]));
+				promiseArray.push(fn.calcDestination(originCalledNumb, lineData[16]));
+				//promiseArray.push(fn.findOrCreateAddressId(lineData[16]));
 				promiseArray.push(fn.findOrCreateGatewayId(lineData[18]));
 				promiseArray.push(fn.findProtocolId(lineData[33]));
 				promiseArray.push(fn.findOrCreateAddressId(lineData[37]));
 				promiseArray.push(fn.findOrCreateAddressId(lineData[39], true));
 				promiseArray.push(fn.findOrCreateAddressId(lineData[20], true));
-				promiseArray.push(fn.calcRegionIdAndCountryId(routingDigits));
 
 				return Promise.all(promiseArray)
 				.then( function(results) {
 					var originProtocolId = results[0],
-					originAddressId = results[1],
+					originAddressId = results[1].originAddressId,
+					countryCode = results[1].countryCode,
+					regionId = results[1].regionId,
+					regionNameId = results[1].regionNameId,
+					routingDigits = results[1].routingDigits,
 					gwId = results[2],
 					termProtocolId = results[3],
 					termAddressId = results[4],
 					termRemoteMediaId = results[5],
-					originRemoteMediaId = results[6],
-					countryCode = results[7].countryCode,
-					regionId = results[7].regionId,
-					regionNameId = results[7].regionNameId;
+					originRemoteMediaId = results[6];
 
 					// console.log(results);
 						insertData.push( "(" + [

@@ -13,11 +13,11 @@ var pool = mysql.createPool( {
 
 var regionTable = {};
 
-pool.query('select prefix, CONCAT(prefix,regioncode) as routingDigits, regionid, prefix, regionNameId from accounting_region')
+pool.query('select prefix, CONCAT(prefix,region_code) as routing_digits, region_id, prefix, region_name_id from accounting_region')
 .then(function(result) {
 	result.forEach(function(elem) {
 		if (!regionTable[elem.prefix]) regionTable[elem.prefix] = {};
-		regionTable[elem.prefix][elem.routingDigits] = { regionId: elem.regionid, regionNameId: elem.regionNameId };
+		regionTable[elem.prefix][elem.routing_digits] = { regionId: elem.region_id, regionNameId: elem.region_name_id };
 	});
 	//console.log(regionTable);
 });
@@ -109,18 +109,20 @@ pool.query('select prefix, CONCAT(prefix,regioncode) as routingDigits, regionid,
   }
 
   function getNextBatchNum () {
-  	return pool.query("select max(batchNum) as maxBatch from accounting_summary")
+  	return pool.query("select max(batch_num) as max_batch from accounting_summary")
   	.then(function(res) {
-  		if (res.length > 0) return res[0].maxBatch + 1;
+  		if (res.length > 0) return res[0].max_batch + 1;
   		else return 1;
   	})
-  	.catch(console.log)
+  	.catch(console.log);
   }
 
-	function calcRoutingDigits (calledNum) {
-		if ( /^77|^78/.test(calledNum) )
-			return calledNum.substring(2);
-		return calledNum.substring(4);
+	function calcRoutingDigits (calledNum, member_id) {
+			//these members send call without prefix
+			if ([72, 231, 249, 267].indexOf(member_id) !== -1) return calledNum;
+			//STE sends call with 2-digit prefix of 77 or 78
+			if ( /^77|^78/.test(calledNum) ) return calledNum.substring(2);
+			return calledNum.substring(4);
 	}
 
   function calcRegionIdAndCountryId (routingDig) {
@@ -143,12 +145,14 @@ pool.query('select prefix, CONCAT(prefix,regioncode) as routingDigits, regionid,
   		var match = 'NULL', regionNameId = 'NULL';
 			if (regionTable[countryCode]) {
 				var countryTable = Object.keys(regionTable[countryCode]);
+				var regionDigits;
 				for (var i = countryTable.length - 1; i >= 0  && match === 'NULL'; i--) {
 					//console.log('countryCode: ', countryCode, 'key: ', countryTable[i], routingDig);
-					var regex = new RegExp("^" + countryTable[i]);
+					regionDigits = countryTable[i];
+					var regex = new RegExp("^" + regionDigits);
 					if (regex.test(routingDig)) {
-						match = regionTable[countryCode][countryTable[i]].regionId;
-						regionNameId = regionTable[countryCode][countryTable[i]].regionNameId;
+						match = regionTable[countryCode][regionDigits].regionId;
+						regionNameId = regionTable[countryCode][regionDigits].regionNameId;
 					}
 
 				}
@@ -160,6 +164,32 @@ pool.query('select prefix, CONCAT(prefix,regioncode) as routingDigits, regionid,
 				regionNameId: regionNameId
   		};
   }
+
+	function calcDestination (originCalledNum, originAddress) {
+		var addressId, routingDigits;
+		return findOrCreateAddressId( originAddress )
+		.then(function(_addressId) {
+			addressId = _addressId;
+			return findOrCreateMemberId(_addressId);
+		})
+		.then(function(_memberId) {
+			return calcRoutingDigits( originCalledNum, _memberId );
+		})
+		.then(function(_routingDigits) {
+			routingDigits = _routingDigits;
+			return calcRegionIdAndCountryId(_routingDigits);
+		})
+		.then(function(results) {
+			return {
+				regionId: results.regionId,
+				countryCode: results.countryCode,
+				regionNameId: results.regionNameId,
+				routingDigits: routingDigits,
+				originAddressId: addressId
+			};
+		})
+		.catch(console.log);
+	}
 
 	function validateLine (line) {
 		if (line.length !== 71) return false;
@@ -196,24 +226,54 @@ pool.query('select prefix, CONCAT(prefix,regioncode) as routingDigits, regionid,
   function closeDb () {
 		var dbQueries = [
 			`update accounting_import a
-			inner join accounting_members d on a.originAddressId = d.address_id
-			set a.lastOriginAttempt =
-			  (case when a.seizId =
-			    (select max(seizId)
+			inner join accounting_members d on a.origin_address_id = d.address_id
+			set a.last_origin_attempt =
+			  (case when a.seiz_id =
+			    (select max(seiz_id)
 			      from (select * from accounting_import) b
-			      where b.confid = a.confid and b.originAddressId = a.originAddressId and b.disconnectTime in (
-			      select max(disconnectTime) from (select * from accounting_import) f where f.confId = a.confId))
+			      where b.conf_id = a.conf_id and b.origin_address_id = a.origin_address_id and b.disconnect_time in (
+			      select max(disconnect_time) from (select * from accounting_import) f where f.conf_id = a.conf_id))
 			      then 1 else 0 end)`,
 			`update accounting_import a
-			inner join accounting_members d on a.termAddressId = d.address_id
-			set a.lastTermAttempt =
-			  (case when a.seizId =
-			    (select max(seizId) from (select * from accounting_import) b
-			    where b.confid = a.confid
-			    and b.termAddressId in (select c.address_id from accounting_members c where c.member_id = d.member_id )
-			    and b.disconnectTime in (
-			    select max(disconnectTime) from (select * from accounting_import) f where f.confId = a.confId and f.termAddressId in (select g.address_id from accounting_members g where g.member_id = d.member_id) ))
+			inner join accounting_members d on a.term_address_id = d.address_id
+			set a.last_term_attempt =
+			  (case when a.seiz_id =
+			    (select max(seiz_id) from (select * from accounting_import) b
+			    where b.conf_id = a.conf_id
+			    and b.term_address_id in (select c.address_id from accounting_members c where c.member_id = d.member_id )
+			    and b.disconnect_time in (
+			    select max(disconnect_time) from (select * from accounting_import) f where f.conf_id = a.conf_id and f.term_address_id in (select g.address_id from accounting_members g where g.member_id = d.member_id) ))
 			    then 1 else 0 end)`,
+					`insert into accounting_summary select a.batch_num, b.member_id as origin_member_id, c.member_id as term_member_id,
+country_code, region_name_id, gw_id,
+sum(case when a.last_origin_attempt = true then 1 else 0 end) as origin_seizures,
+sum(case when a.last_term_attempt = true then 1 else 0 end) as term_seizures,
+sum(case when a.call_duration > 0 then 1 else 0 end) as completed,
+sum(case when a.last_origin_attempt = true and d.asrm_group = false then 1 else 0 end) as origin_asrm_seiz,
+sum(case when a.last_term_attempt = true and d.asrm_group = false then 1 else 0 end) as term_asrm_seiz,
+sum(case when a.last_origin_attempt = true and d.ner_group = true then 1 else 0 end) as origin_ner_seiz,
+sum(case when a.last_term_attempt = true and d.ner_group = true then 1 else 0 end) as term_ner_seiz,
+sum(origin_in_packet_loss) as orig_in_packet_loss, sum(origin_in_jitter) as origin_jitter,
+sum(term_in_packet_loss) as term_packet_loss, sum(term_in_jitter) as term_jitter,
+sum(call_duration/60.0) as conn_minutes,
+sum(case when a.last_origin_attempt = true then post_dial_delay else 0 end) as origin_ans_del,
+sum(case when a.last_origin_attempt = true and disconnect_cause = 34 then post_dial_delay else 0 end) as origin_adj_ans_del,
+sum(case when a.last_term_attempt = true then post_dial_delay else 0 end) as term_ans_del,
+sum(case when a.last_term_attempt = true and disconnect_cause = 34 then post_dial_delay else 0 end) as term_adj_ans_del,
+sum(case when d.disconnect_group = 1 and a.last_origin_attempt = true then 1 else 0 end) as origin_normal_disc,
+sum(case when d.disconnect_group = 2 and a.last_origin_attempt = true then 1 else 0 end) as origin_failure_disc,
+sum(case when d.disconnect_group = 3 and a.last_origin_attempt = true then 1 else 0 end) as origin_no_circ_disc,
+sum(case when d.id = 44 and a.last_origin_attempt = true then 1 else 0 end) as origin_no_req_circ_disc,
+sum(case when d.disconnect_group = 1 and a.last_term_attempt = true then 1 else 0 end) as term_normal_disc,
+sum(case when d.disconnect_group = 2 and a.last_term_attempt = true then 1 else 0 end) as term_failure_disc,
+sum(case when d.disconnect_group = 3 and a.last_term_attempt = true then 1 else 0 end) as term_no_circ_disc,
+sum(case when d.id = 44 and a.last_term_attempt = true then 1 else 0 end) as term_no_req_circ_disc,
+min(disconnect_time) as min_time, max(disconnect_time) as max_time, 0 as origin_fsr_seiz, 0 as term_fsr_seiz
+from accounting_import a
+join accounting_members b on a.origin_address_id = b.address_id
+join accounting_members c on a.term_address_id = c.address_id
+join disconnect_text_master d on a.disconnect_cause = d.id
+group by a.batch_num, country_code, region_name_id, gw_id, origin_member_id, b.member_id, c.member_id`,
 					'SET autocommit=1',
 					'SET unique_checks=1',
 					'SET foreign_key_checks=1'
@@ -248,6 +308,7 @@ module.exports = {
   convertDate: convertDate,
   getNextBatchNum: getNextBatchNum,
 	calcRoutingDigits: calcRoutingDigits,
+	calcDestination: calcDestination,
   calcRegionIdAndCountryId: calcRegionIdAndCountryId,
 	validateLine: validateLine,
   insertCdrData: insertCdrData,
