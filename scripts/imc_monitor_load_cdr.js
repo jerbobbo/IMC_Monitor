@@ -102,7 +102,7 @@ function importCDR (file) {
 					originAddressId = results[1].originAddressId,
 					countryCode = results[1].countryCode,
 					regionId = results[1].regionId,
-					regionNameId = results[1].regionNameId,
+					routeCode = results[1].routeCode,
 					routingDigits = results[1].routingDigits,
 					gwId = results[2],
 					termProtocolId = results[3],
@@ -149,7 +149,7 @@ function importCDR (file) {
 							termRemoteMediaId,
 							fn.addQuotes(countryCode),
 							regionId,
-							regionNameId
+							routeCode
 						].join(",") + ",NULL,NULL)" );
 					return insertData;
 				});
