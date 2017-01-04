@@ -4,39 +4,77 @@ var fsp = require('fs-promise');
 var fs = require('fs');
 var mysql = require('promise-mysql');
 //var db;
-var config = require('../config/db-config');
+const ftpConfig = require('../config/ftp-config');
 //var getDbConnection = require('../config/db-connection');
 var Promise = require('bluebird');
 var fn = require('./cdr_import_functions');
 var path = require('path');
 
+var PromiseFtp = require('promise-ftp');
+
 var timestamp = new Date();
 var cdrDir = path.join(__dirname, '../seed/cdr/1200/');
 
-fn.initialize()
+var ftp = new PromiseFtp();
+var fileNames = [];
+
+return Promise.each(ftpConfig.SERVERS, fetchCDR)
 .then(function() {
-	return fsp.readdir(cdrDir);
-})
-.then(function(_files) {
-	return _files.filter(fn.isCDR);
-})
-.then( function(files) {
+	console.log('All CDRs downloaded');
+});
 
-	files.sort(function(a, b) {
-		return fs.statSync(cdrDir + a).mtime.getTime() - fs.statSync(cdrDir + b).mtime.getTime();
-	});
-	//for testing on a failing cdr file, uncomment this line:
-	//return Promise.each( files.slice(4,5), importCDR );
-	console.log(files);
-	return Promise.each( files, importCDR );
-})
-.then(function() {
-	console.log('all files imported');
-	fn.closeDb();
-})
-.catch(console.log)
+//
+// fn.initialize()
+// .then(function() {
+// 	return fsp.readdir(cdrDir);
+// })
+// .then(function(_files) {
+// 	return _files.filter(fn.isCDR);
+// })
+// .then( function(files) {
+//
+// 	files.sort(function(a, b) {
+// 		return fs.statSync(cdrDir + a).mtime.getTime() - fs.statSync(cdrDir + b).mtime.getTime();
+// 	});
+// 	//for testing on a failing cdr file, uncomment this line:
+// 	//return Promise.each( files.slice(4,5), importCDR );
+// 	console.log(files);
+// 	return Promise.each( files, importCDR );
+// })
+// .then(function() {
+// 	console.log('all files imported');
+// 	fn.closeDb();
+// })
+// .catch(console.log)
 
-
+function fetchCDR(serverUrl, idx) {
+	var fileName;
+	return ftp.connect( {
+		host: serverUrl,
+		user: ftpConfig.USERNAME,
+		password: ftpConfig.PASSWORD
+	})
+	.then(function(serverMessage) {
+		console.log('Server Message: ', serverMessage);
+		return ftp.list('-t /CDR/*.cdr');
+	})
+	.then(function(list) {
+		console.log(list[0]);
+		fileName = list[0].name;
+		return ftp.get('/CDR/' + fileName);
+	})
+	.then(function(stream) {
+		return new Promise( function(resolve, reject) {
+			stream.once('close', resolve);
+			stream.once('error', reject);
+			stream.pipe(fs.createWriteStream(path.join(__dirname, '../seed/cdr/' + idx + '-' + fileName)));
+		});
+	})
+	.then(function() {
+		return ftp.end();
+	})
+	.catch(console.log)
+}
 
 function importCDR (file) {
 	var batchNum;
