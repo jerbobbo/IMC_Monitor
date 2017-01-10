@@ -40,7 +40,9 @@ function findOrCreateGatewayId (address) {
   			});
   		}
   	})
-  	.catch(console.log)
+  	.catch(function(err) {
+			console.log('findOrCreateGatewayId ', address, err);
+		});
 }
 
   function findOrCreateMemberId (address_id) {
@@ -64,7 +66,7 @@ function findOrCreateGatewayId (address) {
   	.catch(console.log)
   }
 
-  function findOrCreateAddressId (address, mediaAddress) {
+  function findOrCreateAddressId (address, isMediaAddress) {
     return pool.query("select id from accounting_ip where address like '" + address + "' limit 1")
     .then(function(res) {
       if (res.length > 0) return res[0].id;
@@ -78,10 +80,13 @@ function findOrCreateGatewayId (address) {
           return pool.query("select id from accounting_ip where address like '" + address + "' limit 1");
         })
         .then(function(_res) {
-          if (!mediaAddress) findOrCreateMemberId(_res[0].id);
-					return _res[0].id
+					//only create a new member if address is not media address
+          if (!isMediaAddress) findOrCreateMemberId(_res[0].id);
+					return _res[0].id;
 				})
-				.catch(console.log)
+				.catch(function(err) {
+					console.log('findOrCreateAddressId ', address, err);
+				});
       }
     })
     .catch(console.log)
@@ -192,6 +197,7 @@ function findOrCreateGatewayId (address) {
 	}
 
 	function validateLine (line) {
+		// console.log([line[57].length, line[14].length, line[6], line[7], line[8]].join(', '));
 		if (line.length !== 71) return false;
 		if (line[57].length !== 35) return false;
 		if (line[14].length === 6 || line[33].length === 6) return false;
@@ -201,8 +207,14 @@ function findOrCreateGatewayId (address) {
 		return true;
 	}
 
+	function naToNull (data) {
+		if (data === 'NA') return 'NULL';
+		return data;
+	}
+
   function insertCdrData (insertData) {
-    return pool.query('insert into accounting_import values ' + insertData);
+    return pool.query('insert into accounting_import values ' + insertData)
+		.catch(console.log)
   }
 
   function addQuotes (data) {

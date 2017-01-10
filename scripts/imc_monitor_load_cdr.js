@@ -13,39 +13,48 @@ var path = require('path');
 var PromiseFtp = require('promise-ftp');
 
 var timestamp = new Date();
-var cdrDir = path.join(__dirname, '../seed/cdr/1200/');
+const cdrDir = path.join(__dirname, '../seed/sansay_cdrs/');
 
 var ftp = new PromiseFtp();
 var fileNames = [];
 
-return Promise.each(ftpConfig.SERVERS, fetchCDR)
+
+fn.initialize()
+.then(function() {
+	return Promise.each(ftpConfig.SERVERS, fetchCDR);
+})
 .then(function() {
 	console.log('All CDRs downloaded');
-});
+	return fsp.readdir(cdrDir);
+})
+.then(function(_files) {
+	return _files.filter(fn.isCDR);
+})
+.then( function(files) {
+	console.log('files:',files);
+	fileNames = files;
+	return Promise.each( files, importCDR );
+})
+.then(function() {
+	console.log('all files imported');
+	return clearCdrs(fileNames);
+})
+.then(function() {
+	fn.closeDb();
+})
+.catch(console.log)
 
-//
-// fn.initialize()
-// .then(function() {
-// 	return fsp.readdir(cdrDir);
-// })
-// .then(function(_files) {
-// 	return _files.filter(fn.isCDR);
-// })
-// .then( function(files) {
-//
-// 	files.sort(function(a, b) {
-// 		return fs.statSync(cdrDir + a).mtime.getTime() - fs.statSync(cdrDir + b).mtime.getTime();
-// 	});
-// 	//for testing on a failing cdr file, uncomment this line:
-// 	//return Promise.each( files.slice(4,5), importCDR );
-// 	console.log(files);
-// 	return Promise.each( files, importCDR );
-// })
-// .then(function() {
-// 	console.log('all files imported');
-// 	fn.closeDb();
-// })
-// .catch(console.log)
+
+function clearCdrs (fileArr) {
+	console.log('fileArr: ', fileArr);
+	return Promise.each( fileArr, function(file) {
+		fsp.remove(cdrDir + file);
+	})
+	.then(function() {
+		console.log('cdr files deleted');
+	})
+	.catch(console.log)
+}
 
 function fetchCDR(serverUrl, idx) {
 	var fileName;
@@ -67,7 +76,7 @@ function fetchCDR(serverUrl, idx) {
 		return new Promise( function(resolve, reject) {
 			stream.once('close', resolve);
 			stream.once('error', reject);
-			stream.pipe(fs.createWriteStream(path.join(__dirname, '../seed/cdr/' + idx + '-' + fileName)));
+			stream.pipe(fs.createWriteStream(cdrDir + idx + '-' + fileName));
 		});
 	})
 	.then(function() {
@@ -81,12 +90,13 @@ function importCDR (file) {
 	return fn.getNextBatchNum()
 	.then(function(_num) {
 		batchNum = _num;
-		console.log(file);
+		console.log('importing ', file);
 		return fsp.readFile(path.join(cdrDir + file), 'ascii');
 	})
 	.then(function(data) {
 		var lines = data.split('\n');
 		if (lines.length === 0) console.log('file is empty');
+		//console.log(lines);
 		return Promise.map( lines, function(line) {
 			var lineData = line.split(';');
 			var insertData = [];
@@ -202,7 +212,8 @@ function importCDR (file) {
 				return elem !== undefined;
 			});
 			finalInsertData = finalInsertData.join(',');
-			// console.log(finalInsertData);
+			fsp.writeFile(path.join(__dirname, file + '-insertData.txt'), finalInsertData);
+			// console.log('finalInsertData:', finalInsertData);
 			return fn.insertCdrData(finalInsertData);
 		})
 		.then(function() {
