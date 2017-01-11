@@ -23,74 +23,111 @@ pool.query('select prefix, CONCAT(prefix,region_code) as routing_digits, region_
 });
 
 function findOrCreateGatewayId (address) {
-  	return pool.query("select id from accounting_gateways where address like '" + address + "' limit 1")
-  	.then(function(res) {
-  		if (res.length > 0) return res[0].id;
-  		else {
-  			console.log('no id found: ', address);
-  			return pool.query("insert into accounting_gateways(address) select '" + address + "'")
-  			.catch(function() {
-  				return pool.query("select id from accounting_gateways where address like '" + address + "' limit 1");
-  			})
-  			.then(function() {
-  				return pool.query("select id from accounting_gateways where address like '" + address + "' limit 1");
-  			})
-  			.then(function(_res) {
-  				return _res[0].id;
-  			});
-  		}
-  	})
-  	.catch(function(err) {
-			console.log('findOrCreateGatewayId ', address, err);
-		});
+	// console.log('GatewayId');
+
+	var conn, foundId;
+	return pool.getConnection()
+	.then(function(_conn) {
+		conn = _conn;
+  	return conn.query("select id from accounting_gateways where address like '" + address + "' limit 1");
+	})
+	.then(function(res) {
+		if (res.length === 0) {
+			console.log('no gateway_id found: ', address);
+			return conn.query("insert into accounting_gateways(address) select '" + address + "'")
+			.then(function() {
+				return conn.query("select id from accounting_gateways where address like '" + address + "' limit 1");
+			})
+			.then(function(_res) {
+				foundId = _res[0].id;
+				return pool.releaseConnection(conn);
+			})
+			.catch(console.log)
+		}
+		else {
+			foundId = res[0].id;
+			return pool.releaseConnection(conn);
+		}
+	})
+	.then(function() {
+		//console.log('you got here');
+		return foundId;
+	})
+	.catch(function(err) {
+		console.log('findOrCreateGatewayId ', address, err);
+	});
 }
 
-  function findOrCreateMemberId (address_id) {
-  	return pool.query("select member_id from accounting_members where address_id =" + address_id + " limit 1")
-  	.then(function(res) {
-  		if (res.length > 0) return res[0].member_id;
-  		else {
-  			console.log('no id found: ', address_id);
-  			return pool.query("insert into accounting_members(member_id, address_id, type_id, vtr_id, intc_id) select 514, '" + address_id + "', 2, 3, 2")
-  			.catch(function() {
-  				return pool.query("select member_id from accounting_members where address_id =" + address_id + " limit 1");
-  			})
-  			.then(function() {
-  				return pool.query("select member_id from accounting_members where address_id =" + address_id + " limit 1");
-  			})
-  			.then(function(_res) {
-  				return _res[0].member_id;
-  			});
-  		}
-  	})
-  	.catch(console.log)
-  }
+function findOrCreateMemberId (address_id) {
+	// console.log('MemberId');
+	var conn, foundId;
+	return pool.getConnection()
+	.then(function(_conn) {
+		conn = _conn;
+  	return conn.query("select member_id from accounting_members where address_id =" + address_id + " limit 1");
+	})
+	.then(function(res) {
+		if (res.length === 0) {
+			console.log('no member_id found for address_id ', address_id);
+			return conn.query("insert into accounting_members(member_id, address_id, type_id, vtr_id, intc_id) select 514, '" + address_id + "', 2, 3, 2")
+			.then(function() {
+				return conn.query("select member_id from accounting_members where address_id =" + address_id + " limit 1");
+			})
+			.then(function(_res) {
+				foundId = _res[0].member_id;
+				return pool.releaseConnection(conn);
+			})
+			.catch(console.log)
+		}
+		else {
+			foundId = res[0].member_id;
+			return pool.releaseConnection(conn);
+		}
+	})
+	.then(function() {
+		// console.log('you got here')
+		return foundId;
+	})
+	.catch(function(err) {
+		console.log('findOrCreateMemberId ', address_id, err);
+	});
+}
 
-  function findOrCreateAddressId (address, isMediaAddress) {
-    return pool.query("select id from accounting_ip where address like '" + address + "' limit 1")
-    .then(function(res) {
-      if (res.length > 0) return res[0].id;
-      else {
-        console.log('no id found: ', address);
-        return pool.query("insert into accounting_ip(address) select '" + address + "'")
-        .catch(function() {
-          return pool.query("select id from accounting_ip where address like '" + address + "' limit 1");
-        })
-        .then(function() {
-          return pool.query("select id from accounting_ip where address like '" + address + "' limit 1");
-        })
-        .then(function(_res) {
-					//only create a new member if address is not media address
-          if (!isMediaAddress) findOrCreateMemberId(_res[0].id);
-					return _res[0].id;
-				})
-				.catch(function(err) {
-					console.log('findOrCreateAddressId ', address, err);
-				});
-      }
-    })
-    .catch(console.log)
-  }
+function findOrCreateAddressId (address, isMediaAddress) {
+	// console.log('AddressId');
+	var conn, foundId;
+	return pool.getConnection()
+	.then(function(_conn) {
+		conn = _conn;
+		return conn.query("select id from accounting_ip where address like '" + address + "' limit 1");
+	})
+	.then(function(res) {
+		if (res.length === 0) {
+			console.log('no address_id found for address: ', address);
+			return conn.query("insert into accounting_ip(address) select '" + address + "'")
+			.then(function() {
+				return conn.query("select id from accounting_ip where address like '" + address + "' limit 1");
+			})
+			.then(function(_res) {
+				foundId = _res[0].id;
+				return pool.releaseConnection(conn);
+			})
+			.catch(console.log)
+		}
+		else {
+			foundId = res[0].id;
+			return pool.releaseConnection(conn);
+		}
+	})
+	.then(function() {
+		// console.log('you got here');
+		if (!isMediaAddress) findOrCreateMemberId(foundId);
+		return foundId;
+	})
+	.catch(function(err) {
+		console.log('findOrCreateAddressId ', address, err);
+	});
+}
 
   function findProtocolId (protocolType) {
   	return pool.query("select id from voip_protocol where protocol like '" + protocolType + "' limit 1")
@@ -230,7 +267,7 @@ function findOrCreateGatewayId (address) {
 			return pool.query(query)
 			.then(function() {
 				console.log('query succeeded: ', query);
-			})
+			});
 		})
 		.catch(console.log);
 	}
@@ -257,6 +294,7 @@ function findOrCreateGatewayId (address) {
 			    select max(disconnect_time) from (select * from accounting_import) f where f.conf_id = a.conf_id and f.term_address_id in (select g.address_id from accounting_members g where g.member_id = d.member_id) ))
 			    then 1 else 0 end)`,
 					`insert into accounting_summary select FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/300)*300) as batch_num,
+a.batch_num,
 b.member_id as origin_member_id, c.member_id as term_member_id,
 country_code, route_code_id, gw_id,
 sum(case when a.last_origin_attempt = true then 1 else 0 end) as origin_seizures,
@@ -286,7 +324,7 @@ from accounting_import a
 join accounting_members b on a.origin_address_id = b.address_id
 join accounting_members c on a.term_address_id = c.address_id
 join disconnect_text_master d on a.disconnect_cause = d.id
-group by FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/300)*300), country_code, route_code_id, gw_id, origin_member_id, b.member_id, c.member_id`,
+group by FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/300)*300), batch_num, country_code, route_code_id, gw_id, origin_member_id, b.member_id, c.member_id`,
 					'SET autocommit=1',
 					'SET unique_checks=1',
 					'SET foreign_key_checks=1'
@@ -295,11 +333,11 @@ group by FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/300)*300), countr
 		return pool.getConnection()
 		.then(function(conn) {
 			return Promise.each(dbQueries, function(query) {
-				return conn.query(query);
+				return conn.query(query)
+				.then(function() {
+					console.log('query succeeded: ', query);
+				});
 			});
-		})
-		.then(function(queries) {
-			console.log('queries succeeded: ', queries);
 		})
 		.then(function() {
 			return pool.end();

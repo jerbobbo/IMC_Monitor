@@ -18,6 +18,8 @@ const cdrDir = path.join(__dirname, '../seed/sansay_cdrs/');
 var ftp = new PromiseFtp();
 var fileNames = [];
 
+// fn.findOrCreateGatewayId('1.1.1.1');
+// fn.findOrCreateMemberId(22);
 
 fn.initialize()
 .then(function() {
