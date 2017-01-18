@@ -21,31 +21,38 @@ var fileNames = [];
 // fn.findOrCreateGatewayId('1.1.1.1');
 // fn.findOrCreateMemberId(22);
 
-fn.initialize()
-.then(function() {
-	return Promise.each(ftpConfig.SERVERS, fetchCDR);
-})
-.then(function() {
-	console.log('All CDRs downloaded');
-	return fsp.readdir(cdrDir);
-})
-.then(function(_files) {
-	return _files.filter(fn.isCDR);
-})
-.then( function(files) {
-	console.log('files:',files);
-	fileNames = files;
-	return Promise.each( files, importCDR );
-})
-.then(function() {
-	console.log('all files imported');
-	return clearCdrs(fileNames);
-})
-.then(function() {
-	fn.closeDb();
-})
-.catch(console.log)
-
+const CronJob = require('cron').CronJob;
+console.log('CDR Import running every 5 minutes');
+const job = new CronJob( {
+	cronTime: '*/5 * * * *',
+	onTick: function() {
+		fn.initialize()
+		.then(function() {
+			return Promise.each(ftpConfig.SERVERS, fetchCDR);
+		})
+		.then(function() {
+			console.log('All CDRs downloaded');
+			return fsp.readdir(cdrDir);
+		})
+		.then(function(_files) {
+			return _files.filter(fn.isCDR);
+		})
+		.then( function(files) {
+			console.log('files:',files);
+			fileNames = files;
+			return Promise.each( files, importCDR );
+		})
+		.then(function() {
+			console.log('all files imported');
+			return clearCdrs(fileNames);
+		})
+		.then(function() {
+			fn.closeDb();
+		})
+		.catch(console.log)
+	},
+	start: true
+});
 
 function clearCdrs (fileArr) {
 	console.log('fileArr: ', fileArr);
@@ -98,7 +105,7 @@ function importCDR (file) {
 	.then(function(data) {
 		var lines = data.split('\n');
 		if (lines.length === 0) console.log('file is empty');
-		//console.log(lines);
+		// console.log(lines);
 		return Promise.map( lines, function(line) {
 			var lineData = line.split(';');
 			var insertData = [];
@@ -145,6 +152,7 @@ function importCDR (file) {
 				promiseArray.push(fn.findOrCreateAddressId(lineData[37]));
 				promiseArray.push(fn.findOrCreateAddressId(lineData[39], true));
 				promiseArray.push(fn.findOrCreateAddressId(lineData[20], true));
+				promiseArray.push(fn.matchCodec(lineData[24], lineData[43]));
 
 				return Promise.all(promiseArray)
 				.then( function(results) {
@@ -158,7 +166,8 @@ function importCDR (file) {
 					termProtocolId = results[3],
 					termAddressId = results[4],
 					termRemoteMediaId = results[5],
-					originRemoteMediaId = results[6];
+					originRemoteMediaId = results[6],
+					codecId = results[7];
 
 					// console.log(results);
 						insertData.push( "(" + [
@@ -199,7 +208,8 @@ function importCDR (file) {
 							termRemoteMediaId,
 							fn.addQuotes(countryCode),
 							regionId,
-							routeCode
+							routeCode,
+							codecId
 						].join(",") + ",NULL,NULL)" );
 					return insertData;
 				});
@@ -214,7 +224,7 @@ function importCDR (file) {
 				return elem !== undefined;
 			});
 			finalInsertData = finalInsertData.join(',');
-			fsp.writeFile(path.join(__dirname, file + '-insertData.txt'), finalInsertData);
+			fsp.writeFile(path.join(__dirname, '../logs/' + file + '-insertData.txt'), finalInsertData);
 			// console.log('finalInsertData:', finalInsertData);
 			return fn.insertCdrData(finalInsertData);
 		})

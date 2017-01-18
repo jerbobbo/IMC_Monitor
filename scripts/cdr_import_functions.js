@@ -23,7 +23,7 @@ pool.query('select prefix, CONCAT(prefix,region_code) as routing_digits, region_
 });
 
 function findOrCreateGatewayId (address) {
-	// console.log('GatewayId');
+	console.log('GatewayId');
 
 	var conn, foundId;
 	return pool.getConnection()
@@ -59,7 +59,7 @@ function findOrCreateGatewayId (address) {
 }
 
 function findOrCreateMemberId (address_id) {
-	// console.log('MemberId');
+	console.log('MemberId');
 	var conn, foundId;
 	return pool.getConnection()
 	.then(function(_conn) {
@@ -94,7 +94,7 @@ function findOrCreateMemberId (address_id) {
 }
 
 function findOrCreateAddressId (address, isMediaAddress) {
-	// console.log('AddressId');
+	console.log('AddressId');
 	var conn, foundId;
 	return pool.getConnection()
 	.then(function(_conn) {
@@ -130,12 +130,41 @@ function findOrCreateAddressId (address, isMediaAddress) {
 }
 
   function findProtocolId (protocolType) {
+		console.log('protocolType');
   	return pool.query("select id from voip_protocol where protocol like '" + protocolType + "' limit 1")
   	.then(function(res) {
   		if (res.length > 0) return res[0].id;
   	})
   	.catch(console.log)
   }
+
+	function findCodecId (codec) {
+		console.log('codecId');
+		return pool.query("select id from voip_codecs where name like '" + codec + "' limit 1")
+  	.then(function(res) {
+  		if (res.length > 0) return res[0].id;
+			else return 'NULL';
+  	})
+  	.catch(console.log)
+	}
+
+	function matchCodec (origList, termList) {
+		console.log('matchCodec');
+		var match;
+		var origListArr = origList.split(',');
+		var termListArr = termList.split(',');
+		// console.log('origListArr', origListArr);
+		// console.log('termListArr', termListArr);
+		for (var i = 0; i < origListArr.length && !match; i++) {
+			for (var j = 0; j < termListArr.length && !match; j++) {
+				if (origListArr[i] === termListArr[j]) match = origListArr[i];
+			}
+		}
+		// console.log('match', match);
+		if (!match) return 'NULL';
+		return findCodecId(match);
+	}
+
 
   function decToHex (num) {
   	return (+num).toString(16);
@@ -208,6 +237,7 @@ function findOrCreateAddressId (address, isMediaAddress) {
   }
 
 	function calcDestination (originCalledNum, originAddress) {
+		console.log('calcDestination');
 		var addressId, routingDigits;
 		return findOrCreateAddressId( originAddress )
 		.then(function(_addressId) {
@@ -250,8 +280,17 @@ function findOrCreateAddressId (address, isMediaAddress) {
 	}
 
   function insertCdrData (insertData) {
-    return pool.query('insert into accounting_import values ' + insertData)
+		var conn;
+		return pool.getConnection()
+		.then(function(_conn) {
+			conn = _conn;
+			return conn.query('insert into accounting_import values ' + insertData);
+		})
+		.then(function() {
+			return pool.releaseConnection(conn);
+		})
 		.catch(console.log)
+
   }
 
   function addQuotes (data) {
@@ -262,12 +301,24 @@ function findOrCreateAddressId (address, isMediaAddress) {
   }
 
 	function initialize () {
-		var dbQueries = ['SET autocommit=0','SET unique_checks=0','SET foreign_key_checks=0','TRUNCATE TABLE accounting_import'];
-		return Promise.each(dbQueries, function(query) {
-			return pool.query(query)
-			.then(function() {
-				console.log('query succeeded: ', query);
+		var conn;
+		var dbQueries = [
+			// 'SET autocommit=0',
+			'SET unique_checks=0',
+			'SET foreign_key_checks=0',
+			'TRUNCATE TABLE accounting_import'];
+		return pool.getConnection()
+		.then(function(_conn) {
+			conn = _conn;
+			return Promise.each(dbQueries, function(query) {
+				return conn.query(query)
+				.then(function() {
+					console.log('query succeeded: ', query);
+				});
 			});
+		})
+		.then(function() {
+			return pool.releaseConnection(conn);
 		})
 		.catch(console.log);
 	}
@@ -325,7 +376,7 @@ join accounting_members b on a.origin_address_id = b.address_id
 join accounting_members c on a.term_address_id = c.address_id
 join disconnect_text_master d on a.disconnect_cause = d.id
 group by FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/300)*300), batch_num, country_code, route_code_id, gw_id, origin_member_id, b.member_id, c.member_id`,
-					'SET autocommit=1',
+					// 'SET autocommit=1',
 					'SET unique_checks=1',
 					'SET foreign_key_checks=1'
 					];
@@ -339,12 +390,12 @@ group by FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/300)*300), batch_
 				});
 			});
 		})
-		.then(function() {
-			return pool.end();
-		})
-		.then(function() {
-			console.log('database connection closed');
-		})
+		// .then(function() {
+		// 	return pool.end();
+		// })
+		// .then(function() {
+		// 	console.log('database connection closed');
+		// })
 		.catch(console.log)
 
   }
@@ -361,6 +412,7 @@ module.exports = {
 	calcRoutingDigits: calcRoutingDigits,
 	calcDestination: calcDestination,
   calcRegionIdAndCountryId: calcRegionIdAndCountryId,
+	matchCodec: matchCodec,
 	validateLine: validateLine,
   insertCdrData: insertCdrData,
   addQuotes: addQuotes,

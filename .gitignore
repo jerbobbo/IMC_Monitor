@@ -4,3 +4,7 @@ npm-debug.log
 public
 .DS_Store
 coverage
+seed
+docs
+config
+logs
