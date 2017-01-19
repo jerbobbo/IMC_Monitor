@@ -10,16 +10,22 @@ var Promise = require('bluebird');
 var fn = require('./cdr_import_functions');
 var path = require('path');
 
-var PromiseFtp = require('promise-ftp');
+var FTPS = require('ftps');
 
 var timestamp = new Date();
 const cdrDir = path.join(__dirname, '../seed/sansay_cdrs/');
 
-var ftp = new PromiseFtp();
 var fileNames = [];
 
 // fn.findOrCreateGatewayId('1.1.1.1');
 // fn.findOrCreateMemberId(22);
+
+// fetchCDR(ftpConfig.SERVERS[0])
+// .then(function(file) {
+// 	console.log(file, ' downloaded')
+// })
+// .catch(console.log);
+
 
 const CronJob = require('cron').CronJob;
 console.log('CDR Import running every 5 minutes');
@@ -30,8 +36,8 @@ const job = new CronJob( {
 		.then(function() {
 			return Promise.each(ftpConfig.SERVERS, fetchCDR);
 		})
-		.then(function() {
-			console.log('All CDRs downloaded');
+		.then(function(downloadedFiles) {
+			console.log(downloadedFiles, ' downloaded');
 			return fsp.readdir(cdrDir);
 		})
 		.then(function(_files) {
@@ -66,33 +72,33 @@ function clearCdrs (fileArr) {
 }
 
 function fetchCDR(serverUrl, idx) {
-	var fileName;
-	return ftp.connect( {
-		host: serverUrl,
-		user: ftpConfig.USERNAME,
-		password: ftpConfig.PASSWORD,
-		autoReconnect: true
-	})
-	.then(function(serverMessage) {
-		console.log('Server Message: ', serverMessage);
-		return ftp.list('-t /CDR/*.cdr');
-	})
-	.then(function(list) {
-		console.log(list[0]);
-		fileName = list[0].name;
-		return ftp.get('/CDR/' + fileName);
-	})
-	.then(function(stream) {
-		return new Promise( function(resolve, reject) {
-			stream.once('close', resolve);
-			stream.once('error', reject);
-			stream.pipe(fs.createWriteStream(cdrDir + idx + '-' + fileName));
+
+	return new Promise( function(resolve, reject) {
+		var fileName;
+		var ftps = new FTPS({
+			host: serverUrl,
+			username: ftpConfig.USERNAME,
+			password: ftpConfig.PASSWORD,
+			protocol: 'ftp',
+			additionalLftpCommands: '--verbose=1',
+			// cwd: '/CDR',
+			retries: 20
 		});
-	})
-	.then(function() {
-		return ftp.end();
-	})
-	.catch(console.log)
+
+		ftps.cd('CDR').raw('ls -t *.cdr').exec(function (err, res) {
+			if (err) reject(err);
+			else {
+				var resArr = res.data.split('\n');
+				var latestFile = resArr[0].split(' ');
+				var latestFileName = latestFile[latestFile.length-1];
+				//console.log('latestFileName: ', latestFileName);
+				ftps.get('/CDR/' + latestFileName, cdrDir + idx + '-' + latestFileName).exec(function (err, res) {
+					if (err) reject(err);
+					else resolve(latestFileName);
+				});
+			}
+		});
+	});
 }
 
 function importCDR (file) {

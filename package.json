@@ -40,6 +40,7 @@
     "extend": "^3.0.0",
     "font-awesome": "^4.6.3",
     "fs-promise": "^1.0.0",
+    "ftps": "^1.0.0",
     "graphql": "^0.8.2",
     "gulp": "^3.8.11",
     "gulp-autoprefixer": "^3.1.0",
