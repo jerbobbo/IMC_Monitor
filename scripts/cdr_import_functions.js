@@ -23,7 +23,7 @@ pool.query('select prefix, CONCAT(prefix,region_code) as routing_digits, region_
 });
 
 function findOrCreateGatewayId (address) {
-	console.log('GatewayId');
+	// console.log('GatewayId');
 
 	var conn, foundId;
 	return pool.getConnection()
@@ -59,7 +59,7 @@ function findOrCreateGatewayId (address) {
 }
 
 function findOrCreateMemberId (address_id) {
-	console.log('MemberId');
+	// console.log('MemberId');
 	var conn, foundId;
 	return pool.getConnection()
 	.then(function(_conn) {
@@ -94,7 +94,7 @@ function findOrCreateMemberId (address_id) {
 }
 
 function findOrCreateAddressId (address, isMediaAddress) {
-	console.log('AddressId');
+	// console.log('AddressId');
 	var conn, foundId;
 	return pool.getConnection()
 	.then(function(_conn) {
@@ -130,7 +130,7 @@ function findOrCreateAddressId (address, isMediaAddress) {
 }
 
   function findProtocolId (protocolType) {
-		console.log('protocolType');
+		// console.log('protocolType');
   	return pool.query("select id from voip_protocol where protocol like '" + protocolType + "' limit 1")
   	.then(function(res) {
   		if (res.length > 0) return res[0].id;
@@ -139,7 +139,7 @@ function findOrCreateAddressId (address, isMediaAddress) {
   }
 
 	function findCodecId (codec) {
-		console.log('codecId');
+		// console.log('codecId');
 		return pool.query("select id from voip_codecs where name like '" + codec + "' limit 1")
   	.then(function(res) {
   		if (res.length > 0) return res[0].id;
@@ -149,7 +149,7 @@ function findOrCreateAddressId (address, isMediaAddress) {
 	}
 
 	function matchCodec (origList, termList) {
-		console.log('matchCodec');
+		// console.log('matchCodec');
 		var match;
 		var origListArr = origList.split(',');
 		var termListArr = termList.split(',');
@@ -237,7 +237,7 @@ function findOrCreateAddressId (address, isMediaAddress) {
   }
 
 	function calcDestination (originCalledNum, originAddress) {
-		console.log('calcDestination');
+		// console.log('calcDestination');
 		var addressId, routingDigits;
 		return findOrCreateAddressId( originAddress )
 		.then(function(_addressId) {

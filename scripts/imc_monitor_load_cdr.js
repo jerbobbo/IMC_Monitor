@@ -70,7 +70,8 @@ function fetchCDR(serverUrl, idx) {
 	return ftp.connect( {
 		host: serverUrl,
 		user: ftpConfig.USERNAME,
-		password: ftpConfig.PASSWORD
+		password: ftpConfig.PASSWORD,
+		autoReconnect: true
 	})
 	.then(function(serverMessage) {
 		console.log('Server Message: ', serverMessage);
