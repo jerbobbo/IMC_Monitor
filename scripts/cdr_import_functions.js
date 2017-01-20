@@ -112,7 +112,16 @@ function findOrCreateAddressId (address, isMediaAddress) {
 				foundId = _res[0].id;
 				return pool.releaseConnection(conn);
 			})
-			.catch(console.log)
+			.catch(function(err) {
+				console.log(err);
+				if (err.errno === 1062) {
+					return conn.query("select id from accounting_ip where address like '" + address + "' limit 1")
+					.then(function(_res) {
+						foundId = _res[0].id;
+						return pool.releaseConnection(conn);
+					});
+				}
+			});
 		}
 		else {
 			foundId = res[0].id;
@@ -390,12 +399,12 @@ group by FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/300)*300), batch_
 				});
 			});
 		})
-		// .then(function() {
-		// 	return pool.end();
-		// })
-		// .then(function() {
-		// 	console.log('database connection closed');
-		// })
+		.then(function() {
+			return pool.end();
+		})
+		.then(function() {
+			console.log('database connection closed');
+		})
 		.catch(console.log)
 
   }

@@ -1,3 +1,4 @@
+#!/usr/local/bin/node
 'use strict';
 
 var fsp = require('fs-promise');
@@ -27,11 +28,11 @@ var fileNames = [];
 // .catch(console.log);
 
 
-const CronJob = require('cron').CronJob;
-console.log('CDR Import running every 5 minutes');
-const job = new CronJob( {
-	cronTime: '*/5 * * * *',
-	onTick: function() {
+// const CronJob = require('cron').CronJob;
+// console.log('CDR Import running every 5 minutes');
+// const job = new CronJob( {
+// 	cronTime: '*/5 * * * *',
+// 	onTick: function() {
 		fn.initialize()
 		.then(function() {
 			return Promise.each(ftpConfig.SERVERS, fetchCDR);
@@ -56,9 +57,10 @@ const job = new CronJob( {
 			fn.closeDb();
 		})
 		.catch(console.log)
-	},
-	start: true
-});
+
+// 	},
+// 	start: true
+// });
 
 function clearCdrs (fileArr) {
 	console.log('fileArr: ', fileArr);
