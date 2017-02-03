@@ -274,12 +274,14 @@ function findOrCreateAddressId (address, isMediaAddress) {
 
 	function validateLine (line) {
 		// console.log([line[57].length, line[14].length, line[6], line[7], line[8]].join(', '));
+		//console.log(line.length);
 		if (line.length !== 71) return false;
 		if (line[57].length !== 35) return false;
 		if (line[14].length === 6 || line[33].length === 6) return false;
-		if (line[6] !== 'NA' && !/\w{3}\s\w{3}\s\d+\s\d{2}:\d{2}:\d{2}\s\d{4}/.test(line[6])) return false;
-		if (line[7] !== 'NA' && !/\w{3}\s\w{3}\s\d+\s\d{2}:\d{2}:\d{2}\s\d{4}/.test(line[7])) return false;
-		if (line[8] !== 'NA' && !/\w{3}\s\w{3}\s\d+\s\d{2}:\d{2}:\d{2}\s\d{4}/.test(line[8])) return false;
+		if (line[6] !== 'NA' && !/\w{3}\s\w{3}\s+\d+\s\d{2}:\d{2}:\d{2}\s\d{4}/.test(line[6])) return false;
+		if (line[7] !== 'NA' && !/\w{3}\s\w{3}\s+\d+\s\d{2}:\d{2}:\d{2}\s\d{4}/.test(line[7])) return false;
+		if (line[8] !== 'NA' && !/\w{3}\s\w{3}\s+\d+\s\d{2}:\d{2}:\d{2}\s\d{4}/.test(line[8])) return false;
+		//console.log('validated');
 		return true;
 	}
 
