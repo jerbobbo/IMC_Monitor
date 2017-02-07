@@ -2,8 +2,8 @@
 var path = require('path');
 var Sequelize = require('sequelize');
 
-const DATABASE_URI = require(path.join(__dirname, '../env')).DATABASE_URI;
-const DATABASE_PASS = require(path.join(__dirname, '../env')).DATABASE_PASS;
+var DATABASE_URI = require(path.join(__dirname, '../env')).DATABASE_URI;
+var DATABASE_PASS = require(path.join(__dirname, '../env')).DATABASE_PASS;
 
 var db = new Sequelize (DATABASE_URI, 'root', DATABASE_PASS , {
   dialect: 'mysql',

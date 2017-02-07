@@ -386,7 +386,7 @@ from accounting_import a
 join accounting_members b on a.origin_address_id = b.address_id
 join accounting_members c on a.term_address_id = c.address_id
 join disconnect_text_master d on a.disconnect_cause = d.id
-group by FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/300)*300), batch_num, country_code, route_code_id, gw_id, origin_member_id, b.member_id, c.member_id`,
+group by FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/300)*300), batch_num, country_code, route_code_id, gw_id, b.member_id, c.member_id`,
 					// 'SET autocommit=1',
 					'SET unique_checks=1',
 					'SET foreign_key_checks=1'
