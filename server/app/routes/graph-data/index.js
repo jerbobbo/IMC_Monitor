@@ -4,21 +4,25 @@ var router = require('express').Router();
 var accountingSummaryModel = require(path.join(__dirname, '../../../db/models/accounting_summary'));
 var Sequelize = require('sequelize');
 
-router.get('/', function(req, res, next) {
-  res.send('Hello');
-});
+// router.get('/', function(req, res, next) {
+//   res.send('Hello');
+// });
 
-router.post('/', function(req, res, next) {
-  // var groupBy = req.body.groupBy;
+router.get('/', function(req, res, next) {
+  console.log(req.query.country);
+  var groupBy = req.query.groupBy.split(',');
+  console.log('groupBy: ', groupBy);
   // var ageRange = req.body.ageRange;
   console.log('you got here');
-  var groupBy = ['batch_time'];
+  // var groupBy = ['batch_time'];
   var now = new Date();
   // now.setHours(now.getHours() + 4);
   var yesterday = new Date();
   // yesterday.setHours(yesterday.getHours() + 4);
   yesterday.setDate(yesterday.getDate() - 1);
   var ageRange = [yesterday, now];
+  var countryCode = req.query.country || '%';
+  var originMemberId = req.query.originMember || '%';
 
   accountingSummaryModel.findAll({
     attributes: [
@@ -34,7 +38,9 @@ router.post('/', function(req, res, next) {
       batch_time: {
         $between: ageRange
       },
-      country_code: '964'
+      country_code: {
+        $like: countryCode
+      }
     },
     group: groupBy
   })
