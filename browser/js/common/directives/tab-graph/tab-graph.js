@@ -1,36 +1,44 @@
 //will be tab-graph in html tag
-app.directive('tabGraph', function (d3Service, $window) {
+app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
 
     return {
         restrict: 'E',
         scope: {
-          where: '=',
-          groupBy: '=',
+          where: '@',
+          groupBy: '@',
           name: '@'
         },
         templateUrl: 'js/common/directives/tab-graph/tab-graph.html',
 
         link: function(scope, elem, attrs) {
           d3Service.d3().then(function(d3) {
-            var margin = parseInt(attrs.margin) || 20,
-            barHeight = parseInt(attrs.barHeight) || 20,
-            barPadding = parseInt(attrs.barPadding) || 5;
+            var margin = {top: 20, right: 20, bottom: 30, left: 50},
+            width = 600 - margin.left - margin.right,
+            height = 350 - margin.top - margin.bottom;
+            // barHeight = parseInt(attrs.barHeight) || 20,
+            // barPadding = parseInt(attrs.barPadding) || 5;
 
             var svg = d3.select(elem[0])
-              .append("svg")
-              .style('width', '100%');
+              .append("svg");
+              // .style('width', '100%')
+              // .attr('height', '300');
+
+            // var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+            // 2017-02-09T14:55:00.000Z
             // Browser onresize event
             window.onresize = function() {
             scope.$apply();
           };
 
-          // hard-code data
-          scope.data = [
-            {name: "Greg", score: 98},
-            {name: "Ari", score: 96},
-            {name: 'Q', score: 75},
-            {name: "Loser", score: 48}
-          ];
+          // // hard-code data
+          // scope.data = [
+          //   {name: "Greg", score: 98},
+          //   {name: "Ari", score: 96},
+          //   {name: 'Q', score: 75},
+          //   {name: "Loser", score: 48}
+          // ];
 
           // Watch for resize event
           scope.$watch(function() {
@@ -46,44 +54,90 @@ app.directive('tabGraph', function (d3Service, $window) {
                 // If we don't pass any data, return out of the element
                 if (!data) return;
 
+                // var parseTime = d3.timeParse("%Y-%m-%dT%H:%M:%SZ");
+                // var parseTime = d3.timeParse("%Y-%m-%dT%H:%M:%SZ");
+                //
+                // var x = d3.scaleTime()
+                //   .rangeRound([0, width]);
+                //
+                // var y = d3.scaleLinear()
+                //   .rangeRound([height, 0]);
+
+
+
                 // setup variables
-                var width = d3.select(elem[0]).node().offsetWidth - margin,
-                    // calculate the height
-                    height = scope.data.length * (barHeight + barPadding),
+                // var width = d3.select(elem[0]).node().offsetWidth - margin,
+                //     // calculate the height
+                //     // height = scope.data.length * (barHeight + barPadding),
+                //     height = +svg.attr("height") - margin.top - margin.bottom,
                     // Use the category20() scale function for multicolor support
-                    color = d3.scale.category20(),
+                    // color = d3.scale.category20(),
                     // our xScale
-                    xScale = d3.scale.linear()
-                      .domain([0, d3.max(data, function(d) {
-                        return d.score;
-                      })])
-                      .range([0, width]);
 
-                // set the height based on the calculations above
-                svg.attr('height', height);
+                var parseTime = d3.timeParse("%Y-%m-%dT%H:%M:%S.%LZ");
 
-                //create the rectangles for the bar chart
-                svg.selectAll('rect')
-                  .data(data).enter()
-                    .append('rect')
-                    .attr('height', barHeight)
-                    .attr('width', 140)
-                    .attr('x', Math.round(margin/2))
-                    .attr('y', function(d,i) {
-                      return i * (barHeight + barPadding);
-                    })
-                    .attr('fill', function(d) { return color(d.score); })
-                    .transition()
-                      .duration(1000)
-                      .attr('width', function(d) {
-                        return xScale(d.score);
-                    });
-                  };
-                });
-              }
-        // controller: function($scope, ele) {
-        //   $scope.getData = GraphFactory.getData;
-        // }
+                var x = d3.scaleTime()
+                  .domain([d3.min(data, function(d) { return parseTime(d.batch_time); }), d3.max(data, function(d) { return parseTime(d.batch_time); })])
+                  .rangeRound([0, width]),
+                y = d3.scaleLinear()
+                  .domain([0, 100])
+                  .rangeRound([height, 0]),
+                xAxis = d3.axisBottom()
+                  .scale(x),
+                yAxis = d3.axisLeft()
+                  .scale(y);
+
+
+                var area = d3.area()
+                  .x(function(d) { console.log(x(parseTime(d.batch_time))); return x(parseTime(d.batch_time)); })
+                  .y0(height)
+                  .y1(function(d) { console.log('asr', y(100*d.completed/d.originSeiz)); return y(100*d.completed/d.originSeiz); });
+
+                svg.attr('width', width + margin.left + margin.right)
+                    .attr('height', height + margin.top + margin.bottom)
+                    .append('g')
+                    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+                svg.append('path')
+                  .datum(data)
+                  .attr('class', 'area')
+                  .attr('d', area)
+                  .transition()
+                    .duration(1000);
+
+                svg.append('g')
+                  .attr('class', 'x axis')
+                  .attr('transform', 'translate(0,' + height + ')')
+                  .call(xAxis);
+
+                svg.append('g')
+                  .attr('class', 'y axis')
+                  .call(yAxis);
+
+
+
+                // g.append('g')
+                //   .attr('transform', 'translate(0,' + height + ')')
+                //   .call(d3.axisBottom(xScale));
+
+              };
+              scope.render(scope.data);
+            });
+
+          },
+        controller: function($scope, GraphFactory) {
+          console.log('where:', $scope.where);
+          console.log('groupBy:', $scope.groupBy);
+          console.log('scope:', $scope);
+
+          var params = $scope.where + '&groupBy=' + $scope.groupBy;
+          GraphFactory.getData(params)
+          .then(function(results) {
+            $scope.data = results;
+            // $scope.$digest();
+            // $scope.render($scope.data);
+          });
+        }
     };
 
 });

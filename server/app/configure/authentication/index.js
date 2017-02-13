@@ -5,6 +5,7 @@ var Models = require(path.join(__dirname, '../../../db/models'));
 var passport = require('passport');
 var pg = require('pg');
 var MySQLStore = require('express-mysql-session')(session);
+var envVariables = require(path.join(__dirname, '../../../env'));
 
 var ENABLED_AUTH_STRATEGIES = [
     'local'
@@ -13,10 +14,10 @@ var ENABLED_AUTH_STRATEGIES = [
 var sessionStore = new MySQLStore({
   host: 'localhost',
   port: 3306,
-  user: 'root',
-  password: null,
-  database: 'imc_monitor'
-})
+  user: envVariables.DATABASE_USER,
+  password: envVariables.DATABASE_PASS,
+  database: envVariables.DATABASE_URI
+});
 
 module.exports = function (app) {
     // First, our session middleware will set/read sessions from the request.

@@ -4,11 +4,15 @@ var router = require('express').Router();
 var accountingSummaryModel = require(path.join(__dirname, '../../../db/models/accounting_summary'));
 var Sequelize = require('sequelize');
 
-// router.get('/', function(req, res, next) {
-//   res.send('Hello');
-// });
+var ensureAuthenticated = function (req, res, next) {
+    if (req.isAuthenticated()) {
+        next();
+    } else {
+        res.status(401).end();
+    }
+};
 
-router.get('/', function(req, res, next) {
+router.get('/', ensureAuthenticated, function(req, res, next) {
   console.log(req.query.country);
   var groupBy = req.query.groupBy.split(',');
   console.log('groupBy: ', groupBy);

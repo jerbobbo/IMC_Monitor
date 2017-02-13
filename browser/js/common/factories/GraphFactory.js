@@ -1,4 +1,0 @@
-app.factory('GraphFactory', function() {
-  
-
-});
