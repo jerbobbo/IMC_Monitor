@@ -13,7 +13,17 @@ svg {
   fill: #4ca3bd;
 }
 
-.path {
-  stroke: #000;
-  stroke-width: 1px;
+.asrm {
+  fill: none;
+  stroke: none;
+  &.draw {
+    fill: none;
+    stroke: #000;
+  }
+}
+
+.tick {
+  line {
+    stroke: #888;
+  }
 }

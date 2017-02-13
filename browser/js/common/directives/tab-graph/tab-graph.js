@@ -92,24 +92,70 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
                 yAxis = d3.axisLeft()
                   .scale(y);
 
+                // gridlines in x axis function
+                function make_x_gridlines() {
+                    return d3.axisBottom(x)
+                        .ticks(5);
+                }
+
+                // gridlines in y axis function
+                function make_y_gridlines() {
+                    return d3.axisLeft(y)
+                        .ticks(10);
+                }
 
                 var area = d3.area()
-                  .x(function(d) { console.log(x(parseTime(d.batch_time))); return x(parseTime(d.batch_time)); })
+                  .x(function(d) { return x(parseTime(d.batch_time)); })
                   .y0(height)
-                  .y1(function(d) { console.log('asr', y(100*d.completed/d.originSeiz)); return y(100*d.completed/d.originSeiz); });
+                  .y1(function(d) { return y(100*d.completed/d.originSeiz); });
+
+                var asrm = d3.line()
+                .x(function(d) { return x(parseTime(d.batch_time)); })
+                .y(function(d) { return y(100*d.completed/d.originAsrmSeiz); });
 
                 svg.attr('width', width + margin.left + margin.right)
                     .attr('height', height + margin.top + margin.bottom);
 
+                var t = d3.transition()
+                  .duration(1000)
+                  .ease(d3.easeLinear);
+
                 var g = svg.append('g')
                     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
+                // // add the X gridlines
+                // g.append("g")
+                // .attr("class", "grid")
+                // .attr("transform", "translate(0," + height + ")")
+                // .call(make_x_gridlines()
+                //     .tickSize(-height)
+                //     .tickFormat("")
+                // );
+
+                // add the Y gridlines
+                g.append("g")
+                .attr("class", "grid")
+                .call(make_y_gridlines()
+                    .tickSize(-width)
+                    .tickFormat("")
+                );
+
+
                 g.append('path')
                   .datum(data)
-                  .attr('class', 'area')
                   .attr('d', area)
-                  .transition()
-                    .duration(1000);
+                    .style('fill', '#fff')
+                  .transition(t)
+                    .style('fill', '#4ca3bd');
+                  // .attr('class', 'area')
+
+                g.append('path')
+                  .datum(data)
+                  .attr('d', asrm)
+                  .attr('class', 'asrm')
+                  .transition(t)
+                    .style('stroke', '#000');
+                  // .call(transition);
 
                 g.append('g')
                   .attr('class', 'x axis')
@@ -120,6 +166,18 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
                   .attr('class', 'y axis')
                   .call(yAxis);
 
+                function transition(path) {
+                  path.transition()
+                      .duration(7500)
+                      .attrTween("stroke-dasharray", tweenDash)
+                      .each("end", function() { d3.select(this).call(transition); });
+                }
+
+                function tweenDash() {
+                  var l = this.getTotalLength(),
+                      i = d3.interpolateString("0," + l, l + "," + l);
+                  return function(t) { return i(t); };
+                }
 
 
                 // g.append('g')
