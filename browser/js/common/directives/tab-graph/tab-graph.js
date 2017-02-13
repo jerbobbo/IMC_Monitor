@@ -19,7 +19,8 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
             // barPadding = parseInt(attrs.barPadding) || 5;
 
             var svg = d3.select(elem[0])
-              .append("svg");
+              .append("svg")
+              ;
               // .style('width', '100%')
               // .attr('height', '300');
 
@@ -75,9 +76,13 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
                     // our xScale
 
                 var parseTime = d3.timeParse("%Y-%m-%dT%H:%M:%S.%LZ");
+                var yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                var today = new Date();
+                var now = convertDateToUTC(today);
 
                 var x = d3.scaleTime()
-                  .domain([d3.min(data, function(d) { return parseTime(d.batch_time); }), d3.max(data, function(d) { return parseTime(d.batch_time); })])
+                  .domain([yesterday, now])
                   .rangeRound([0, width]),
                 y = d3.scaleLinear()
                   .domain([0, 100])
@@ -94,23 +99,24 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
                   .y1(function(d) { console.log('asr', y(100*d.completed/d.originSeiz)); return y(100*d.completed/d.originSeiz); });
 
                 svg.attr('width', width + margin.left + margin.right)
-                    .attr('height', height + margin.top + margin.bottom)
-                    .append('g')
+                    .attr('height', height + margin.top + margin.bottom);
+
+                var g = svg.append('g')
                     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-                svg.append('path')
+                g.append('path')
                   .datum(data)
                   .attr('class', 'area')
                   .attr('d', area)
                   .transition()
                     .duration(1000);
 
-                svg.append('g')
+                g.append('g')
                   .attr('class', 'x axis')
                   .attr('transform', 'translate(0,' + height + ')')
                   .call(xAxis);
 
-                svg.append('g')
+                g.append('g')
                   .attr('class', 'y axis')
                   .call(yAxis);
 
@@ -122,6 +128,11 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
 
               };
               scope.render(scope.data);
+
+              function convertDateToUTC(date) {
+                return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+              }
+
             });
 
           },

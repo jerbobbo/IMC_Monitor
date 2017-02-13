@@ -5,7 +5,15 @@ svg {
 .axis path, .axis line {
   fill: none;
   stroke: #000;
+  stroke-width: 1px;
   shape-rendering: crispEdges;
 }
 
-.area { fill: #4ca3bd; }
+.area {
+  fill: #4ca3bd;
+}
+
+.path {
+  stroke: #000;
+  stroke-width: 1px;
+}
