@@ -14,32 +14,14 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
           d3Service.d3().then(function(d3) {
             var margin = {top: 20, right: 20, bottom: 30, left: 50},
             width = 600 - margin.left - margin.right,
-            height = 350 - margin.top - margin.bottom;
-            // barHeight = parseInt(attrs.barHeight) || 20,
-            // barPadding = parseInt(attrs.barPadding) || 5;
+            height = 250 - margin.top - margin.bottom;
 
             var svg = d3.select(elem[0])
-              .append("svg")
-              ;
-              // .style('width', '100%')
-              // .attr('height', '300');
+              .append("svg");
 
-            // var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-
-            // 2017-02-09T14:55:00.000Z
-            // Browser onresize event
             window.onresize = function() {
             scope.$apply();
           };
-
-          // // hard-code data
-          // scope.data = [
-          //   {name: "Greg", score: 98},
-          //   {name: "Ari", score: 96},
-          //   {name: 'Q', score: 75},
-          //   {name: "Loser", score: 48}
-          // ];
 
           // Watch for resize event
           scope.$watch(function() {
@@ -54,26 +36,6 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
 
                 // If we don't pass any data, return out of the element
                 if (!data) return;
-
-                // var parseTime = d3.timeParse("%Y-%m-%dT%H:%M:%SZ");
-                // var parseTime = d3.timeParse("%Y-%m-%dT%H:%M:%SZ");
-                //
-                // var x = d3.scaleTime()
-                //   .rangeRound([0, width]);
-                //
-                // var y = d3.scaleLinear()
-                //   .rangeRound([height, 0]);
-
-
-
-                // setup variables
-                // var width = d3.select(elem[0]).node().offsetWidth - margin,
-                //     // calculate the height
-                //     // height = scope.data.length * (barHeight + barPadding),
-                //     height = +svg.attr("height") - margin.top - margin.bottom,
-                    // Use the category20() scale function for multicolor support
-                    // color = d3.scale.category20(),
-                    // our xScale
 
                 var parseTime = d3.timeParse("%Y-%m-%dT%H:%M:%S.%LZ");
                 var yesterday = new Date();
@@ -90,12 +52,13 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
                 xAxis = d3.axisBottom()
                   .scale(x),
                 yAxis = d3.axisLeft()
-                  .scale(y);
+                  .scale(y)
+                  .ticks(5);
 
                 // gridlines in x axis function
                 function make_x_gridlines() {
                     return d3.axisBottom(x)
-                        .ticks(5);
+                        .ticks(10);
                 }
 
                 // gridlines in y axis function
@@ -110,6 +73,7 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
                   .y1(function(d) { return y(100*d.completed/d.originSeiz); });
 
                 var asrm = d3.line()
+                // .curve(d3.curveCatmullRomOpen)
                 .x(function(d) { return x(parseTime(d.batch_time)); })
                 .y(function(d) { return y(100*d.completed/d.originAsrmSeiz); });
 
@@ -149,14 +113,16 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
                   .transition(t)
                     .style('fill', '#3FBF83');
 
+                var line = d3.line()
+                  .curve(d3.curveCatmullRomOpen)
+                  .x(function(d, i) { return x(i); })
+                  .y(function(d) {return y(d); });
 
-                g.append('path')
-                  .datum(data)
-                  .attr('d', asrm)
-                  .attr('class', 'asrm')
-                  .transition(t)
-                    .style('stroke', '#000');
-                  // .call(transition);
+                var path = g.append('path')
+                  .attr('d', asrm(data))
+                  .attr('stroke', '#333')
+                  .attr('stroke-width', '1')
+                  .attr('fill', 'none');
 
                 g.append('g')
                   .attr('class', 'x axis')
@@ -165,25 +131,23 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
 
                 g.append('g')
                   .attr('class', 'y axis')
-                  .call(yAxis);
+                  .call(yAxis)
+                .append("text")
+                  .attr("transform", "rotate(90)")
+                  .attr("y", 6)
+                  .attr("dy", "-4em")
+                  .style("text-anchor", "end")
+                  .text("ASR/ASRm");
 
-                function transition(path) {
-                  path.transition()
-                      .duration(7500)
-                      .attrTween("stroke-dasharray", tweenDash)
-                      .each("end", function() { d3.select(this).call(transition); });
-                }
+                var totalLength = path.node().getTotalLength();
 
-                function tweenDash() {
-                  var l = this.getTotalLength(),
-                      i = d3.interpolateString("0," + l, l + "," + l);
-                  return function(t) { return i(t); };
-                }
-
-
-                // g.append('g')
-                //   .attr('transform', 'translate(0,' + height + ')')
-                //   .call(d3.axisBottom(xScale));
+                path
+                .attr("stroke-dasharray", totalLength + " " + totalLength)
+                .attr("stroke-dashoffset", totalLength)
+                .transition()
+                  .duration(1000)
+                  .ease(d3.easeLinear)
+                  .attr("stroke-dashoffset", 0);
 
               };
               scope.render(scope.data);
@@ -204,8 +168,6 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
           GraphFactory.getData(params)
           .then(function(results) {
             $scope.data = results;
-            // $scope.$digest();
-            // $scope.render($scope.data);
           });
         }
     };
