@@ -5,12 +5,16 @@ svg {
 .axis path, .axis line {
   fill: none;
   stroke: #000;
-  stroke-width: 1px;
+  stroke-width: 2px;
   shape-rendering: crispEdges;
+  &.tick {
+    stroke-width: 1px;
+    stroke: #000;
+  }
 }
 
 .area {
-  fill: #4ca3bd;
+  opacity: 0.6;
 }
 
 .asrm {
@@ -22,8 +26,19 @@ svg {
   }
 }
 
-.tick {
-  line {
-    stroke: #888;
+.horizontal-grid {
+  .tick {
+    line {
+      stroke: #888;
+      stroke-dasharray: 3;
+    }
+  }
+}
+.vertical-grid {
+  .tick {
+    line {
+      stroke: red;
+      stroke-dasharray: 3;
+    }
   }
 }

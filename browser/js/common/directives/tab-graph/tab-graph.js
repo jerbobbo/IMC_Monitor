@@ -85,7 +85,7 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
                   .domain([yesterday, now])
                   .rangeRound([0, width]),
                 y = d3.scaleLinear()
-                  .domain([0, 100])
+                  .domain([0, d3.max(data, function(d) { return 100*d.completed/d.originAsrmSeiz; }) ])
                   .rangeRound([height, 0]),
                 xAxis = d3.axisBottom()
                   .scale(x),
@@ -123,18 +123,18 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
                 var g = svg.append('g')
                     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-                // // add the X gridlines
-                // g.append("g")
-                // .attr("class", "grid")
-                // .attr("transform", "translate(0," + height + ")")
-                // .call(make_x_gridlines()
-                //     .tickSize(-height)
-                //     .tickFormat("")
-                // );
+                // add the X gridlines
+                g.append("g")
+                .attr("class", "vertical-grid")
+                .attr("transform", "translate(0," + height + ")")
+                .call(make_x_gridlines()
+                    .tickSize(-height)
+                    .tickFormat("")
+                );
 
                 // add the Y gridlines
                 g.append("g")
-                .attr("class", "grid")
+                .attr("class", "horizontal-grid")
                 .call(make_y_gridlines()
                     .tickSize(-width)
                     .tickFormat("")
@@ -145,9 +145,10 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
                   .datum(data)
                   .attr('d', area)
                     .style('fill', '#fff')
+                  .attr('class', 'area')
                   .transition(t)
-                    .style('fill', '#4ca3bd');
-                  // .attr('class', 'area')
+                    .style('fill', '#3FBF83');
+
 
                 g.append('path')
                   .datum(data)
