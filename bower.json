@@ -1,5 +1,5 @@
 {
-  "name": "IMCmonitor",
+  "name": "imcmonitor",
   "description": "IMCmonitor",
   "main": "server/start.js",
   "authors": [
