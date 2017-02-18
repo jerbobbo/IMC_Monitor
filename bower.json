@@ -1,0 +1,23 @@
+{
+  "name": "IMCmonitor",
+  "description": "IMCmonitor",
+  "main": "server/start.js",
+  "authors": [
+    "Rob Debbane <studio@robertdebbane.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/jerbobbo/IMC_Monitor",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-sanitize": ">= 1.2",
+    "angular-schema-form": "^0.8.13",
+    "angular-stripe": "^4.2.12",
+    "jquery-ui": "^1.11.4"
+  }
+}
