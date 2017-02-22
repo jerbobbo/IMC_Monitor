@@ -35,7 +35,7 @@ gulp.task('lintJS', function () {
         .pipe(plumber({
             errorHandler: notify.onError('Linting FAILED! Check your gulp process.')
         }))
-        .pipe(eslint({configFile: 'eslintrc.json'))
+        .pipe(eslint({configFile: 'eslintrc.json'}))
         .pipe(eslint.format())
         .pipe(eslint.failOnError());
 
