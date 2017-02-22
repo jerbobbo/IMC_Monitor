@@ -12,5 +12,5 @@
 
 */
 
-require('babel-core/register');
+require('babel-register');
 require('./main');
