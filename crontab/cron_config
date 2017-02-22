@@ -1,0 +1,1 @@
+*/5 * * * * PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin /usr/local/bin/node /home/monitor/imc_monitor/scripts/imc_monitor_load_cdr.js
