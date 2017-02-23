@@ -5,7 +5,7 @@ var Models = require(path.join(__dirname, '../../../db/models'));
 var passport = require('passport');
 var pg = require('pg');
 var MySQLStore = require('express-mysql-session')(session);
-var envVariables = require(path.join(__dirname, '../../../env'));
+var dbVariables = require(path.join(__dirname, '../../../../config/db-config'));
 
 var ENABLED_AUTH_STRATEGIES = [
     'local'
@@ -14,9 +14,9 @@ var ENABLED_AUTH_STRATEGIES = [
 var sessionStore = new MySQLStore({
   host: 'localhost',
   port: 3306,
-  user: envVariables.DATABASE_USER,
-  password: envVariables.DATABASE_PASS,
-  database: envVariables.DATABASE_URI
+  user: dbVariables.DATABASE_USER,
+  password: dbVariables.DATABASE_PASS,
+  database: dbVariables.DATABASE_URI
 });
 
 module.exports = function (app) {
