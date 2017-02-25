@@ -24,8 +24,8 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
               {
                 name: 'asr',
                 legend: 'ASR/ASRm',
-                areaFunc: function(d) { return 100*d.completed/d.originSeiz; },
-                lineFunc: function(d) { return 100*d.completed/d.originAsrmSeiz; },
+                areaFunc: function(d) { return 100*d.completed/d.originSeiz || 0; },
+                lineFunc: function(d) { return 100*d.completed/d.originAsrmSeiz || 0; },
                 maxGraphHeight: function(data) { return d3.max(data, function(d) { return 100*d.completed/d.originAsrmSeiz; }); }
                 // maxGraphHeight: function(data) {return 100;}
               }
