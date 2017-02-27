@@ -306,6 +306,7 @@ function findOrCreateAddressId (address, isMediaAddress) {
 
   function addQuotes (data) {
     if (data && data !== 'NULL') {
+			var retData = data.replace(/\'/g, '');
       return "'" + data + "'";
     }
 		return 'NULL';
