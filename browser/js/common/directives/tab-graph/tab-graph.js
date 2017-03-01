@@ -20,29 +20,33 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
           .then(function(results) {
             $scope.data = results;
 
-            $scope.graphTypes = [
-              {
-                name: 'asr',
-                legend: 'ASR/ASRm',
-                areaFunc: function(d) { return 100*d.completed/d.originSeiz || 0; },
-                lineFunc: function(d) { return 100*d.completed/d.originAsrmSeiz || 0; },
-                maxGraphHeight: function(data) { return d3.max(data, function(d) { return 100*d.completed/d.originAsrmSeiz; }); }
-                // maxGraphHeight: function(data) {return 100;}
-              },
-              {
-                name: 'acd',
-                legend: 'ACD',
-                areaFunc: function(d) { return d.connMinutes/d.completed || 0; },
-                lineFunc: function(d) { return d.connMinutes/d.completed  || 0; },
-                maxGraphHeight: function(data) { return d3.max(data, function(d) { return d.connMinutes/d.completed; }); }
-                // maxGraphHeight: function(data) {return 100;}
-              }
-            ];
+            $scope.graphTypes = ['asr', 'acd'];
+
+            // $scope.graphTypes = [
+            //   {
+            //     name: 'ASR',
+            //     legend: 'ASR/ASRm',
+            //     areaFunc: function(d) { return 100*d.completed/d.originSeiz || 0; },
+            //     lineFunc: function(d) { return 100*d.completed/d.originAsrmSeiz || 0; },
+            //     maxGraphHeight: function(data) { return d3.max(data, function(d) { return 100*d.completed/d.originAsrmSeiz; }); }
+            //     // maxGraphHeight: function(data) {return 100;}
+            //   },
+            //   {
+            //     name: 'ACD',
+            //     legend: 'ACD',
+            //     areaFunc: function(d) { return d.connMinutes/d.completed || 0; },
+            //     lineFunc: function(d) { return d.connMinutes/d.completed  || 0; },
+            //     maxGraphHeight: function(data) { return d3.max(data, function(d) { return d.connMinutes/d.completed; }); }
+            //     // maxGraphHeight: function(data) {return 100;}
+            //   }
+            // ];
 
             $scope.currType = $scope.graphTypes[0];
 
-            $scope.toggleState = function(typeIdx) {
-              $scope.currType = $scope.graphTypes[typeIdx];
+            $scope.toggleState = function(type) {
+              $scope.currType = type;
+              // console.log($scope.currType);
+              // $scope.$digest();
             };
 
           });

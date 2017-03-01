@@ -5,7 +5,7 @@ app.directive('graph', function (d3Service, $window) {
         restrict: 'E',
         scope: {
           data: '=',
-          type: '='
+          type: '@'
         },
 
         link: function(scope, elem, attrs) {
@@ -22,6 +22,26 @@ app.directive('graph', function (d3Service, $window) {
             scope.$apply();
           };
 
+          scope.graphTypes =
+            {
+              asr: {
+                name: 'ASR',
+                legend: 'ASR/ASRm',
+                areaFunc: function(d) { return 100*d.completed/d.originSeiz || 0; },
+                lineFunc: function(d) { return 100*d.completed/d.originAsrmSeiz || 0; },
+                maxGraphHeight: function(data) { return d3.max(data, function(d) { return 100*d.completed/d.originAsrmSeiz; }); }
+              },
+              acd: {
+                name: 'ACD',
+                legend: 'ACD',
+                areaFunc: function(d) { return d.connMinutes/d.completed || 0; },
+                lineFunc: function(d) { return d.connMinutes/d.completed  || 0; },
+                maxGraphHeight: function(data) { return d3.max(data, function(d) { return d.connMinutes/d.completed || 0; }); }
+              }
+            };
+
+          scope.currFunctions = scope.graphTypes[ scope.type ];
+
           // Watch for resize event
           scope.$watch(function() {
             return angular.element($window)[0].innerWidth;
@@ -29,9 +49,17 @@ app.directive('graph', function (d3Service, $window) {
             scope.render(scope.data);
           });
 
+          scope.$watch( function(scope) {
+            return scope.type;
+          }, function() {
+            console.log('type changed');
+            scope.currFunctions = scope.graphTypes[ scope.type ];
+            scope.render(scope.data);
+          });
+
 
           scope.render = function(data) {
-            console.log('scope.type:', scope.type);
+            // console.log('scope.currFunctions:', scope.currFunctions);
 
             // remove all previous items before render
                 svg.selectAll('*').remove();
@@ -49,7 +77,7 @@ app.directive('graph', function (d3Service, $window) {
                   .domain([yesterday, now])
                   .rangeRound([0, width]),
                 y = d3.scaleLinear()
-                  .domain([0, scope.type.maxGraphHeight(data) ])
+                  .domain([0, scope.currFunctions.maxGraphHeight(data) ])
                   .rangeRound([height, 0]),
                 xAxis = d3.axisBottom()
                   .scale(x),
@@ -72,13 +100,13 @@ app.directive('graph', function (d3Service, $window) {
                 var area = d3.area()
                   .x(function(d) { return x(parseTime(d.batch_time)); })
                   .y0(height)
-                  .y1(function(d) { return y(scope.type.areaFunc(d)); });
+                  .y1(function(d) { return y(scope.currFunctions.areaFunc(d)); });
 
                 var lineData = d3.line()
                 // .curve(d3.curveCatmullRomOpen)
                 .x(function(d) { return x(parseTime(d.batch_time)); })
-                .y(function(d) { return y(scope.type.lineFunc(d)); });
-                // .y(scope.type.lineFunc);
+                .y(function(d) { return y(scope.currFunctions.lineFunc(d)); });
+                // .y(scope.currFunctions.lineFunc);
 
                 svg.attr('width', width + margin.left + margin.right)
                     .attr('height', height + margin.top + margin.bottom);
@@ -140,7 +168,7 @@ app.directive('graph', function (d3Service, $window) {
                   .attr("y", 6)
                   .attr("dy", "-4em")
                   .style("text-anchor", "end")
-                  .text(scope.type.legend);
+                  .text(scope.currFunctions.legend);
 
                 var totalLength = path.node().getTotalLength();
 
