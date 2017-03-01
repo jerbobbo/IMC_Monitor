@@ -24,19 +24,26 @@ app.directive('graph', function (d3Service, $window) {
 
           scope.graphTypes =
             {
-              asr: {
+              ASR: {
                 name: 'ASR',
                 legend: 'ASR/ASRm',
                 areaFunc: function(d) { return 100*d.completed/d.originSeiz || 0; },
                 lineFunc: function(d) { return 100*d.completed/d.originAsrmSeiz || 0; },
                 maxGraphHeight: function(data) { return d3.max(data, function(d) { return 100*d.completed/d.originAsrmSeiz; }); }
               },
-              acd: {
+              ACD: {
                 name: 'ACD',
                 legend: 'ACD',
                 areaFunc: function(d) { return d.connMinutes/d.completed || 0; },
                 lineFunc: function(d) { return d.connMinutes/d.completed  || 0; },
                 maxGraphHeight: function(data) { return d3.max(data, function(d) { return d.connMinutes/d.completed || 0; }); }
+              },
+              Seizures: {
+                name: 'Seiz/Min',
+                legend: 'Seiz/Min & Completed/Min',
+                lineFunc: function(d) { return d.originSeiz/5 || 0; },
+                areaFunc: function(d) { return d.completed/5  || 0; },
+                maxGraphHeight: function(data) { return d3.max(data, function(d) { return d.seizures/5 || 0; }); }
               }
             };
 
