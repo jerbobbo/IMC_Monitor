@@ -1,8 +1,8 @@
 
 <div class="ui container">
   <div class="ui breadcrumb">
-    <a ng-repeat-start="type in graphTypes" ng-click="toggleState(type)" class="{'active': currType == type} section">{{ type }}</a>
-    <div ng-repeat-end ng-show="idx !== graphTypes.length-1" class="divider"> / </div>
+    <a ng-repeat-start="type in graphTypes" ng-click="toggleState(type)" ng-class="{active: currType == type}">{{ type }}</a>
+    <div ng-repeat-end ng-show="$index !== graphTypes.length-1" class="divider"> / </div>
   </div>
 </div>
 <div class="ui container">

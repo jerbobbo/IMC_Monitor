@@ -2,6 +2,10 @@ svg {
   border: 1px solid #dedede;
 }
 
+.active a {
+  font-color: #000;
+}
+
 .axis path, .axis line {
   fill: none;
   stroke: #000;
