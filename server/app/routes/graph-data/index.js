@@ -35,7 +35,8 @@ router.get('/', ensureAuthenticated, function(req, res, next) {
       [Sequelize.fn('SUM', Sequelize.col('origin_seizures')), 'originSeiz'],
       [Sequelize.fn('SUM', Sequelize.col('term_seizures')), 'termSeiz'],
       [Sequelize.fn('SUM', Sequelize.col('completed')), 'completed'],
-      [Sequelize.fn('SUM', Sequelize.col('origin_asrm_seiz')), 'originAsrmSeiz']
+      [Sequelize.fn('SUM', Sequelize.col('origin_asrm_seiz')), 'originAsrmSeiz'],
+      [Sequelize.fn('SUM', Sequelize.col('conn_minutes')), 'connMinutes']
 
     ],
     where: {

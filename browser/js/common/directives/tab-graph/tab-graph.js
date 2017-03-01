@@ -28,6 +28,14 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
                 lineFunc: function(d) { return 100*d.completed/d.originAsrmSeiz || 0; },
                 maxGraphHeight: function(data) { return d3.max(data, function(d) { return 100*d.completed/d.originAsrmSeiz; }); }
                 // maxGraphHeight: function(data) {return 100;}
+              },
+              {
+                name: 'acd',
+                legend: 'ACD',
+                areaFunc: function(d) { return d.connMinutes/d.completed || 0; },
+                lineFunc: function(d) { return d.connMinutes/d.completed  || 0; },
+                maxGraphHeight: function(data) { return d3.max(data, function(d) { return d.connMinutes/d.completed; }); }
+                // maxGraphHeight: function(data) {return 100;}
               }
             ];
 
