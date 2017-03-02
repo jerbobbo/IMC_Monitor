@@ -132,7 +132,7 @@ app.directive('graph', function (d3Service, $window) {
                     .attr('height', height + margin.top + margin.bottom);
 
                 var t = d3.transition()
-                  .duration(1000)
+                  .duration(700)
                   .ease(d3.easeLinear);
 
                 var g = svg.append('g')
@@ -198,7 +198,7 @@ app.directive('graph', function (d3Service, $window) {
                 .attr("stroke-dasharray", totalLength + " " + totalLength)
                 .attr("stroke-dashoffset", totalLength)
                 .transition()
-                  .duration(1000)
+                  .duration(700)
                   .ease(d3.easeLinear)
                   .attr("stroke-dashoffset", 0);
 
