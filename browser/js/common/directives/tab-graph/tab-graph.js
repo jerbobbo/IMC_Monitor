@@ -49,6 +49,10 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
               // $scope.$digest();
             };
 
+            $scope.isCurrentType = function(type) {
+              return $scope.currType == type;
+            };
+
           });
 
 

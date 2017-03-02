@@ -2,8 +2,16 @@ svg {
   border: 1px solid #dedede;
 }
 
-.active a {
-  font-color: #000;
+.active {
+  color: #e62e00;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.units {
+  color: #000;
 }
 
 .axis path, .axis line {

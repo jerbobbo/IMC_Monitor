@@ -26,30 +26,36 @@ app.directive('graph', function (d3Service, $window) {
             {
               ASR: {
                 name: 'ASR',
-                legend: 'ASR/ASRm',
+                areaAbbr: 'ASR',
+                lineAbbr: 'ASRm',
+                yAxis: '%',
                 areaFunc: function(d) { return 100*d.completed/d.originSeiz || 0; },
                 lineFunc: function(d) { return 100*d.completed/d.originAsrmSeiz || 0; },
                 maxGraphHeight: function(data) { return d3.max(data, function(d) { return 100*d.completed/d.originAsrmSeiz; }); }
               },
               ACD: {
                 name: 'ACD',
-                legend: 'ACD',
+                areaAbbr: 'ACD',
+                yAxis: 'Minutes',
                 areaFunc: function(d) { return d.connMinutes/d.completed || 0; },
                 lineFunc: function(d) { return d.connMinutes/d.completed  || 0; },
                 maxGraphHeight: function(data) { return d3.max(data, function(d) { return d.connMinutes/d.completed || 0; }); }
               },
               Seizures: {
                 name: 'Seiz/Min',
-                legend: 'Seiz/Min & Completed/Min',
+                areaAbbr: 'Completed/Min',
+                lineAbbr: 'Seiz/Min',
+                yAxis: 'Seiz/Min',
                 lineFunc: function(d) { return d.originSeiz/5 || 0; },
                 areaFunc: function(d) { return d.completed/5  || 0; },
                 maxGraphHeight: function(data) { return d3.max(data, function(d) { return d.originSeiz/5 || 0; }); }
               },
               NoCircuit: {
                 name: 'No Circuit',
-                legend: 'No Circuit / FSR',
+                areaAbbr: 'No Circuit',
+                yAxis: '%',
                 lineFunc: function(d) { return 100*d.originNoCirc/d.originSeiz || 0; },
-                areaFunc: function(d) { return 100*d.originFsrSeiz/d.originSeiz || 0; },
+                areaFunc: function(d) { return 100*d.originNoCirc/d.originSeiz || 0; },
                 maxGraphHeight: function(data) { return d3.max(data, function(d) { return 100*d.originNoCirc/d.originSeiz || 0; }); }
               }
             };
@@ -181,8 +187,10 @@ app.directive('graph', function (d3Service, $window) {
                   .attr("transform", "rotate(90)")
                   .attr("y", 6)
                   .attr("dy", "-4em")
+                  .attr('class', 'units')
                   .style("text-anchor", "end")
-                  .text(scope.currFunctions.legend);
+                  .text("testing");
+                  // .text(scope.currFunctions.yAxis);
 
                 var totalLength = path.node().getTotalLength();
 
