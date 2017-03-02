@@ -20,7 +20,7 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
           .then(function(results) {
             $scope.data = results;
 
-            $scope.graphTypes = ['ASR', 'ACD', 'Seizures'];
+            $scope.graphTypes = ['ASR', 'ACD', 'Seizures', 'NoCircuit'];
 
             // $scope.graphTypes = [
             //   {

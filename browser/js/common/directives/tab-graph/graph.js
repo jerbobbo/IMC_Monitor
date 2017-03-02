@@ -43,7 +43,14 @@ app.directive('graph', function (d3Service, $window) {
                 legend: 'Seiz/Min & Completed/Min',
                 lineFunc: function(d) { return d.originSeiz/5 || 0; },
                 areaFunc: function(d) { return d.completed/5  || 0; },
-                maxGraphHeight: function(data) { return d3.max(data, function(d) { return d.seizures/5 || 0; }); }
+                maxGraphHeight: function(data) { return d3.max(data, function(d) { return d.originSeiz/5 || 0; }); }
+              },
+              NoCircuit: {
+                name: 'No Circuit',
+                legend: 'No Circuit / FSR',
+                lineFunc: function(d) { return 100*d.originNoCirc/d.originSeiz || 0; },
+                areaFunc: function(d) { return 100*d.originFsrSeiz/d.originSeiz || 0; },
+                maxGraphHeight: function(data) { return d3.max(data, function(d) { return 100*d.originNoCirc/d.originSeiz || 0; }); }
               }
             };
 
