@@ -13,7 +13,7 @@ var ENABLED_AUTH_STRATEGIES = [
 
 var sessionStore = new MySQLStore({
   host: 'localhost',
-  port: 3306,
+  port: dbVariables.DATABASE_PORT,
   user: dbVariables.DATABASE_USER,
   password: dbVariables.DATABASE_PASS,
   database: dbVariables.DATABASE_URI
