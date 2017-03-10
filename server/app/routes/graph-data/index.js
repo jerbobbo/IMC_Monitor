@@ -22,8 +22,9 @@ router.get('/', ensureAuthenticated, function(req, res, next) {
   var now = new Date();
   // now.setHours(now.getHours() + 4);
   var yesterday = new Date();
-  // yesterday.setHours(yesterday.getHours() + 4);
+  yesterday.setHours(yesterday.getHours() - 5);
   yesterday.setDate(yesterday.getDate() - 1);
+  // yesterday.setDate(yesterday.getDate() - 1);
   var ageRange = [yesterday, now];
   var countryCode = req.query.country || '%';
   var originMemberId = req.query.originMember || '%';

@@ -1,12 +1,14 @@
 //will be tab-graph in html tag
-app.directive('graph', function (d3Service, $window) {
+app.directive("graph", function (d3Service, $window) {
 
     return {
-        restrict: 'E',
+        restrict: "E",
         scope: {
-          data: '=',
-          type: '@'
+          data: "=",
+          type: "@",
+          index: "@"
         },
+        templateUrl: "js/common/directives/graph/graph.html",
 
         link: function(scope, elem, attrs) {
           console.log(scope);
@@ -15,48 +17,93 @@ app.directive('graph', function (d3Service, $window) {
             width = 600 - margin.left - margin.right,
             height = 250 - margin.top - margin.bottom;
 
-            var svg = d3.select(elem[0])
-              .append("svg");
+            var selector = "#" + scope.index;
+            console.log("selector", selector);
+            console.log("elem:", elem);
+            // var svg = d3.select(elem[0].children[0].children[0].children[0])
+            //   .append("svg");
+
+            // var statistics = d3.select(elem[0].children[0].children[0].children[0])
+            //   .append("div");
+
+            // var svg = d3.select(elem[0])
+            //   .insert("svg");
+
+            var svg = d3.select(selector)
+              .insert("svg");
+
+            // var statistics = d3.select(elem[0])
+            //   .append("div");
+            //
+            // var areaLabel = statistics
+            //   .append("div")
+            //     .attr("class", "ui label")
+            //     .attr("id", "area-label-" + scope.index)
+            //   .append("div")
+            //     .attr("class", "detail")
+            //     .attr("id", "area-stats-" + scope.index);
+
+            // var areaStats = areaLabel
+            //   .append("div")
+            //     .attr("class", "detail");
 
             window.onresize = function() {
             scope.$apply();
           };
 
+          function round(num) {
+            return parseFloat(Math.round(num * 100) / 100).toFixed(1);
+          }
+
           scope.graphTypes =
             {
               ASR: {
-                name: 'ASR',
-                areaAbbr: 'ASR',
-                lineAbbr: 'ASRm',
-                yAxis: '%',
+                name: "ASR",
+                areaAbbr: "ASR",
+                lineAbbr: "ASRm",
+                yAxis: "%",
                 areaFunc: function(d) { return 100*d.completed/d.originSeiz || 0; },
                 lineFunc: function(d) { return 100*d.completed/d.originAsrmSeiz || 0; },
-                maxGraphHeight: function(data) { return d3.max(data, function(d) { return 100*d.completed/d.originAsrmSeiz; }); }
+                maxGraphHeight: function(data) { return d3.max(data, function(d) { return 100*d.completed/d.originAsrmSeiz; }); },
+                avgAreaFunc: function(data) { return round( d3.mean(data, function(d) { return 100*d.completed/d.originSeiz || 0; }) ); },
+                avgLineFunc: function(data) { return round( d3.mean(data, function(d) { return 100*d.completed/d.originAsrmSeiz || 0; }) ); },
+                currAreaFunc: function(data) {
+                  var lastFullReading = data[ data.length-2 ];
+                  return round( 100*lastFullReading.completed/lastFullReading.originSeiz || 0 );
+                },
+                currLineFunc: function(data) {
+                  var lastFullReading = data[ data.length-2 ];
+                  return round( 100*lastFullReading.completed/lastFullReading.originAsrmSeiz || 0 );
+                }
               },
               ACD: {
-                name: 'ACD',
-                areaAbbr: 'ACD',
-                yAxis: 'Minutes',
+                name: "ACD",
+                areaAbbr: "ACD",
+                yAxis: "Minutes",
                 areaFunc: function(d) { return d.connMinutes/d.completed || 0; },
                 lineFunc: function(d) { return d.connMinutes/d.completed  || 0; },
-                maxGraphHeight: function(data) { return d3.max(data, function(d) { return d.connMinutes/d.completed || 0; }); }
+                maxGraphHeight: function(data) { return d3.max(data, function(d) { return d.connMinutes/d.completed || 0; }); },
+                avgAreaFunc: function(data) { return round( d3.mean(data, function(d) { return d.connMinutes/d.completed || 0; }) ); }
+
               },
               Seizures: {
-                name: 'Seiz/Min',
-                areaAbbr: 'Completed/Min',
-                lineAbbr: 'Seiz/Min',
-                yAxis: 'Seiz/Min',
+                name: "Seiz/Min",
+                areaAbbr: "Completed/Min",
+                lineAbbr: "Seiz/Min",
+                yAxis: "Seiz/Min",
                 lineFunc: function(d) { return d.originSeiz/5 || 0; },
                 areaFunc: function(d) { return d.completed/5  || 0; },
-                maxGraphHeight: function(data) { return d3.max(data, function(d) { return d.originSeiz/5 || 0; }); }
+                maxGraphHeight: function(data) { return d3.max(data, function(d) { return d.originSeiz/5 || 0; }); },
+                avgAreaFunc: function(data) { return round( d3.mean(data, function(d) { return d.completed/5  || 0; }) ); }
               },
               NoCircuit: {
-                name: 'No Circuit',
-                areaAbbr: 'No Circuit',
-                yAxis: '%',
+                name: "No Circuit",
+                areaAbbr: "No Circuit",
+                yAxis: "%",
                 lineFunc: function(d) { return 100*d.originNoCirc/d.originSeiz || 0; },
                 areaFunc: function(d) { return 100*d.originNoCirc/d.originSeiz || 0; },
-                maxGraphHeight: function(data) { return d3.max(data, function(d) { return 100*d.originNoCirc/d.originSeiz || 0; }); }
+                maxGraphHeight: function(data) { return d3.max(data, function(d) { return 100*d.originNoCirc/d.originSeiz || 0; }); },
+                avgAreaFunc: function(data) { return round( d3.mean(data, function(d) { return 100*d.originNoCirc/d.originSeiz || 0; }) ); }
               }
             };
 
@@ -72,19 +119,19 @@ app.directive('graph', function (d3Service, $window) {
           scope.$watch( function(scope) {
             return scope.type;
           }, function() {
-            console.log('type changed');
+            console.log("type changed");
             scope.currFunctions = scope.graphTypes[ scope.type ];
             scope.render(scope.data);
           });
 
 
           scope.render = function(data) {
-            // console.log('scope.currFunctions:', scope.currFunctions);
+            // console.log("scope.currFunctions:", scope.currFunctions);
 
             // remove all previous items before render
-                svg.selectAll('*').remove();
+                svg.selectAll("*").remove();
 
-                // If we don't pass any data, return out of the element
+                // If we don"t pass any data, return out of the element
                 if (!data) return;
 
                 var parseTime = d3.timeParse("%Y-%m-%dT%H:%M:%S.%LZ");
@@ -92,6 +139,7 @@ app.directive('graph', function (d3Service, $window) {
                 yesterday.setDate(yesterday.getDate() - 1);
                 var today = new Date();
                 var now = convertDateToUTC(today);
+                now.setMinutes(Math.floor(now.getMinutes()/5)*5 - 10);
 
                 var x = d3.scaleTime()
                   .domain([yesterday, now])
@@ -128,15 +176,17 @@ app.directive('graph', function (d3Service, $window) {
                 .y(function(d) { return y(scope.currFunctions.lineFunc(d)); });
                 // .y(scope.currFunctions.lineFunc);
 
-                svg.attr('width', width + margin.left + margin.right)
-                    .attr('height', height + margin.top + margin.bottom);
+                var areaAvg = scope.currFunctions.avgAreaFunc(data) || "NA";
+
+                svg.attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom);
 
                 var t = d3.transition()
                   .duration(700)
                   .ease(d3.easeLinear);
 
-                var g = svg.append('g')
-                    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+                var g = svg.append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
                 // add the X gridlines
                 g.append("g")
@@ -156,41 +206,50 @@ app.directive('graph', function (d3Service, $window) {
                 );
 
 
-                g.append('path')
+                g.append("path")
                   .datum(data)
-                  .attr('d', area)
-                    .style('fill', '#fff')
-                  .attr('class', 'area')
+                  .attr("d", area)
+                    .style("fill", "#fff")
+                  .attr("class", "area")
                   .transition(t)
-                    .style('fill', '#3FBF83');
+                    .style("fill", "#3FBF83");
                 //
                 // var line = d3.line()
                 //   .curve(d3.curveCatmullRomOpen)
                 //   .x(function(d, i) { return x(i); })
                 //   .y(function(d) {return y(d); });
 
-                var path = g.append('path')
-                  .attr('d', lineData(data))
-                  .attr('stroke', '#333')
-                  .attr('stroke-width', '1')
-                  .attr('fill', 'none');
+                var path = g.append("path")
+                  .attr("d", lineData(data))
+                  .attr("stroke", "#333")
+                  .attr("stroke-width", "1")
+                  .attr("fill", "none");
 
-                g.append('g')
-                  .attr('class', 'x axis')
-                  .attr('transform', 'translate(0,' + height + ')')
+                g.append("g")
+                  .attr("class", "x axis")
+                  .attr("transform", "translate(0," + height + ")")
                   .call(xAxis);
 
-                g.append('g')
-                  .attr('class', 'y axis')
+                g.append("g")
+                  .attr("class", "y axis")
                   .call(yAxis)
                 .append("text")
                   .attr("transform", "rotate(90)")
                   .attr("y", 6)
                   .attr("dy", "-4em")
-                  .attr('class', 'units')
+                  .attr("class", "units")
                   .style("text-anchor", "end")
                   .text("testing");
                   // .text(scope.currFunctions.yAxis);
+
+                  // d3.select("#area-label-" + scope.index)
+                  //   .text(scope.currFunctions.areaAbbr);
+                  //
+                  // // areaStats
+                  // //   .text(areaAvg);
+                  //
+                  // d3.select("#area-stats-" + scope.index)
+                  //   .text(areaAvg);
 
                 var totalLength = path.node().getTotalLength();
 

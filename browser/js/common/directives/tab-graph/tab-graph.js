@@ -6,7 +6,8 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
         scope: {
           where: '@',
           groupBy: '@',
-          name: '@'
+          name: '@',
+          index: '@'
         },
         templateUrl: 'js/common/directives/tab-graph/tab-graph.html',
 
