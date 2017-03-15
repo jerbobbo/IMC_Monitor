@@ -64,7 +64,7 @@ app.directive("graph", function (d3Service, $window) {
                 yAxis: "%",
                 areaFunc: function(d) { return 100*d.completed/d.originSeiz || 0; },
                 lineFunc: function(d) { return 100*d.completed/d.originAsrmSeiz || 0; },
-                maxGraphHeight: function(data) { return d3.max(data, function(d) { return 100*d.completed/d.originAsrmSeiz; }); },
+                maxGraphHeight: function(data) { return d3.max(data, function(d) { return 100*d.completed/d.originAsrmSeiz || 0; }); },
                 avgAreaFunc: function(data) { return round( d3.mean(data, function(d) { return 100*d.completed/d.originSeiz || 0; }) ); },
                 avgLineFunc: function(data) { return round( d3.mean(data, function(d) { return 100*d.completed/d.originAsrmSeiz || 0; }) ); },
                 currAreaFunc: function(data) {
@@ -83,7 +83,11 @@ app.directive("graph", function (d3Service, $window) {
                 areaFunc: function(d) { return d.connMinutes/d.completed || 0; },
                 lineFunc: function(d) { return d.connMinutes/d.completed  || 0; },
                 maxGraphHeight: function(data) { return d3.max(data, function(d) { return d.connMinutes/d.completed || 0; }); },
-                avgAreaFunc: function(data) { return round( d3.mean(data, function(d) { return d.connMinutes/d.completed || 0; }) ); }
+                avgAreaFunc: function(data) { return round( d3.mean(data, function(d) { return d.connMinutes/d.completed || 0; }) ); },
+                currAreaFunc: function(data) {
+                  var lastFullReading = data[ data.length-2 ];
+                  return round( lastFullReading.connMinutes/lastFullReading.completed || 0 );
+                }
 
               },
               Seizures: {
@@ -94,7 +98,16 @@ app.directive("graph", function (d3Service, $window) {
                 lineFunc: function(d) { return d.originSeiz/5 || 0; },
                 areaFunc: function(d) { return d.completed/5  || 0; },
                 maxGraphHeight: function(data) { return d3.max(data, function(d) { return d.originSeiz/5 || 0; }); },
-                avgAreaFunc: function(data) { return round( d3.mean(data, function(d) { return d.completed/5  || 0; }) ); }
+                avgAreaFunc: function(data) { return round( d3.mean(data, function(d) { return d.completed/5  || 0; }) ); },
+                avgLineFunc: function(data) { return round( d3.mean(data, function(d) { return d.originSeiz/5  || 0; }) ); },
+                currAreaFunc: function(data) {
+                  var lastFullReading = data[ data.length-2 ];
+                  return round( lastFullReading.completed/5 || 0 );
+                },
+                currLineFunc: function(data) {
+                  var lastFullReading = data[ data.length-2 ];
+                  return round( lastFullReading.originSeiz/5 || 0 );
+                }
               },
               NoCircuit: {
                 name: "No Circuit",
