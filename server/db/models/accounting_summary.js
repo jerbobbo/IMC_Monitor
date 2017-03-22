@@ -4,8 +4,9 @@
 var path = require('path');
 var db = require(path.join(__dirname, '../')).db;
 var Sequelize = require('sequelize');
+var CountryPrefix = require(path.join(__dirname, 'country_prefix'));
 
-var accountingSummary = db.define('accounting_summary', {
+var AccountingSummary = db.define('accounting_summary', {
     batch_time: {
       type: Sequelize.TIME,
       allowNull: false,
@@ -186,4 +187,6 @@ var accountingSummary = db.define('accounting_summary', {
     timestamps: false
   });
 
-  module.exports = accountingSummary;
+  AccountingSummary.belongsTo(CountryPrefix, {foreignKey: 'country_code'} );
+
+  module.exports = AccountingSummary;

@@ -2,6 +2,7 @@
 var path = require('path');
 var router = require('express').Router();
 var accountingSummaryModel = require(path.join(__dirname, '../../../db/models/accounting_summary'));
+var countryPrefixModel = require(path.join(__dirname, '../../../db/models/country_prefix'));
 var Sequelize = require('sequelize');
 
 var ensureAuthenticated = function (req, res, next) {
@@ -26,7 +27,7 @@ router.get('/', ensureAuthenticated, function(req, res, next) {
   yesterday.setDate(yesterday.getDate() - 1);
   // yesterday.setDate(yesterday.getDate() - 1);
   var ageRange = [yesterday, now];
-  var countryCode = req.query.country || '%';
+  var countryName = req.query.country || '%';
   var originMemberId = req.query.originMember || '%';
 
   accountingSummaryModel.findAll({
@@ -62,12 +63,17 @@ router.get('/', ensureAuthenticated, function(req, res, next) {
 
 
     ],
+    include: [{
+      model: countryPrefixModel,
+      attributes: [],
+      where: { country: {
+        $like: countryName
+      }
+     }
+    }],
     where: {
       batch_time: {
         $between: ageRange
-      },
-      country_code: {
-        $like: countryCode
       }
     },
     group: groupBy
