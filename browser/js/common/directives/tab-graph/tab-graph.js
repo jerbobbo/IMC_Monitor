@@ -5,7 +5,8 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
         restrict: 'E',
         scope: {
           where: '@',
-          groupBy: '@',
+          graphTitle: '@',
+          period: '@',
           name: '@',
           index: '@'
         },
@@ -16,12 +17,14 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
           // console.log('groupBy:', $scope.groupBy);
           // console.log('scope:', $scope);
 
-          var params = $scope.where + '&groupBy=' + $scope.groupBy;
+            //for when period is implemented:
+          // var params = $scope.where + '&period=' + $scope.period;
+          var params = $scope.where;
           GraphFactory.getData(params)
           .then(function(results) {
             $scope.data = results;
 
-            $scope.graphTypes = ['ASR', 'ACD', 'Seizures', 'NoCircuit'];
+            $scope.graphTypes = ['ASR', 'ACD', 'Seizures', 'AnswerDelay', 'NoCircuit', 'Normal', 'Failure'];
 
             // $scope.graphTypes = [
             //   {

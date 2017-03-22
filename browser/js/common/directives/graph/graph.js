@@ -88,7 +88,19 @@ app.directive("graph", function (d3Service, $window) {
                   var lastFullReading = data[ data.length-2 ];
                   return round( lastFullReading.connMinutes/lastFullReading.completed || 0 );
                 }
-
+              },
+              AnswerDelay: {
+                name: "Answer Delay",
+                areaAbbr: "Answer Delay",
+                yAxis: "Seconds",
+                areaFunc: function(d) { return d.originAnsDel/d.originSeiz || 0; },
+                lineFunc: function(d) { return d.originAnsDel/d.originSeiz  || 0; },
+                maxGraphHeight: function(data) { return d3.max(data, function(d) { return d.originAnsDel/d.originSeiz || 0; }); },
+                avgAreaFunc: function(data) { return round( d3.mean(data, function(d) { return d.originAnsDel/d.originSeiz || 0; }) ); },
+                currAreaFunc: function(data) {
+                  var lastFullReading = data[ data.length-2 ];
+                  return round( lastFullReading.originAnsDel/lastFullReading.originSeiz || 0 );
+                }
               },
               Seizures: {
                 name: "Seiz/Min",
@@ -116,7 +128,37 @@ app.directive("graph", function (d3Service, $window) {
                 lineFunc: function(d) { return 100*d.originNoCirc/d.originSeiz || 0; },
                 areaFunc: function(d) { return 100*d.originNoCirc/d.originSeiz || 0; },
                 maxGraphHeight: function(data) { return d3.max(data, function(d) { return 100*d.originNoCirc/d.originSeiz || 0; }); },
-                avgAreaFunc: function(data) { return round( d3.mean(data, function(d) { return 100*d.originNoCirc/d.originSeiz || 0; }) ); }
+                avgAreaFunc: function(data) { return round( d3.mean(data, function(d) { return 100*d.originNoCirc/d.originSeiz || 0; }) ); },
+                currAreaFunc: function(data) {
+                  var lastFullReading = data[ data.length-2 ];
+                  return round( 100*lastFullReading.originNoCirc/lastFullReading.originSeiz || 0 );
+                }
+              },
+              Normal: {
+                name: "Normal Disc",
+                areaAbbr: "Normal Disc",
+                yAxis: "%",
+                lineFunc: function(d) { return 100*d.originNormalDisc/d.originSeiz || 0; },
+                areaFunc: function(d) { return 100*d.originNormalDisc/d.originSeiz || 0; },
+                maxGraphHeight: function(data) { return d3.max(data, function(d) { return 100*d.originNormalDisc/d.originSeiz || 0; }); },
+                avgAreaFunc: function(data) { return round( d3.mean(data, function(d) { return 100*d.originNormalDisc/d.originSeiz || 0; }) ); },
+                currAreaFunc: function(data) {
+                  var lastFullReading = data[ data.length-2 ];
+                  return round( 100*lastFullReading.originNormalDisc/lastFullReading.originSeiz || 0 );
+                }
+              },
+              Failure: {
+                name: "Failure Disc",
+                areaAbbr: "Failure Disc",
+                yAxis: "%",
+                lineFunc: function(d) { return 100*d.originFailDisc/d.originSeiz || 0; },
+                areaFunc: function(d) { return 100*d.originFailDisc/d.originSeiz || 0; },
+                maxGraphHeight: function(data) { return d3.max(data, function(d) { return 100*d.originFailDisc/d.originSeiz || 0; }); },
+                avgAreaFunc: function(data) { return round( d3.mean(data, function(d) { return 100*d.originFailDisc/d.originSeiz || 0; }) ); },
+                currAreaFunc: function(data) {
+                  var lastFullReading = data[ data.length-2 ];
+                  return round( 100*lastFullReading.originFailDisc/lastFullReading.originSeiz || 0 );
+                }
               }
             };
 

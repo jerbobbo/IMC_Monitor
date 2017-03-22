@@ -1,5 +1,8 @@
 
 <div class="ui container">
+  <div class="ui small header">
+    {{ graphTitle }}
+  </div>
   <div class="ui breadcrumb">
     <a ng-repeat-start="type in graphTypes" ng-click="toggleState(type)" class="pointer" ng-hide="isCurrentType(type)">{{ type }}</a>
     <span class="active" ng-show="isCurrentType(type)">{{ type }}</span>
