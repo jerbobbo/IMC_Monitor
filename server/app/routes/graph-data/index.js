@@ -15,9 +15,6 @@ var ensureAuthenticated = function (req, res, next) {
 
 router.get('/', ensureAuthenticated, function(req, res, next) {
   console.log(req.query.country);
-  var groupBy = req.query.groupBy.split(',');
-  console.log('groupBy: ', groupBy);
-  // var ageRange = req.body.ageRange;
   console.log('you got here');
   // var groupBy = ['batch_time'];
   var now = new Date();
@@ -28,7 +25,10 @@ router.get('/', ensureAuthenticated, function(req, res, next) {
   // yesterday.setDate(yesterday.getDate() - 1);
   var ageRange = [yesterday, now];
   var countryName = req.query.country || '%';
-  var originMemberId = req.query.originMember || '%';
+  var originMemberId = req.query.originMemberId || '%';
+  var termMemberId = req.query.termMemberId || '%';
+  var routeCodeId = req.query.routeCodeId || '%';
+  var gwId = req.query.gwId || '%';
 
   accountingSummaryModel.findAll({
     attributes: [
@@ -66,17 +66,30 @@ router.get('/', ensureAuthenticated, function(req, res, next) {
     include: [{
       model: countryPrefixModel,
       attributes: [],
-      where: { country: {
-        $like: countryName
-      }
+      where: {
+        country: {
+          $like: countryName
+        }
      }
     }],
     where: {
       batch_time: {
         $between: ageRange
+      },
+      route_code_id: {
+        $like: routeCodeId
+      },
+      origin_member_id: {
+        $like: originMemberId
+      },
+      term_member_id: {
+        $like: termMemberId
+      },
+      gw_id: {
+        $like: gwId
       }
     },
-    group: groupBy
+    group: 'batch_time'
   })
   .then(function(data) {
     // console.log('graph data:', data);

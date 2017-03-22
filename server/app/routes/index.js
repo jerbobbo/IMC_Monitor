@@ -4,6 +4,9 @@ module.exports = router;
 
 router.use('/members', require('./members'));
 router.use('/graph-data', require('./graph-data'));
+router.use('/gateways', require('./gateways'));
+router.use('/countries', require('./countries'));
+router.use('/region-names', require('./region-names'));
 
 // Make sure this is after all of
 // the registered routes!

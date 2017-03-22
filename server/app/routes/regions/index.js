@@ -1,8 +1,9 @@
 'use strict';
 var path = require('path');
 var router = require('express').Router();
-var accountingMembersNameModel = require(path.join(__dirname, '../../../db/models/accounting_members_name'));
+var regionModel = require(path.join(__dirname, '../../../db/models/accounting_region'));
 var Sequelize = require('sequelize');
+var countryPrefixModel = require(path.join(__dirname, '../../../db/models/country_prefix'));
 
 var ensureAuthenticated = function (req, res, next) {
     if (req.isAuthenticated()) {
@@ -13,7 +14,13 @@ var ensureAuthenticated = function (req, res, next) {
 };
 
 router.get('/', ensureAuthenticated, function(req, res, next) {
-  accountingMembersNameModel.findAll({})
+  regionModel.findAll({
+    include: [{
+      model: countryPrefixModel,
+      attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('country'))]],
+      where: { prefix: Sequelize.col('regionmodel.prefix') }
+    }]
+  })
   .then(function(data) {
     res.status(200).json(data);
   }, next);
