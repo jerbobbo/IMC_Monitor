@@ -13,21 +13,12 @@ app.directive("graph", function (d3Service, $window) {
         link: function(scope, elem, attrs) {
           console.log(scope);
           d3Service.d3().then(function(d3) {
-            var margin = {top: 20, right: 20, bottom: 30, left: 50},
-            width = 600 - margin.left - margin.right,
-            height = 250 - margin.top - margin.bottom;
+            // var margin = {top: 20, right: 20, bottom: 30, left: 50},
+            // width = 500 - margin.left - margin.right,
+            // height = 250 - margin.top - margin.bottom;
 
             var selector = "#" + scope.index;
-            console.log("selector", selector);
-            console.log("elem:", elem);
-            // var svg = d3.select(elem[0].children[0].children[0].children[0])
-            //   .append("svg");
 
-            // var statistics = d3.select(elem[0].children[0].children[0].children[0])
-            //   .append("div");
-
-            // var svg = d3.select(elem[0])
-            //   .insert("svg");
 
             var svg = d3.select(selector)
               .insert("svg");
@@ -62,16 +53,16 @@ app.directive("graph", function (d3Service, $window) {
                 areaAbbr: "ASR",
                 lineAbbr: "ASRm",
                 yAxis: "%",
-                areaFunc: function(d) { return 100*d.completed/d.originSeiz || 0; },
-                lineFunc: function(d) { return 100*d.completed/d.originAsrmSeiz || 0; },
-                maxGraphHeight: function(data) { return d3.max(data, function(d) { return 100*d.completed/d.originAsrmSeiz || 0; }); },
-                avgAreaFunc: function(data) { return round( d3.mean(data, function(d) { return 100*d.completed/d.originSeiz || 0; }) ); },
-                avgLineFunc: function(data) { return round( d3.mean(data, function(d) { return 100*d.completed/d.originAsrmSeiz || 0; }) ); },
-                currAreaFunc: function(data) {
+                areaFunc: d => 100*d.completed/d.originSeiz || 0,
+                lineFunc: d => 100*d.completed/d.originAsrmSeiz || 0,
+                maxGraphHeight: data => d3.max(data, d => 100*d.completed/d.originAsrmSeiz || 0),
+                avgAreaFunc: data => round( d3.mean(data, d => 100*d.completed/d.originSeiz || 0) ),
+                avgLineFunc: data => round( d3.mean(data, d => 100*d.completed/d.originAsrmSeiz || 0) ),
+                currAreaFunc: data => {
                   var lastFullReading = data[ data.length-2 ];
                   return round( 100*lastFullReading.completed/lastFullReading.originSeiz || 0 );
                 },
-                currLineFunc: function(data) {
+                currLineFunc: data => {
                   var lastFullReading = data[ data.length-2 ];
                   return round( 100*lastFullReading.completed/lastFullReading.originAsrmSeiz || 0 );
                 }
@@ -182,6 +173,18 @@ app.directive("graph", function (d3Service, $window) {
 
           scope.render = function(data) {
             // console.log("scope.currFunctions:", scope.currFunctions);
+            var divElement = d3.select(selector).node();
+            console.log('element', divElement.getBoundingClientRect());
+            var totalWidth = divElement.getBoundingClientRect().width;
+            var totalHeight = totalWidth / 2.5;
+            var margin = {
+              top: totalHeight * 0.03,
+              bottom: totalHeight * 0.1,
+              left: totalWidth * 0.1,
+              right: totalWidth * 0.05
+            };
+            var width = totalWidth - margin.left - margin.right;
+            var height = totalHeight - margin.top - margin.bottom;
 
             // remove all previous items before render
                 svg.selectAll("*").remove();

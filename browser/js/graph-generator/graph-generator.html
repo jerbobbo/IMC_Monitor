@@ -16,11 +16,11 @@
 <div class="ui grid">
   <div class="two wide column">
   </div>
-  <div class="six wide column">
+  <div class="three wide column">
     <form class="ui form">
       <h4 class="ui dividing header">Graph Generator</h4>
 
-      <div class="two fields">
+
         <div class="field">
           <label>Country</label>
           <select class="ui fluid search selection dropdown" ng-model="currCountry" ng-change="getRegionList(currCountry)">
@@ -35,9 +35,8 @@
             <option ng-repeat="region in currRegionList" ng-value="{{ region }}">{{ region.region_name }}</option>
           </select>
         </div>
-      </div>
 
-      <div class="two fields">
+
         <div class="field">
           <label>Originating Client</label>
           <select class="ui fluid search selection dropdown" ng-model="currOrigin">
@@ -53,19 +52,16 @@
           </select>
         </div>
 
-      </div>
 
-      <div class="two fields">
         <div class="field">
           <label>Gateway</label>
           <select class="ui fluid dropdown" ng-model="currGw">
             <option class="default text" value="">Select Address</option>
             <option ng-repeat="gateway in gatewayList" ng-value="{{ gateway }}">{{ gateway.address }}</option>
           </select>
-        </div>
 
       </div>
-      <div class="ui button" tabindex="0" ng-click="addGraph()">Add Graph</div>
+      <div class="ui button" type="submit" tabindex="0" ng-click="addGraph()">Add Graph</div>
 
     </form>
   </div>
@@ -79,8 +75,5 @@
     </div>
 
   </div>
+
 </div>
-<script>
-$('.ui.dropdown')
-  .dropdown();
-</script>

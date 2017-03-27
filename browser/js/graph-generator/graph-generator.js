@@ -2,28 +2,20 @@ app.factory('GraphAddFactory', function($http) {
   return {
     getGateways: function() {
       return $http.get('/api/gateways')
-      .then(function(response) {
-        return response.data;
-      });
+      .then(response => response.data);
     },
     getCountries: function() {
       return $http.get('/api/countries')
-      .then(function(response) {
-        return response.data;
-      });
+      .then(response => response.data);
     },
     getMembers: function() {
       return $http.get('/api/members')
-      .then(function(response) {
-        return response.data;
-      });
+      .then(response => response.data);
     },
     getRegionNames: function(countryName) {
       if (!countryName) countryName = '';
       return $http.get('/api/region-names/' + countryName)
-      .then(function(response) {
-        return response.data;
-      });
+      .then(response => response.data);
     }
   };
 });
@@ -46,6 +38,13 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
   $scope.addToList = function(graphParams) {
     $scope.currGraphList.push(graphParams);
   };
+
+  function clearCurrents() {
+    ['currCountry', 'currRegion', 'currOrigin', 'currTerm', 'currGw']
+    .forEach( (field) => {
+      $scope[field] = null;
+    });
+  }
 
   $scope.addGraph = function() {
     var whereClause = "";
@@ -77,6 +76,11 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
     };
 
     $scope.currGraphList.push(newGraphParams);
+    // $('form').form('reset');
+    // $('form').form('clear');
+    // $('select').dropdown('set value', '');
+    $('select').dropdown('clear');
+    clearCurrents();
   };
 
   $scope.noCurrCountry = function() {
@@ -94,23 +98,16 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
   })
   .then(function(_result) {
     $scope.memberList = _result;
+    $('.ui.dropdown').dropdown();
     $scope.addToList(testGraph);
   });
-
-
-
-
-
-
-
-
 });
 
 
 app.config(function ($stateProvider) {
-  $stateProvider.state('graphs', {
-    url: '/graphs',
-    templateUrl: 'js/graphs/graphs.html',
+  $stateProvider.state('graph-generator', {
+    url: '/graph-generator',
+    templateUrl: 'js/graph-generator/graph-generator.html',
     controller: 'GraphAddCtrl'
   });
 });
