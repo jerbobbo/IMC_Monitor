@@ -62,10 +62,16 @@
 
       </div>
       <div class="ui button" type="submit" tabindex="0" ng-click="addGraph()">Add Graph</div>
-
     </form>
+
   </div>
   <div class="eight wide column">
+    <!-- <form>
+      <select class="ui fluid dropdown" ng-model="currGw">
+        <option class="default text" value="">Select Address</option>
+        <option ng-repeat="gateway in gatewayList" ng-value="{{ gateway }}">{{ gateway.address }}</option>
+      </select>
+    </form> -->
     <div class="ui cards">
       <div ng-repeat="graphParams in currGraphList track by $index" class="ui fluid card">
         <div class="content">
