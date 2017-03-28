@@ -76,9 +76,6 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
     };
 
     $scope.currGraphList.push(newGraphParams);
-    // $('form').form('reset');
-    // $('form').form('clear');
-    // $('select').dropdown('set value', '');
     $('select').dropdown('clear');
     clearCurrents();
   };
