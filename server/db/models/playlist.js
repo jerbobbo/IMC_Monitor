@@ -14,5 +14,5 @@ var Playlist = db.define('playlist', {
     timestamps: false
 });
 
-Playlists.belongsTo(User, { foreignKey: 'user_id' });
+Playlist.belongsTo(User, { foreignKey: 'user_id' });
 module.exports = Playlist;
