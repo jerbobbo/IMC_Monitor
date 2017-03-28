@@ -33,7 +33,6 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
     GraphAddFactory.getRegionNames(countryName)
     .then(function(_result) {
       $scope.currRegionList = _result;
-      console.log('noCurrCountry', $scope.noCurrCountry());
     });
   };
 
@@ -102,7 +101,7 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
   .then(function(_result) {
     $scope.memberList = _result;
     $('.ui.dropdown').dropdown();
-    addToList(testGraph);
+    // addToList(testGraph);
   });
 });
 
