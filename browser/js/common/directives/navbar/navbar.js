@@ -7,9 +7,7 @@ app.directive('navbar', function ($rootScope, AuthService, AUTH_EVENTS, $state) 
         link: function (scope) {
 
             scope.items = [
-                { label: 'Home', state: 'home' },
-                { label: 'About', state: 'about' },
-                { label: 'Documentation', state: 'docs' },
+                { label: 'Graphs', state: 'graph-generator', auth: true },
                 { label: 'Members Only', state: 'membersOnly', auth: true }
             ];
 
@@ -36,6 +34,8 @@ app.directive('navbar', function ($rootScope, AuthService, AUTH_EVENTS, $state) 
             };
 
             setUser();
+
+            $('.ui.sidebar').sidebar('toggle');
 
             $rootScope.$on(AUTH_EVENTS.loginSuccess, setUser);
             $rootScope.$on(AUTH_EVENTS.logoutSuccess, removeUser);
