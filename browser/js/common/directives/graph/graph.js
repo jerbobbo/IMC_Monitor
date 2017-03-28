@@ -23,7 +23,7 @@ app.directive("graph", function (d3Service, $window) {
             scope.$apply();
           };
 
-          scope.graphTypes =
+          var graphTypes =
             {
               ASR: {
                 name: "ASR",
@@ -130,7 +130,7 @@ app.directive("graph", function (d3Service, $window) {
               }
             };
 
-          var currFunctions = scope.graphTypes[ scope.type ];
+          scope.currFunctions = graphTypes[ scope.type ];
 
           // Watch for resize event
           scope.$watch(function() {
@@ -143,7 +143,7 @@ app.directive("graph", function (d3Service, $window) {
             return scope.type;
           }, function() {
             console.log("type changed");
-            currFunctions = scope.graphTypes[ scope.type ];
+            scope.currFunctions = graphTypes[ scope.type ];
             scope.render(scope.data);
           });
 
@@ -184,7 +184,7 @@ app.directive("graph", function (d3Service, $window) {
               .domain([yesterday, now])
               .rangeRound([0, width]),
             y = d3.scaleLinear()
-              .domain([0, currFunctions.maxGraphHeight(data) ])
+              .domain([0, scope.currFunctions.maxGraphHeight(data) ])
               .rangeRound([height, 0]),
             xAxis = d3.axisBottom()
               .scale(x),
@@ -207,13 +207,13 @@ app.directive("graph", function (d3Service, $window) {
             var area = d3.area()
               .x(d => x(parseTime(d.batch_time)))
               .y0(height)
-              .y1(d => y(currFunctions.areaFunc(d)));
+              .y1(d => y(scope.currFunctions.areaFunc(d)));
 
             var lineData = d3.line()
             .x(d => x(parseTime(d.batch_time)))
-            .y(d => y(currFunctions.lineFunc(d)));
+            .y(d => y(scope.currFunctions.lineFunc(d)));
 
-            var areaAvg = currFunctions.avgAreaFunc(data) || "NA";
+            var areaAvg = scope.currFunctions.avgAreaFunc(data) || "NA";
 
             svg.attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom);
