@@ -1,25 +1,9 @@
-<!-- <div class="ui container">
-  <tab-graph where="country=963" group-by="batch_time,country_code" index="graph1"></tab-graph>
-</div>
-
-<div class="ui container">
-  <tab-graph where="country=965" group-by="batch_time,country_code" index="graph2"></tab-graph>
-</div>
-
-<div class="ui container">
-  <tab-graph where="country=961" group-by="batch_time,country_code" index="graph3"></tab-graph>
-</div>
-
-<div class="ui container">
-  <tab-graph where="gw_id=1" group-by="batch_time" index="graph4"></tab-graph>
-</div> -->
 <div class="ui grid">
   <div class="two wide column">
   </div>
   <div class="three wide column">
     <form class="ui form">
       <h4 class="ui dividing header">Graph Generator</h4>
-
 
         <div class="field">
           <label>Country</label>
@@ -28,14 +12,13 @@
             <option ng-repeat="country in countryList" value="{{ country.country }}">{{ country.country }}</option>
           </select>
         </div>
-        <div class="field">
+        <div class="field" ng-class="{ 'disabled': noCurrCountry() }">
           <label>Region</label>
-          <select class="ui fluid search selection dropdown" ng-model="currRegion" ng-class="{ disabled: noCurrCountry() }">
+          <select class="ui fluid search selection dropdown" ng-model="currRegion">
             <option class="default text" value="">Select Region</option>
             <option ng-repeat="region in currRegionList" ng-value="{{ region }}">{{ region.region_name }}</option>
           </select>
         </div>
-
 
         <div class="field">
           <label>Originating Client</label>

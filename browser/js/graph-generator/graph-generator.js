@@ -25,25 +25,30 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
   $scope.currCountry = "";
 
   var testGraph = {
-    whereClause: "country=Egypt"
+    whereClause: "country=Egypt",
+    graphTitle: 'Egypt'
   };
 
   $scope.getRegionList = function(countryName) {
     GraphAddFactory.getRegionNames(countryName)
     .then(function(_result) {
       $scope.currRegionList = _result;
+      console.log('noCurrCountry', $scope.noCurrCountry());
     });
   };
 
-  $scope.addToList = function(graphParams) {
+  var addToList = function(graphParams) {
     $scope.currGraphList.push(graphParams);
   };
 
   function clearCurrents() {
     ['currCountry', 'currRegion', 'currOrigin', 'currTerm', 'currGw']
     .forEach( (field) => {
-      $scope[field] = null;
+      $scope[field] = "";
     });
+    $('.dropdown').dropdown('clear');
+    // console.log($scope);
+
   }
 
   $scope.addGraph = function() {
@@ -75,8 +80,9 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
       graphTitle: graphTitle
     };
 
-    $scope.currGraphList.push(newGraphParams);
-    $('select').dropdown('clear');
+    addToList(newGraphParams);
+    console.trace('addtoList');
+    // $('select').dropdown('clear');
     clearCurrents();
   };
 
@@ -96,7 +102,7 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
   .then(function(_result) {
     $scope.memberList = _result;
     $('.ui.dropdown').dropdown();
-    $scope.addToList(testGraph);
+    addToList(testGraph);
   });
 });
 
