@@ -9,17 +9,16 @@ var Models = require('./server/db/models');
 var seedUsers = function () {
 
     var users = [
-        {
-            name: 'testing',
-            email: 'testing@fsa.com',
-            password: 'password'
-        },
-        {
-            name: 'obama',
-            email: 'obama@gmail.com',
-            password: 'potus'
-        }
-
+        // {
+        //     name: 'testing',
+        //     email: 'testing@fsa.com',
+        //     password: 'password'
+        // },
+        // {
+        //     name: 'obama',
+        //     email: 'obama@gmail.com',
+        //     password: 'potus'
+        // }
     ];
 
     return Models.User.bulkCreate(users);
