@@ -177,7 +177,7 @@ app.directive("graph", function (d3Service, $window) {
 
             };
 
-            render(scope.data);
+            // render(scope.data);
 
 
             //helper functions

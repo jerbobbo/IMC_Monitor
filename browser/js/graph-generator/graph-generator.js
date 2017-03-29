@@ -40,22 +40,13 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
     $scope.currGraphList.push(graphParams);
   };
 
-  function clearCurrents() {
-    ['currCountry', 'currRegion', 'currOrigin', 'currTerm', 'currGw']
-    .forEach( (field) => {
-      $scope[field] = "";
-    });
-    $('.dropdown').dropdown('clear');
-    // console.log($scope);
-
-  }
-
   $scope.addGraph = function() {
     var whereClause = "";
     var graphTitle = "";
 
     var titleDivider = () => {
       if (graphTitle !== "") return " | ";
+      return "";
     };
 
     if (!!$scope.currCountry) {
@@ -85,9 +76,6 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
     };
 
     addToList(newGraphParams);
-    // console.trace('addtoList');
-    // $('select').dropdown('clear');
-    clearCurrents();
   };
 
   $scope.noCurrCountry = function() {
@@ -105,7 +93,8 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
   })
   .then(function(_result) {
     $scope.memberList = _result;
-    $('.ui.dropdown').dropdown();
+    // $('.ui.dropdown').dropdown();
+    $('.ui.dropdown').dropdown({ placeholder: false });
     // addToList(testGraph);
   });
 });

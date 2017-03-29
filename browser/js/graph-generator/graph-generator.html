@@ -7,30 +7,30 @@
 
         <div class="field">
           <label>Country</label>
-          <select class="ui fluid search selection dropdown" ng-model="currCountry" ng-change="getRegionList(currCountry)">
-            <option class="default text" value="">Select Country</option>
+          <select class="ui fluid search selection dropdown" ng-model="currCountry" ng-change="getRegionList(currCountry)" id="currCountry">
+            <option class="default text" value="">All Countries</option>
             <option ng-repeat="country in countryList" value="{{ country.country }}">{{ country.country }}</option>
           </select>
         </div>
         <div class="field" ng-class="{ 'disabled': noCurrCountry() }">
           <label>Region</label>
-          <select class="ui fluid search selection dropdown" ng-model="currRegion">
-            <option class="default text" value="">Select Region</option>
+          <select class="ui fluid search selection dropdown" ng-model="currRegion" id="currRegion">
+            <option class="default text" value="">All Regions</option>
             <option ng-repeat="region in currRegionList" ng-value="{{ region }}">{{ region.region_name }}</option>
           </select>
         </div>
 
         <div class="field">
           <label>Originating Client</label>
-          <select class="ui fluid search selection dropdown" ng-model="currOrigin">
-            <option class="default text" value="">Select Client</option>
+          <select class="ui fluid search selection dropdown" ng-model="currOrigin" id="currOrigin">
+            <option class="default text" value="">All Clients</option>
             <option ng-repeat="member in memberList" ng-value="{{ member }}">{{ member.name }}</option>
           </select>
         </div>
         <div class="field">
           <label>Terminating Client</label>
-          <select class="ui fluid search selection dropdown" ng-model="currTerm">
-            <option class="default text" value="">Select Client</option>
+          <select class="ui fluid search selection dropdown" ng-model="currTerm" id="currTerm">
+            <option class="default text" value="">All Clients</option>
             <option ng-repeat="member in memberList" ng-value="{{ member }}">{{ member.name }}</option>
           </select>
         </div>
@@ -38,8 +38,8 @@
 
         <div class="field">
           <label>Gateway</label>
-          <select class="ui fluid dropdown" ng-model="currGw">
-            <option class="default text" value="">Select Address</option>
+          <select class="ui fluid dropdown" ng-model="currGw" id="currGw">
+            <option class="default text" value="">All Gateways</option>
             <option ng-repeat="gateway in gatewayList" ng-value="{{ gateway }}">{{ gateway.address }}</option>
           </select>
 
