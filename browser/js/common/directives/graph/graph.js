@@ -36,6 +36,7 @@ app.directive("graph", function (d3Service, $window) {
             return scope.type;
           }, function() {
             console.log("type changed");
+            console.log("scope.data", scope.data);
             scope.currFunctions = graphTypes[ scope.type ];
             render(scope.data);
           });
