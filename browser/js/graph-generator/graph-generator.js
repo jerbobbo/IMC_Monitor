@@ -53,25 +53,30 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
   $scope.addGraph = function() {
     var whereClause = "";
     var graphTitle = "";
+
+    var titleDivider = () => {
+      if (graphTitle !== "") return " | ";
+    };
+
     if (!!$scope.currCountry) {
       whereClause += "country=" + $scope.currCountry;
       graphTitle = $scope.currCountry;
     }
     if (!!$scope.currRegion) {
       whereClause += "&routeCodeId=" + $scope.currRegion.id;
-      graphTitle += ' | ' + $scope.currRegion.region_name;
+      graphTitle += titleDivider() + $scope.currRegion.region_name;
     }
     if (!!$scope.currOrigin) {
       whereClause += "&originMemberId=" + $scope.currOrigin.id;
-      graphTitle += ' | Originating: ' + $scope.currOrigin.name;
+      graphTitle += titleDivider() + 'Originating: ' + $scope.currOrigin.name;
     }
     if (!!$scope.currTerm) {
       whereClause += "&termMemberId=" + $scope.currTerm.id;
-      graphTitle += ' | Terminating: ' + $scope.currTerm.name;
+      graphTitle += titleDivider() + 'Terminating: ' + $scope.currTerm.name;
     }
     if (!!$scope.currGw) {
       whereClause += "&gwId=" + $scope.currGw.id;
-      graphTitle += ' | ' + $scope.currGw.address;
+      graphTitle += titleDivider() + $scope.currGw.address;
     }
 
     var newGraphParams = {
@@ -80,7 +85,7 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
     };
 
     addToList(newGraphParams);
-    console.trace('addtoList');
+    // console.trace('addtoList');
     // $('select').dropdown('clear');
     clearCurrents();
   };

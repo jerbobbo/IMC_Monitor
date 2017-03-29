@@ -29,7 +29,7 @@ app.directive("graph", function (d3Service, $window) {
           scope.$watch(function() {
             return angular.element($window)[0].innerWidth;
           }, function() {
-            scope.render(scope.data);
+            render(scope.data);
           });
 
           scope.$watch( function(scope) {
@@ -37,11 +37,11 @@ app.directive("graph", function (d3Service, $window) {
           }, function() {
             console.log("type changed");
             scope.currFunctions = graphTypes[ scope.type ];
-            scope.render(scope.data);
+            render(scope.data);
           });
 
 
-          scope.render = function(data) {
+          function render(data) {
 
             var divElement = d3.select(selector).node();
 
@@ -177,7 +177,7 @@ app.directive("graph", function (d3Service, $window) {
 
             };
 
-            scope.render(scope.data);
+            render(scope.data);
 
 
             //helper functions
