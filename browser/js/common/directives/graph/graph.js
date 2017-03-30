@@ -172,10 +172,18 @@ app.directive("graph", function (d3Service, $window) {
                 scope.render(scope.data);
               });
 
-              scope.$watchGroup( ['type', 'index'], () => { scope.render(scope.data); });
-              scope.$watch('type', () => {
-                scope.currFunctions = graphTypes[ scope.type ]}
-              );
+              scope.$watch( 'type', () => {
+                scope.currFunctions = graphTypes[ scope.type ];
+                scope.render(scope.data);
+              });
+
+              var renderCount = 0;
+
+              scope.$watch('data', () => {
+                renderCount++;
+                //make sure only renders if not first load (watch is triggered 3 times the first load)
+                if (renderCount > 3) scope.render(scope.data);
+              });
 
           });
 

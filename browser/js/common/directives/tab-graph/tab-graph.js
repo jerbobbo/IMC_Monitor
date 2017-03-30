@@ -46,7 +46,7 @@ app.directive('tabGraph', function (GraphFactory) {
             return $scope.currType == type;
           };
 
-          $scope.$watch( () => $scope.where, () => { init(); });
+          $scope.$watch( 'index', () => { init(); });
 
 
         }
