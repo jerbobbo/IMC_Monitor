@@ -24,24 +24,31 @@ app.directive('tabGraph', function (GraphFactory) {
         templateUrl: 'js/common/directives/tab-graph/tab-graph.html',
 
         controller: function($scope, GraphFactory) {
-          var params = $scope.where;
-          GraphFactory.getData(params)
-          .then(function(results) {
-            $scope.data = results;
+          function init() {
+            var params = $scope.where;
+            GraphFactory.getData(params)
+            .then(function(results) {
+              $scope.data = results;
 
-            $scope.graphTypes = ['ASR', 'ACD', 'Seizures', 'AnswerDelay', 'NoCircuit', 'Normal', 'Failure'];
+              $scope.graphTypes = ['ASR', 'ACD', 'Seizures', 'AnswerDelay', 'NoCircuit', 'Normal', 'Failure'];
 
-            $scope.currType = $scope.graphTypes[0];
+              $scope.currType = $scope.graphTypes[0];
+            });
+          }
 
-            $scope.toggleState = function(type) {
-              $scope.currType = type;
-            };
+          init();
 
-            $scope.isCurrentType = function(type) {
-              return $scope.currType == type;
-            };
+          $scope.toggleState = function(type) {
+            $scope.currType = type;
+          };
 
-          });
+          $scope.isCurrentType = function(type) {
+            return $scope.currType == type;
+          };
+
+          $scope.$watch( () => $scope.where, () => { init(); });
+
+
         }
     };
 

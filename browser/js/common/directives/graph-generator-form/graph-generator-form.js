@@ -43,6 +43,7 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
   $scope.addGraph = function() {
     var whereClause = "";
     var graphTitle = "";
+    var id = new Date().getTime();
 
     var titleDivider = () => {
       if (graphTitle !== "") return " | ";
@@ -72,7 +73,8 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
 
     var newGraphParams = {
       whereClause: whereClause,
-      graphTitle: graphTitle
+      graphTitle: graphTitle,
+      id: id
     };
 
     addToList(newGraphParams);
