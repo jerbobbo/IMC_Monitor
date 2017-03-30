@@ -15,9 +15,14 @@ app.directive("graph", function (d3Service, $window) {
           d3Service.d3().then(function(d3) {
 
             var selector = "#" + scope.index;
-            console.log(d3.select(selector));
+            // console.log(d3.select(selector));
+            var graphDiv = d3.select(selector);
 
-            var svg = d3.select(selector)
+            while (graphDiv._groups[0][0] === null) {
+              graphDiv = d3.select(selector);
+            }
+
+            var svg = graphDiv
               .insert("svg");
 
             window.onresize = function() {
