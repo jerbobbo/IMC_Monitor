@@ -16,13 +16,8 @@ app.directive("graph", function (d3Service, $window) {
 
             var selector = "#" + scope.index;
             // console.log(d3.select(selector));
-            var graphDiv = d3.select(selector);
-
-            // while (graphDiv._groups[0][0] === null) {
-            //   graphDiv = d3.select(selector);
-            // }
-
-            var svg = graphDiv
+            
+            var svg = d3.select(selector)
               .insert("svg");
 
             window.onresize = function() {
