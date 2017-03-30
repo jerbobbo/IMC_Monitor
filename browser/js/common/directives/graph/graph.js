@@ -15,6 +15,7 @@ app.directive("graph", function (d3Service, $window) {
           d3Service.d3().then(function(d3) {
 
             var selector = "#" + scope.index;
+            console.log(d3.select(selector));
 
             var svg = d3.select(selector)
               .insert("svg");
@@ -36,7 +37,6 @@ app.directive("graph", function (d3Service, $window) {
             return scope.type;
           }, function() {
             console.log("type changed");
-            console.log("scope.data", scope.data);
             scope.currFunctions = graphTypes[ scope.type ];
             if (scope.data) render(scope.data);
           });
