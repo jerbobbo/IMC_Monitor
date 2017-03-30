@@ -1,5 +1,16 @@
+app.factory('GraphFactory', function($http) {
+  return {
+    getData: function(params) {
+      return $http.get('/api/graph-data?' + params)
+      .then(function(response) {
+        return response.data;
+      });
+    }
+  };
+});
+
 //will be tab-graph in html tag
-app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
+app.directive('tabGraph', function (GraphFactory) {
 
     return {
         restrict: 'E',
@@ -29,6 +40,7 @@ app.directive('tabGraph', function (d3Service, $window, GraphFactory) {
             $scope.isCurrentType = function(type) {
               return $scope.currType == type;
             };
+
           });
         }
     };

@@ -1,0 +1,7 @@
+  <div class="ui cards">
+    <div ng-repeat="graphParams in graphList track by $index" class="ui fluid card">
+      <div class="content">
+        <tab-graph where="{{ graphParams.whereClause }}" graph-title="{{ graphParams.graphTitle }}" index="graph{{ $index }}"></tab-graph>
+      </div>
+    </div>
+  </div>
