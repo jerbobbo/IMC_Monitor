@@ -1,12 +1,19 @@
 app.controller('GraphListCtrl', ($scope) => {
 
   $scope.removeGraph = (idx) => {
-
     $scope.graphList.splice(idx, 1);
-    // $scope.graphList = $scope.graphList.filter( (elem, i) => {
-    //   return i !== idx;
-    // });
-    // console.log('after delete', $scope.graphList);
+  };
+
+  $scope.moveUp = (idx) => {
+    var currentGraph = $scope.graphList[idx];
+    $scope.graphList[idx] = $scope.graphList[idx-1];
+    $scope.graphList[idx-1] = currentGraph;
+  };
+
+  $scope.moveDown = (idx) => {
+    var currentGraph = $scope.graphList[idx];
+    $scope.graphList[idx] = $scope.graphList[idx+1];
+    $scope.graphList[idx+1] = currentGraph;
   };
 
   $scope.$watch( () => $scope.graphList,
