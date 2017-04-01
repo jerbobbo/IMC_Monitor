@@ -8,7 +8,12 @@ var Playlist = db.define('playlist', {
     user_id: {
       type: Sequelize.STRING,
       allowNull: false
+    },
+    name: {
+      type: Sequelize.STRING,
+      allowNull: false
     }
+
   },
   {
     timestamps: false
