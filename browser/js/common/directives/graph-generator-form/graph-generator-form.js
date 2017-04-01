@@ -23,6 +23,7 @@ app.factory('GraphAddFactory', function($http) {
 app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
   // $scope.graphList = [];
   $scope.currCountry = "";
+  var graphCount = 0;
 
   var testGraph = {
     whereClause: "country=Egypt",
@@ -43,7 +44,9 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
   $scope.addGraph = function() {
     var whereClause = "";
     var graphTitle = "";
-    var id = new Date().getTime();
+    var graphOrder = $scope.graphList.length;
+    // var id = new Date().getTime();
+    var graphId = graphCount++;
 
     var titleDivider = () => {
       if (graphTitle !== "") return " | ";
@@ -74,7 +77,8 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
     var newGraphParams = {
       whereClause: whereClause,
       graphTitle: graphTitle,
-      id: id
+      id: graphId,
+      order: graphOrder
     };
 
     addToList(newGraphParams);
