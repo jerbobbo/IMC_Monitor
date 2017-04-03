@@ -42,7 +42,6 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
   };
 
   $scope.addGraph = function() {
-    var whereClause = "";
     var graphTitle = "";
     var graphOrder = $scope.graphList.length;
     // var id = new Date().getTime();
@@ -53,29 +52,67 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
       return "";
     };
 
+    // var addToTitle = ( parameters ) => {
+    //   parameters.forEach( (parameter) => {
+    //     if (parameter) graphTitle += titleDivider() + parameter.title + parameter.data;
+    //   });
+    // };
+    //
+    // var parameterList = [
+    //   {
+    //     title: "",
+    //     data: $scope.currCountry || ""
+    //   },
+    //   {
+    //     title: "",
+    //     data: $scope.currRegion.region_name || ""
+    //   },
+    //   {
+    //     title: "Originating: ",
+    //     data: $scope.currOrigin.name || ""
+    //   },
+    //   {
+    //     title: "Terminating: ",
+    //     data: $scope.currTerm.name || ""
+    //   },
+    //   {
+    //     title: "",
+    //     data: $scope.currGw.address || ""
+    //   }
+    // ];
+
+    // addToTitle(parameterList);
+
+    var country, routeCodeId, originMemberId, termMemberId, gwId;
+
     if (!!$scope.currCountry) {
-      whereClause += "country=" + $scope.currCountry;
+      country = $scope.currCountry;
       graphTitle = $scope.currCountry;
     }
     if (!!$scope.currRegion) {
-      whereClause += "&routeCodeId=" + $scope.currRegion.id;
+      routeCodeId = $scope.currRegion.id;
       graphTitle += titleDivider() + $scope.currRegion.region_name;
     }
     if (!!$scope.currOrigin) {
-      whereClause += "&originMemberId=" + $scope.currOrigin.id;
+      originMemberId = $scope.currOrigin.id;
       graphTitle += titleDivider() + 'Originating: ' + $scope.currOrigin.name;
     }
     if (!!$scope.currTerm) {
-      whereClause += "&termMemberId=" + $scope.currTerm.id;
+      termMemberId = $scope.currTerm.id;
       graphTitle += titleDivider() + 'Terminating: ' + $scope.currTerm.name;
     }
     if (!!$scope.currGw) {
-      whereClause += "&gwId=" + $scope.currGw.id;
+      gwId = $scope.currGw.id;
       graphTitle += titleDivider() + $scope.currGw.address;
     }
 
+
     var newGraphParams = {
-      whereClause: whereClause,
+      country: country || '%',
+      routeCodeId: routeCodeId || '%',
+      originMemberId: originMemberId || '%',
+      termMemberId: termMemberId || '%',
+      gwId: gwId || '%',
       graphTitle: graphTitle,
       id: graphId,
       order: graphOrder

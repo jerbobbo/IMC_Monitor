@@ -24,11 +24,11 @@ router.get('/', ensureAuthenticated, function(req, res, next) {
   yesterday.setDate(yesterday.getDate() - 1);
   // yesterday.setDate(yesterday.getDate() - 1);
   var ageRange = [yesterday, now];
-  var countryName = req.query.country || '%';
-  var originMemberId = req.query.originMemberId || '%';
-  var termMemberId = req.query.termMemberId || '%';
-  var routeCodeId = req.query.routeCodeId || '%';
-  var gwId = req.query.gwId || '%';
+  // var countryName = req.query.country || '%';
+  // var originMemberId = req.query.originMemberId || '%';
+  // var termMemberId = req.query.termMemberId || '%';
+  // var routeCodeId = req.query.routeCodeId || '%';
+  // var gwId = req.query.gwId || '%';
 
   accountingSummaryModel.findAll({
     attributes: [
@@ -68,7 +68,7 @@ router.get('/', ensureAuthenticated, function(req, res, next) {
       attributes: [],
       where: {
         country: {
-          $like: countryName
+          $like: req.query.country
         }
      }
     }],
@@ -77,16 +77,16 @@ router.get('/', ensureAuthenticated, function(req, res, next) {
         $between: ageRange
       },
       route_code_id: {
-        $like: routeCodeId
+        $like: req.query.routeCodeId
       },
       origin_member_id: {
-        $like: originMemberId
+        $like: req.query.originMemberId
       },
       term_member_id: {
-        $like: termMemberId
+        $like: req.query.termMemberId
       },
       gw_id: {
-        $like: gwId
+        $like: req.query.gwId
       }
     },
     group: 'batch_time'
