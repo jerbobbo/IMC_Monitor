@@ -7,6 +7,9 @@ app.factory('PlaylistFactory', ($http) => {
     createPlaylist: (newList) => {
       return $http.post('/api/playlists', newList)
       .then( (results) => results.data);
+    },
+    saveToList: (graphList) => {
+
     }
   };
 });
@@ -17,14 +20,28 @@ app.controller('PlaylistCtrl', ($scope, PlaylistFactory) => {
     $scope.playlists = _playlists;
   });
 
-  $scope.createPlaylist = PlaylistFactory.createPlaylist;
-  
+  $scope.createPlaylist = (name) => {
+    var newList = {
+      name: name
+    };
+
+    PlaylistFactory.createPlaylist(newList)
+    .then( (list) => {
+      $scope.playlists.push(list);
+    });
+  };
+
+  $scope.printList = () => console.log($scope.graphList);
+
 });
 
 app.directive('addToPlaylist', (PlaylistFactory) => {
   return {
     restrict: 'E',
     templateUrl: 'js/common/directives/add-to-playlist/add-to-playlist.html',
-    controller: 'PlaylistCtrl'
+    controller: 'PlaylistCtrl',
+    scope: {
+      graphList: '='
+    }
   };
 });
