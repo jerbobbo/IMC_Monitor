@@ -1,3 +1,5 @@
+"use strict";
+
 app.factory('GraphAddFactory', function($http) {
   return {
     getGateways: function() {
@@ -107,18 +109,20 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
     }
 
 
-    var newGraphParams = {
-      country: country || '%',
-      routeCodeId: routeCodeId || '%',
-      originMemberId: originMemberId || '%',
-      termMemberId: termMemberId || '%',
-      gwId: gwId || '%',
+    var newGraph = {
+      params: {
+        country: country || '%',
+        routeCodeId: routeCodeId || '%',
+        originMemberId: originMemberId || '%',
+        termMemberId: termMemberId || '%',
+        gwId: gwId || '%'
+      },
       graphTitle: graphTitle,
       id: graphId,
       order: graphOrder
     };
 
-    addToList(newGraphParams);
+    addToList(newGraph);
   };
 
   $scope.noCurrCountry = function() {

@@ -15,11 +15,7 @@ app.directive('tabGraph', function (GraphFactory) {
     return {
         restrict: 'E',
         scope: {
-          country: '@',
-          routeCodeId: '@',
-          originMemberId: '@',
-          termMemberId: '@',
-          gwId: '@',
+          params: '=',
           graphTitle: '@',
           period: '@',
           name: '@',
@@ -29,7 +25,7 @@ app.directive('tabGraph', function (GraphFactory) {
 
         controller: function($scope, GraphFactory) {
           function init() {
-            var params = `country=${ $scope.country }&routeCodeId=${ $scope.routeCodeId }&originMemberId=${ $scope.originMemberId }&termMemberId=${ $scope.termMemberId }&gwId=${ $scope.gwId }`;
+            var params = `country=${ $scope.params.country }&routeCodeId=${ $scope.params.routeCodeId }&originMemberId=${ $scope.params.originMemberId }&termMemberId=${ $scope.params.termMemberId }&gwId=${ $scope.params.gwId }`;
 
             GraphFactory.getData(params)
             .then(function(results) {
