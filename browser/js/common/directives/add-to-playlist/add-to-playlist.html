@@ -1,16 +1,18 @@
-<button class="ui blue button" ng-click="printList()">Print List</button>
-<div class="ui right floated green basic dropdown button">
+<!-- <button class="ui blue button" ng-click="printList()">Print List</button> -->
+<button class="ui right floated small blue button" ng-show="playlistId" ng-click="saveToPlaylist()">Add to Playlist</button>
+<div class="ui right floated green basic dropdown button" ng-show="graphList.length">
   <span class="text">Save Graphs</span>
   <div class="menu">
     <div class="header">
       New Playlist
     </div>
     <div class="ui input">
-      <input type="text" name="name" ng-model="newListName" placeholder="Enter Name">
-      <button class="ui mini green button" ng-click="createPlaylist(newListName)">Save</button>
+      <input type="text" name="name" ng-model="newListName" placeholder="Enter Name" ng-change="printScope()">
+      <button class="ui mini green button" ng-click="createPlaylist()">Save</button>
     </div>
     <div class="divider"></div>
-    <div class="item" ng-repeat="list in playlists | orderBy:'name'">
+    <h4 class="ui header">Add to Playlist</h4>
+    <div class="item" ng-repeat="list in playlists | orderBy:'name'" ng-click="selectListId(list.id)">
       {{ list.name }}
     </div>
   </div>

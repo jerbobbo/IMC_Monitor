@@ -8,7 +8,7 @@ router.use('/gateways', require('./gateways'));
 router.use('/countries', require('./countries'));
 router.use('/region-names', require('./region-names'));
 router.use('/playlists', require('./playlists'));
-// router.use('/playlist-graphs', require('./playlist-graphs'));
+router.use('/playlist-graphs', require('./playlist-graphs'));
 
 // Make sure this is after all of
 // the registered routes!

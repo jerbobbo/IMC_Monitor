@@ -6,13 +6,17 @@ app.controller('GraphListCtrl', ($scope) => {
 
   $scope.moveUp = (idx) => {
     var currentGraph = $scope.graphList[idx];
+    currentGraph.order--;
     $scope.graphList[idx] = $scope.graphList[idx-1];
+    $scope.graphList[idx].order++;
     $scope.graphList[idx-1] = currentGraph;
   };
 
   $scope.moveDown = (idx) => {
     var currentGraph = $scope.graphList[idx];
+    currentGraph.order++;
     $scope.graphList[idx] = $scope.graphList[idx+1];
+    $scope.graphList[idx].order--;
     $scope.graphList[idx+1] = currentGraph;
   };
 

@@ -8,8 +8,9 @@ app.factory('PlaylistFactory', ($http) => {
       return $http.post('/api/playlists', newList)
       .then( (results) => results.data);
     },
-    saveToList: (graphList) => {
-
+    saveToList: (graph, playlistId) => {
+      return $http.post(`/api/playlists/${playlistId}/playlist-graph`, graph)
+      .then( (results) => results.data);
     }
   };
 });
@@ -20,18 +21,33 @@ app.controller('PlaylistCtrl', ($scope, PlaylistFactory) => {
     $scope.playlists = _playlists;
   });
 
-  $scope.createPlaylist = (name) => {
+  $scope.saveToPlaylist = () => {
+    $scope.graphList.forEach( (graph) => PlaylistFactory.saveToList(graph, $scope.playlistId) );
+  };
+
+
+  $scope.createPlaylist = () => {
     var newList = {
       name: name
     };
 
-    PlaylistFactory.createPlaylist(newList)
+    return PlaylistFactory.createPlaylist(newList)
     .then( (list) => {
       $scope.playlists.push(list);
+      $scope.playlistId = list.id;
+      $scope.saveToPlaylist();
     });
   };
 
+  $scope.selectListId = (id) => {
+    $scope.playlistId = id;
+    console.log($scope);
+  };
+
+
+
   $scope.printList = () => console.log($scope.graphList);
+  $scope.printScope = () => console.log($scope);
 
 });
 
@@ -41,7 +57,8 @@ app.directive('addToPlaylist', (PlaylistFactory) => {
     templateUrl: 'js/common/directives/add-to-playlist/add-to-playlist.html',
     controller: 'PlaylistCtrl',
     scope: {
-      graphList: '='
+      graphList: '=',
+      playlistId: '@'
     }
   };
 });
