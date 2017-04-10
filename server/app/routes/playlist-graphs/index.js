@@ -39,13 +39,6 @@ router.put('/:graphId', ensureAuthenticated, (req, res, next) => {
   .then( (graph) => { res.status(200).json(graph); }, next );
 });
 
-router.post('/:playlistId', ensureAuthenticated, function(req, res, next) {
-  var newGraph = req.body;
-  newGraph.playlist_id = req.params.playlistId;
-  playlistGraphModel.create(newGraph)
-  .then(function(data) {
-    res.status(201).json(data);
-  }, next);
-});
+
 
 module.exports = router;

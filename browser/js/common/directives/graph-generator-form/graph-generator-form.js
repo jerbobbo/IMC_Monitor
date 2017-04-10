@@ -22,7 +22,7 @@ app.factory('GraphAddFactory', function($http) {
   };
 });
 
-app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
+app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory) {
   // $scope.graphList = [];
   $scope.currCountry = "";
   var graphCount = 0;
@@ -41,6 +41,7 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory) {
 
   var addToList = function(graphParams) {
     $scope.graphList.push(graphParams);
+    PlaylistFactory.saveToList(graphParams, $scope.playlist.id);
   };
 
   $scope.addGraph = function() {
@@ -150,7 +151,8 @@ app.directive('graphGeneratorForm', () => {
   return {
     restrict: 'E',
     scope: {
-      graphList: '='
+      graphList: '=',
+      playlist: '='
     },
     templateUrl: '/js/common/directives/graph-generator-form/graph-generator-form.html',
     controller: 'GraphAddCtrl'
