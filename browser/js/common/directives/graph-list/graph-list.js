@@ -1,4 +1,39 @@
-app.controller('GraphListCtrl', ($scope) => {
+app.factory('GraphListFactory', ($http) => {
+  return {
+    fetchGraphs: (playlistId) => {
+      return $http.get(`/api/playlists/${playlistId}`)
+      .then( (results) => {
+        var graphArray = results.data.playlist_graphs;
+        graphArray.forEach( (graph) => {
+          graph.params = {
+            country: graph.country === "" ? "%" : graph.country,
+            routeCodeId: graph.route_code_id === 0 ? "%" : graph.route_code_id,
+            originMemberId: graph.origin_member_id === 0 ? "%" : graph.origin_member_id,
+            termMemberId: graph.term_member_id === 0 ? "%" : graph.term_member_id,
+            gwId: graph.gw_id === 0 ? "%" : graph.gw_id
+          };
+          graph.graphTitle = graph.title;
+        });
+        return {
+          graphList: graphArray,
+          playlistName: results.data.name
+        };
+      });
+    }
+  };
+});
+
+app.controller('GraphListCtrl', ($scope, GraphListFactory) => {
+
+  // if ($scope.playlistId) {
+  //   $scope.playlistId = +$scope.playlistId;
+  //   GraphListFactory.fetchGraphs($scope.playlistId)
+  //   .then( (results) => {
+  //     $scope.graphList = results.graphList;
+  //     $scope.playlistName = results.playlistName;
+  //     console.log('results', results);
+  //   });
+  // }
 
   $scope.removeGraph = (idx) => {
     $scope.graphList.splice(idx, 1);
@@ -23,6 +58,7 @@ app.controller('GraphListCtrl', ($scope) => {
   $scope.$watch( () => $scope.graphList,
     () => { console.log($scope.graphList) } );
 
+
 });
 
 app.directive('graphList', () => {
@@ -30,7 +66,7 @@ app.directive('graphList', () => {
     restrict: 'E',
     scope: {
       graphList: '=',
-      playlistId: '@'
+      playlist: '='
     },
     templateUrl: '/js/common/directives/graph-list/graph-list.html',
     controller: 'GraphListCtrl'

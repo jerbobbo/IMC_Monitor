@@ -1,4 +1,7 @@
-  <add-to-playlist graph-list="graphList" playlist-id="{{ playlistId }}"></add-to-playlist>
+
+  <h3 ng-show="playlist" class="ui header">
+    {{ playlist.name }}
+  </h3>
   <div class="ui cards">
     <div ng-repeat="graph in graphList track by $index" class="ui fluid card animate-repeat">
       <div class="content">

@@ -2,7 +2,7 @@
 var path = require('path');
 var db = require(path.join(__dirname, '../')).db;
 var Sequelize = require('sequelize');
-var User = require(path.join(__dirname, 'user'));
+var User = require('./user');
 
 var Playlist = db.define('playlist', {
     user_id: {
@@ -19,5 +19,4 @@ var Playlist = db.define('playlist', {
     timestamps: false
 });
 
-Playlist.belongsTo(User, { foreignKey: 'user_id' });
 module.exports = Playlist;

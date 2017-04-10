@@ -22,25 +22,29 @@ app.controller('PlaylistCtrl', ($scope, PlaylistFactory) => {
   });
 
   $scope.saveToPlaylist = () => {
-    $scope.graphList.forEach( (graph) => PlaylistFactory.saveToList(graph, $scope.playlistId) );
+    $scope.graphList.forEach( (graph) => PlaylistFactory.saveToList(graph, $scope.playlist.id) );
   };
 
 
   $scope.createPlaylist = () => {
     var newList = {
-      name: name
+      name: $scope.newListName
     };
 
     return PlaylistFactory.createPlaylist(newList)
     .then( (list) => {
       $scope.playlists.push(list);
-      $scope.playlistId = list.id;
+      $scope.playlist = {
+        id: list.id,
+        name: list.name,
+      };
+      
       $scope.saveToPlaylist();
     });
   };
 
   $scope.selectListId = (id) => {
-    $scope.playlistId = id;
+    $scope.playlist.id = id;
     console.log($scope);
   };
 
@@ -58,7 +62,7 @@ app.directive('addToPlaylist', (PlaylistFactory) => {
     controller: 'PlaylistCtrl',
     scope: {
       graphList: '=',
-      playlistId: '@'
+      playlist: '='
     }
   };
 });

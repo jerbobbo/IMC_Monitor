@@ -1,8 +1,7 @@
 'use strict';
 var path = require('path');
 var router = require('express').Router();
-var playlistModel = require(path.join(__dirname, '../../../db/models/playlist'));
-var playlistGraphModel = require(path.join(__dirname, '../../../db/models/playlist_graph'));
+var models = require(path.join(__dirname, '../../../db/models/'));
 var Sequelize = require('sequelize');
 
 var ensureAuthenticated = function (req, res, next) {
@@ -14,12 +13,12 @@ var ensureAuthenticated = function (req, res, next) {
 };
 
 router.get('/:id', ensureAuthenticated, function (req, res, next) {
-  playlistModel.findById(req.params.id, { include: [ playlistGraphModel ]})
-  .then( (playlist) => res.status(200).json(playlist), next );
+  models.Playlist.findById(req.params.id, { include: [ models.PlaylistGraph ]})
+    .then( (playlist) => res.send(playlist), next );
 });
 
 router.get('/', ensureAuthenticated, function(req, res, next) {
-  playlistModel.findAll({
+  models.Playlist.findAll({
     id: req.user.id
   })
   .then(function(data) {
@@ -30,7 +29,7 @@ router.get('/', ensureAuthenticated, function(req, res, next) {
 router.post('/:playlistId/playlist-graph', ensureAuthenticated, function(req, res, next) {
   var newGraph = req.body;
   newGraph.playlist_id = req.params.playlistId;
-  playlistGraphModel.create({
+  models.PlaylistGraph.create({
     playlist_id: newGraph.playlist_id,
     order: newGraph.order,
     title: newGraph.graphTitle,
@@ -46,7 +45,7 @@ router.post('/:playlistId/playlist-graph', ensureAuthenticated, function(req, re
 });
 
 router.post('/', ensureAuthenticated, function(req, res, next) {
-  playlistModel.create({
+  models.Playlist.create({
     user_id: req.user.id,
     name: req.body.name
   })

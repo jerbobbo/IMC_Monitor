@@ -2,7 +2,7 @@
 var path = require('path');
 var db = require(path.join(__dirname, '../')).db;
 var Sequelize = require('sequelize');
-var Playlist = require(path.join(__dirname, 'playlist'));
+var Playlist = require('./playlist');
 
 var PlaylistGraph = db.define('playlist_graph', {
 
@@ -16,23 +16,23 @@ var PlaylistGraph = db.define('playlist_graph', {
     },
     country: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: true
     },
     route_code_id: {
       type: Sequelize.INTEGER,
-      allowNull: false
+      allowNull: true
     },
     origin_member_id: {
       type: Sequelize.INTEGER,
-      allowNull: false
+      allowNull: true
     },
     term_member_id: {
       type: Sequelize.INTEGER,
-      allowNull: false
+      allowNull: true
     },
     gw_id: {
       type: Sequelize.INTEGER,
-      allowNull: false
+      allowNull: true
     }
 
   },
@@ -40,5 +40,4 @@ var PlaylistGraph = db.define('playlist_graph', {
     timestamps: false
 });
 
-PlaylistGraph.belongsTo(Playlist, { foreignKey: 'playlist_id' });
 module.exports = PlaylistGraph;
