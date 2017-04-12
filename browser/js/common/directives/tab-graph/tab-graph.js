@@ -19,7 +19,8 @@ app.directive('tabGraph', function (GraphFactory) {
           graphTitle: '@',
           period: '@',
           name: '@',
-          index: '@'
+          index: '@',
+          twoColumns: '='
         },
         templateUrl: 'js/common/directives/tab-graph/tab-graph.html',
 
@@ -48,7 +49,6 @@ app.directive('tabGraph', function (GraphFactory) {
           };
 
           $scope.$watch( 'index', () => { init(); });
-
 
         }
     };
