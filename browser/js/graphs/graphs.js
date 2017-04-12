@@ -1,6 +1,9 @@
 app.controller('GraphCtrl', ($scope, graphData, $stateParams, listCollection) => {
   $scope.graphList = [];
   $scope.listCollection = listCollection;
+  $scope.twoColumns = {
+    value: true
+  };
 
   if (graphData) {
     $scope.graphList = graphData.graphList;
@@ -12,8 +15,10 @@ app.controller('GraphCtrl', ($scope, graphData, $stateParams, listCollection) =>
 
   $scope.showLists = () => {
     $('.ui.sidebar')
-      .sidebar('setting', 'transition', 'overlay')
+      .sidebar('setting', 'transition', 'push')
       .sidebar('toggle');
+
+    $scope.twoColumns.value = false;
   };
 
 });

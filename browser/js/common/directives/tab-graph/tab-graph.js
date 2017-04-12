@@ -19,8 +19,7 @@ app.directive('tabGraph', function (GraphFactory) {
           graphTitle: '@',
           period: '@',
           name: '@',
-          index: '@',
-          twoColumns: '='
+          index: '@'
         },
         templateUrl: 'js/common/directives/tab-graph/tab-graph.html',
 

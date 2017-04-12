@@ -21,15 +21,15 @@ app.directive("graph", function (d3Service, $window) {
             var svg = d3.select(selector)
               .insert("svg");
 
-            window.onresize = function() {
-            scope.$apply();
-            };
+            // window.onresize = function() {
+            // scope.$apply();
+            // };
 
-            console.log(d3.select(selector)._groups[0]);
-            d3.select(selector)._groups[0].onresize = () => {
-              console.log('onresize');
-              scope.$apply();
-            };
+            // console.log(d3.select(selector)._groups[0]);
+            // d3.select(selector)._groups[0].onresize = () => {
+            //   console.log('onresize');
+            //   scope.$apply();
+            // };
 
             scope.currFunctions = graphTypes[ scope.type ];
 
@@ -185,13 +185,19 @@ app.directive("graph", function (d3Service, $window) {
               // scope.$watch( () => {
               //   return d3.select(selector).node().getBoundingClientRect().width;
               // }, () => {
-              //   console.log('width changed:', d3.select(selector));
+              //   console.log('width changed:', d3.select(selector).node().getBoundingClientRect().width);
               //   scope.render(scope.data);
               // });
 
               scope.$watch( 'type', () => {
                 scope.currFunctions = graphTypes[ scope.type ];
                 scope.render(scope.data);
+              });
+
+              var element = document.getElementById(scope.index);
+              new ResizeSensor(element, function() {
+                scope.render(scope.data);
+                console.log('Changed to ' + element.clientWidth);
               });
 
               // scope.$watch( 'twoColumns.value', () => {
