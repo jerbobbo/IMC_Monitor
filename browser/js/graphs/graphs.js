@@ -1,5 +1,7 @@
-app.controller('GraphCtrl', ($scope, graphData, $stateParams) => {
+app.controller('GraphCtrl', ($scope, graphData, $stateParams, listCollection) => {
   $scope.graphList = [];
+  $scope.listCollection = listCollection;
+
   if (graphData) {
     $scope.graphList = graphData.graphList;
     $scope.playlist = {
@@ -7,6 +9,13 @@ app.controller('GraphCtrl', ($scope, graphData, $stateParams) => {
       name: graphData.playlistName || ""
     };
   }
+
+  $scope.showLists = () => {
+    $('.ui.sidebar')
+      .sidebar('setting', 'transition', 'overlay')
+      .sidebar('toggle');
+  };
+
 });
 
 app.config(function ($stateProvider) {
@@ -20,6 +29,9 @@ app.config(function ($stateProvider) {
           return GraphListFactory.fetchGraphs($stateParams.playlistId)
           .then( (graphData) => graphData);
         }
+      },
+      listCollection: (PlaylistFactory) => {
+        return PlaylistFactory.fetchPlaylists();
       }
     }
   });

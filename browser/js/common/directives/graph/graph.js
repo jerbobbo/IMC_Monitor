@@ -6,12 +6,13 @@ app.directive("graph", function (d3Service, $window) {
         scope: {
           data: "=",
           type: "@",
-          index: "@"
+          index: "@",
+          twoColumns: '='
         },
         templateUrl: "js/common/directives/graph/graph.html",
 
         link: function(scope, elem, attrs) {
-          console.log(scope);
+          // console.log(scope);
           d3Service.d3().then(function(d3) {
 
             var selector = "#" + scope.index;
@@ -24,6 +25,12 @@ app.directive("graph", function (d3Service, $window) {
             scope.$apply();
             };
 
+            console.log(d3.select(selector)._groups[0]);
+            d3.select(selector)._groups[0].onresize = () => {
+              console.log('onresize');
+              scope.$apply();
+            };
+
             scope.currFunctions = graphTypes[ scope.type ];
 
 
@@ -31,6 +38,12 @@ app.directive("graph", function (d3Service, $window) {
 
               //reset selector in case of deleted graph
               selector = "#" + scope.index;
+
+              if (!svg._groups[0][0]) {
+                svg = d3.select(selector)
+                  .insert("svg");
+              }
+
 
               var divElement = d3.select(selector).node();
 
@@ -166,16 +179,25 @@ app.directive("graph", function (d3Service, $window) {
 
               };
               // Watch for resize event
-              scope.$watch(function() {
-                return angular.element($window)[0].innerWidth;
-              }, function() {
-                scope.render(scope.data);
-              });
+              scope.$watch( () => angular.element($window)[0].innerWidth,
+                () => scope.render(scope.data) );
+
+              // scope.$watch( () => {
+              //   return d3.select(selector).node().getBoundingClientRect().width;
+              // }, () => {
+              //   console.log('width changed:', d3.select(selector));
+              //   scope.render(scope.data);
+              // });
 
               scope.$watch( 'type', () => {
                 scope.currFunctions = graphTypes[ scope.type ];
                 scope.render(scope.data);
               });
+
+              // scope.$watch( 'twoColumns.value', () => {
+              //   console.log('twoColumns', scope.twoColumns);
+              //   scope.render(scope.data);
+              // });
 
               var renderCount = 0;
 
@@ -183,6 +205,7 @@ app.directive("graph", function (d3Service, $window) {
                 renderCount++;
                 //make sure only renders if not first load (watch is triggered 3 times the first load)
                 if (renderCount > 3) scope.render(scope.data);
+
               });
 
           });

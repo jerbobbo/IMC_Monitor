@@ -41,7 +41,9 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory
 
   var addToList = function(graphParams) {
     $scope.graphList.push(graphParams);
-    PlaylistFactory.saveToList(graphParams, $scope.playlist.id);
+    if ($scope.playlist) {
+      PlaylistFactory.saveToList(graphParams, $scope.playlist.id);
+    }
   };
 
   $scope.addGraph = function() {

@@ -16,10 +16,10 @@ app.factory('PlaylistFactory', ($http) => {
 });
 
 app.controller('PlaylistCtrl', ($scope, PlaylistFactory) => {
-  PlaylistFactory.fetchPlaylists()
-  .then( (_playlists) => {
-    $scope.playlists = _playlists;
-  });
+  // PlaylistFactory.fetchPlaylists()
+  // .then( (_playlists) => {
+  //   $scope.playlists = _playlists;
+  // });
 
   $('#add-to-list')
     .popup({
@@ -38,7 +38,7 @@ app.controller('PlaylistCtrl', ($scope, PlaylistFactory) => {
 
     return PlaylistFactory.createPlaylist(newList)
     .then( (list) => {
-      $scope.playlists.push(list);
+      $scope.listCollection.push(list);
       $scope.playlist = {
         id: list.id,
         name: list.name,
@@ -50,7 +50,6 @@ app.controller('PlaylistCtrl', ($scope, PlaylistFactory) => {
 
   $scope.selectListId = (id) => {
     $scope.playlist.id = id;
-    console.log($scope);
   };
 
   $scope.printList = () => console.log($scope.graphList);
@@ -65,7 +64,8 @@ app.directive('addToPlaylist', (PlaylistFactory) => {
     controller: 'PlaylistCtrl',
     scope: {
       graphList: '=',
-      playlist: '='
+      playlist: '=',
+      listCollection: '='
     }
   };
 });

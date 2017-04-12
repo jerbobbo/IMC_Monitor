@@ -15,7 +15,7 @@
       <div class="twelve wide field">
         <select class="ui fluid dropdown" ng-model="targetListId">
           <option class="default text" value="">Add to List</option>
-          <option ng-repeat="list in playlists | orderBy: 'name'" ng-value="{{ list.id }}">{{ list.name }}</option>
+          <option ng-repeat="list in listCollection | orderBy: 'name'" ng-value="{{ list.id }}">{{ list.name }}</option>
         </select>
       </div>
       <div class="four wide field">
