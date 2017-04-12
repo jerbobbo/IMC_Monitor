@@ -13,30 +13,16 @@ var ensureAuthenticated = function (req, res, next) {
     }
 };
 
-// var ensureCorrectUser = function (req, res, next, graphUserId) {
-//   if (req.user.id === graphUserId) next();
-//   else res.status(401).end();
-// };
-
-// router.get('/:playlistId', ensureAuthenticated, function(req, res, next) {
-//   playlistGraphModel.findAll({
-//     playlist_id: req.params.playlistId,
-//     include: [{
-//       model: playlistModel
-//     }]
-//   })
-//   .then(function(data) {
-//     data.forEach( (graph) => {
-//       if (graph.playlist.id !== req.user.id) return res.status(401).end();
-//     });
-//     res.status(200).json(data);
-//   }, next);
-// });
-
 router.put('/:graphId', ensureAuthenticated, (req, res, next) => {
   playlistGraphModel.findById(req.params.graphId)
   .then( (_graph) => _graph.update( { order: req.body.order } ) )
   .then( (graph) => { res.status(200).json(graph); }, next );
+});
+
+router.delete('/:graphId', ensureAuthenticated, (req, res, next) => {
+  playlistGraphModel.findById(req.params.graphId)
+  .then( (graph) => graph.destroy() )
+  .then( () => res.status(204).end() , next);
 });
 
 

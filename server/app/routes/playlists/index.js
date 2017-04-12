@@ -13,7 +13,10 @@ var ensureAuthenticated = function (req, res, next) {
 };
 
 router.get('/:id', ensureAuthenticated, function (req, res, next) {
-  models.Playlist.findById(req.params.id, { include: [ models.PlaylistGraph ]})
+  models.Playlist.findById(req.params.id, {
+    include: [ models.PlaylistGraph ],
+    order: ['order']
+  })
     .then( (playlist) => res.send(playlist), next );
 });
 
