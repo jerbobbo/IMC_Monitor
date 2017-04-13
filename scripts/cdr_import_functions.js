@@ -357,7 +357,10 @@ function findOrCreateAddressId (address, isMediaAddress) {
 			    and b.disconnect_time in (
 			    select max(disconnect_time) from (select * from accounting_import) f where f.conf_id = a.conf_id and f.term_address_id in (select g.address_id from accounting_members g where g.member_id = d.member_id) ))
 			    then 1 else 0 end)`,
-					`insert into accounting_summary select FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/300)*300) as batch_num,
+					`insert into accounting_summary select FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/300)*300) as batch_time,
+FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/1800)*1800) as batch_time_30,
+FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/7200)*7200) as batch_time_120,
+FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/86400)*86400) as batch_time_24h,
 a.batch_num,
 b.member_id as origin_member_id, c.member_id as term_member_id,
 country_code, route_code_id, gw_id,
@@ -388,7 +391,11 @@ from accounting_import a
 join accounting_members b on a.origin_address_id = b.address_id
 join accounting_members c on a.term_address_id = c.address_id
 join disconnect_text_master d on a.disconnect_cause = d.id
-group by FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/300)*300), batch_num, country_code, route_code_id, gw_id, b.member_id, c.member_id`,
+group by FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/300)*300),
+FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/1800)*1800),
+FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/7200)*7200),
+FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/86400)*86400),
+batch_num, country_code, route_code_id, gw_id, b.member_id, c.member_id`,
 					// 'SET autocommit=1',
 					'SET unique_checks=1',
 					'SET foreign_key_checks=1'

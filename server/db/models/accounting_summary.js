@@ -13,6 +13,24 @@ var AccountingSummary = db.define('accounting_summary', {
       defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       primaryKey: true
     },
+    batch_time_30: {
+      type: Sequelize.TIME,
+      allowNull: false,
+      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      primaryKey: true
+    },
+    batch_time_120: {
+      type: Sequelize.TIME,
+      allowNull: false,
+      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      primaryKey: true
+    },
+    batch_time_24h: {
+      type: Sequelize.TIME,
+      allowNull: false,
+      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      primaryKey: true
+    },
     batch_num: {
       type: Sequelize.INTEGER(11),
       allowNull: false,
