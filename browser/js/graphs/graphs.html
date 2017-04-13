@@ -1,4 +1,3 @@
-
   <div class="ui wide sidebar vertical menu">
     <graph-generator-form graph-list="graphList" playlist="playlist" ></graph-generator-form>
     <add-to-playlist graph-list="graphList" playlist="playlist" list-collection="listCollection"></add-to-playlist>
@@ -6,8 +5,14 @@
   <div class="pusher">
     <div class="ui grid">
       <div class="two wide column">
-        <button class="ui small basic fluid green button" ui-sref="graphs({ playlistId: null })">Clear All</button>
-        <button class="ui small fluid blue button" ng-click="showLists()">Add Graphs</button>
+        <button class="ui basic fluid green button" ui-sref="graphs({ playlistId: null })">
+          <i class="remove icon"></i>
+          Clear All
+        </button>
+        <button class="ui basic fluid blue button" ng-click="showLists()">
+          <i class="add square icon"></i>
+          Add Graphs
+        </button>
         <h4 class="ui header">Your Lists</h4>
         <div class="ui relaxed divided list">
           <div class="item" ng-repeat="list in listCollection | orderBy: 'name'">
@@ -16,8 +21,9 @@
             </div>
           </div>
         </div>
-          </div>
-    <div class="fourteen wide column">
-      <graph-list graph-list="graphList" playlist="playlist" two-columns="twoColumns"></graph-list>
+      </div>
+      <div class="fourteen wide column">
+        <graph-list graph-list="graphList" playlist="playlist" two-columns="twoColumns"></graph-list>
+      </div>
     </div>
-    </div>
+  </div>
