@@ -6,30 +6,18 @@ app.directive("graph", function (d3Service, $window) {
         scope: {
           data: "=",
           type: "@",
-          index: "@",
-          twoColumns: '='
+          index: "@"
         },
         templateUrl: "js/common/directives/graph/graph.html",
 
         link: function(scope, elem, attrs) {
-          // console.log(scope);
+
           d3Service.d3().then(function(d3) {
 
             var selector = "#" + scope.index;
-            // console.log(d3.select(selector));
 
             var svg = d3.select(selector)
               .insert("svg");
-
-            // window.onresize = function() {
-            // scope.$apply();
-            // };
-
-            // console.log(d3.select(selector)._groups[0]);
-            // d3.select(selector)._groups[0].onresize = () => {
-            //   console.log('onresize');
-            //   scope.$apply();
-            // };
 
             scope.currFunctions = graphTypes[ scope.type ];
 
@@ -182,28 +170,10 @@ app.directive("graph", function (d3Service, $window) {
               scope.$watch( () => angular.element($window)[0].innerWidth,
                 () => scope.render(scope.data) );
 
-              // scope.$watch( () => {
-              //   return d3.select(selector).node().getBoundingClientRect().width;
-              // }, () => {
-              //   console.log('width changed:', d3.select(selector).node().getBoundingClientRect().width);
-              //   scope.render(scope.data);
-              // });
-
               scope.$watch( 'type', () => {
                 scope.currFunctions = graphTypes[ scope.type ];
                 scope.render(scope.data);
               });
-
-              var element = document.getElementById(scope.index);
-              new ResizeSensor(element, function() {
-                scope.render(scope.data);
-                console.log('Changed to ' + element.clientWidth);
-              });
-
-              // scope.$watch( 'twoColumns.value', () => {
-              //   console.log('twoColumns', scope.twoColumns);
-              //   scope.render(scope.data);
-              // });
 
               var renderCount = 0;
 
@@ -211,8 +181,17 @@ app.directive("graph", function (d3Service, $window) {
                 renderCount++;
                 //make sure only renders if not first load (watch is triggered 3 times the first load)
                 if (renderCount > 3) scope.render(scope.data);
+                if (renderCount === 3) addResizeWatch();
 
               });
+
+              function addResizeWatch() {
+                var element = document.getElementById(scope.index);
+                new ResizeSensor(element, function() {
+                  scope.render(scope.data);
+                  console.log('Changed to ' + element.clientWidth);
+                });
+              }
 
           });
 
