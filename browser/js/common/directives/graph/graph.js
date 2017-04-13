@@ -189,7 +189,6 @@ app.directive("graph", function (d3Service, $window) {
                 var element = document.getElementById(scope.index);
                 new ResizeSensor(element, function() {
                   scope.render(scope.data);
-                  console.log('Changed to ' + element.clientWidth);
                 });
               }
 
