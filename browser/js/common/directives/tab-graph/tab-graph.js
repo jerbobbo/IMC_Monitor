@@ -17,21 +17,25 @@ app.directive('tabGraph', function (GraphFactory) {
         scope: {
           params: '=',
           graphTitle: '@',
-          period: '@',
           name: '@',
           index: '@'
         },
         templateUrl: 'js/common/directives/tab-graph/tab-graph.html',
 
         controller: function($scope, GraphFactory) {
+          $scope.interval = {
+            value: "daily"
+          };
+
           function init() {
-            var params = `country=${ $scope.params.country }&routeCodeId=${ $scope.params.routeCodeId }&originMemberId=${ $scope.params.originMemberId }&termMemberId=${ $scope.params.termMemberId }&gwId=${ $scope.params.gwId }`;
+            var params = `country=${ $scope.params.country }&routeCodeId=${ $scope.params.routeCodeId }&originMemberId=${ $scope.params.originMemberId }&termMemberId=${ $scope.params.termMemberId }&gwId=${ $scope.params.gwId }&interval=${ $scope.interval.value }`;
 
             GraphFactory.getData(params)
             .then(function(results) {
               $scope.data = results;
 
               $scope.graphTypes = ['ASR', 'ACD', 'Seizures', 'AnswerDelay', 'NoCircuit', 'Normal', 'Failure'];
+              $scope.intervalTypes = ['daily', 'weekly', 'monthly', 'yearly'];
 
               $scope.currType = $scope.graphTypes[0];
             });
@@ -39,12 +43,14 @@ app.directive('tabGraph', function (GraphFactory) {
 
           init();
 
-          $scope.toggleState = function(type) {
-            $scope.currType = type;
-          };
+          $scope.toggleState = (type) => $scope.currType = type;
 
-          $scope.isCurrentType = function(type) {
-            return $scope.currType == type;
+          $scope.isCurrentType = (type) => $scope.currType == type;
+          $scope.isCurrentInterval = (interval) => $scope.interval.value == interval;
+
+          $scope.changeInterval = (interval) => {
+            $scope.interval.value = interval;
+            init();
           };
 
           $scope.$watch( 'index', () => { init(); });

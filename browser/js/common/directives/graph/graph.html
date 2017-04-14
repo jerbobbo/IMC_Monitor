@@ -3,24 +3,24 @@
 <div class="ui label">
   Avg {{ currFunctions.areaAbbr }}
   <div class="detail">
-    {{ currFunctions.avgAreaFunc(data) }}
+    {{ currFunctions.avgAreaFunc(data, currInterval.denominator) }}
   </div>
 </div>
 <div class="ui label">
   Curr {{ currFunctions.areaAbbr }}
   <div class="detail">
-    {{ currFunctions.currAreaFunc(data) }}
+    {{ currFunctions.currAreaFunc(data, currInterval.denominator) }}
   </div>
 </div>
 <div class="ui label" ng-show="currFunctions.avgLineFunc">
   Avg {{ currFunctions.lineAbbr }}
   <div class="detail">
-    {{ currFunctions.avgLineFunc(data) }}
+    {{ currFunctions.avgLineFunc(data, currInterval.denominator) }}
   </div>
 </div>
 <div class="ui label" ng-show="currFunctions.currLineFunc">
   Curr {{ currFunctions.lineAbbr }}
   <div class="detail">
-    {{ currFunctions.currLineFunc(data) }}
+    {{ currFunctions.currLineFunc(data, currInterval.denominator) }}
   </div>
 </div>

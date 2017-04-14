@@ -6,7 +6,8 @@ app.directive("graph", function (d3Service, $window) {
         scope: {
           data: "=",
           type: "@",
-          index: "@"
+          index: "@",
+          interval: '='
         },
         templateUrl: "js/common/directives/graph/graph.html",
 
@@ -55,19 +56,25 @@ app.directive("graph", function (d3Service, $window) {
               if (!data) return;
 
               var parseTime = d3.timeParse("%Y-%m-%dT%H:%M:%S.%LZ");
-              var yesterday = new Date();
-              yesterday.setDate(yesterday.getDate() - 1);
-              var today = new Date();
-              var now = convertDateToUTC(today);
+              // var yesterday = new Date();
+              // yesterday.setDate(yesterday.getDate() - 1);
+              // var today = new Date();
+              // var now = convertDateToUTC(today);
+              scope.currInterval = intervalTypes[scope.interval.value];
 
-              //offset by 5 hours -- to be changed when
+              var now = new Date();
+              now = convertDateToUTC(now);
+              var oldestDate = new Date();
+              oldestDate = convertDateToUTC(oldestDate);
+              scope.currInterval.setOldest(oldestDate);
+
               now.setMinutes(Math.floor(now.getMinutes()/5)*5 - 10);
 
               var x = d3.scaleTime()
-                .domain([yesterday, now])
+                .domain([oldestDate, now])
                 .rangeRound([0, width]),
               y = d3.scaleLinear()
-                .domain([0, scope.currFunctions.maxGraphHeight(data) ])
+                .domain([0, scope.currFunctions.maxGraphHeight(data, scope.currInterval.denominator) ])
                 .rangeRound([height, 0]),
               xAxis = d3.axisBottom()
                 .scale(x),
@@ -88,15 +95,15 @@ app.directive("graph", function (d3Service, $window) {
               }
 
               var area = d3.area()
-                .x(d => x(parseTime(d.batch_time)))
+                .x(d => x(parseTime(d[scope.currInterval.groupBy])))
                 .y0(height)
-                .y1(d => y(scope.currFunctions.areaFunc(d)));
+                .y1(d => y(scope.currFunctions.areaFunc(d, scope.currInterval.denominator)));
 
               var lineData = d3.line()
-              .x(d => x(parseTime(d.batch_time)))
-              .y(d => y(scope.currFunctions.lineFunc(d)));
+              .x(d => x(parseTime(d[scope.currInterval.groupBy])))
+              .y(d => y(scope.currFunctions.lineFunc(d, scope.currInterval.denominator)));
 
-              var areaAvg = scope.currFunctions.avgAreaFunc(data) || "NA";
+              var areaAvg = scope.currFunctions.avgAreaFunc(data, scope.currInterval.denominator) || "NA";
 
               svg.attr("width", width + margin.left + margin.right)
                   .attr("height", height + margin.top + margin.bottom);

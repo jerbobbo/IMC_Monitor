@@ -14,25 +14,70 @@ var ensureAuthenticated = function (req, res, next) {
 };
 
 router.get('/', ensureAuthenticated, function(req, res, next) {
-  console.log(req.query.country);
-  console.log('you got here');
-  // var groupBy = ['batch_time'];
+
+  var intervalMap = {
+    daily: {
+      setOldest: (date) => {
+        date.setHours(date.getHours() - 4);
+        date.setDate(date.getDate() - 1);
+      },
+      groupBy: 'batch_time'
+    },
+    weekly: {
+      setOldest: (date) => {
+        date.setDate(date.getDate() - 8);
+      },
+      groupBy: 'batch_time_30'
+    },
+    monthly: {
+      setOldest: (date) => {
+        date.setDate(date.getDate() - 34);
+      },
+      groupBy: 'batch_time_120'
+    },
+    yearly: {
+      setOldest: (date) => {
+        date.setDate(date.getDate() - 395);
+      },
+      groupBy: 'batch_time_24h'
+    },
+  };
+
+  var interval = intervalMap[req.query.interval];
+
+  var whereClause = {
+    route_code_id: {
+      $like: req.query.routeCodeId
+    },
+    origin_member_id: {
+      $like: req.query.originMemberId
+    },
+    term_member_id: {
+      $like: req.query.termMemberId
+    },
+    gw_id: {
+      $like: req.query.gwId
+    }
+  };
+
+
+  // var now = convertDateToUTC( new Date() );
   var now = new Date();
-  // now.setHours(now.getHours() + 4);
-  var yesterday = new Date();
-  yesterday.setHours(yesterday.getHours() - 4);
-  yesterday.setDate(yesterday.getDate() - 1);
-  // yesterday.setDate(yesterday.getDate() - 1);
-  var ageRange = [yesterday, now];
-  // var countryName = req.query.country || '%';
-  // var originMemberId = req.query.originMemberId || '%';
-  // var termMemberId = req.query.termMemberId || '%';
-  // var routeCodeId = req.query.routeCodeId || '%';
-  // var gwId = req.query.gwId || '%';
+  console.log('now', now);
+  // var oldestDate = convertDateToUTC( new Date() );
+  var oldestDate = new Date();
+  console.log('oldestDate', oldestDate);
+  interval.setOldest(oldestDate);
+  console.log('oldestDate - changed', oldestDate);
+  var ageRange = [oldestDate, now];
+
+  whereClause[interval.groupBy] = {
+    $between: ageRange
+  };
 
   accountingSummaryModel.findAll({
     attributes: [
-      'batch_time',
+      interval.groupBy,
       'country_code',
       [Sequelize.fn('SUM', Sequelize.col('origin_seizures')), 'originSeiz'],
       [Sequelize.fn('SUM', Sequelize.col('completed')), 'completed'],
@@ -72,29 +117,17 @@ router.get('/', ensureAuthenticated, function(req, res, next) {
         }
      }
     }],
-    where: {
-      batch_time: {
-        $between: ageRange
-      },
-      route_code_id: {
-        $like: req.query.routeCodeId
-      },
-      origin_member_id: {
-        $like: req.query.originMemberId
-      },
-      term_member_id: {
-        $like: req.query.termMemberId
-      },
-      gw_id: {
-        $like: req.query.gwId
-      }
-    },
-    group: 'batch_time'
+    where: whereClause,
+    group: interval.groupBy
   })
   .then(function(data) {
     // console.log('graph data:', data);
     res.status(200).json(data);
   }, next);
 });
+
+function convertDateToUTC(date) {
+  return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+}
 
 module.exports = router;
