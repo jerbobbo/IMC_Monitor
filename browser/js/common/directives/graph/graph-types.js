@@ -5,29 +5,29 @@ var graphTypes =
       areaAbbr: "ASR",
       lineAbbr: "ASRm",
       yAxis: "%",
-      areaFunc: d => 100*d.completed/d.originSeiz || 0,
-      lineFunc: d => 100*d.completed/d.originAsrmSeiz || 0,
-      maxGraphHeight: data => d3.max(data, d => 100*d.completed/d.originAsrmSeiz || 0),
-      avgAreaFunc: data => roundToFixed( d3.mean(data, d => 100*d.completed/d.originSeiz || 0) ),
-      avgLineFunc: data => roundToFixed( d3.mean(data, d => 100*d.completed/d.originAsrmSeiz || 0) ),
-      currAreaFunc: data => {
+      areaFunc: (d, originTerm) => 100*d.completed/d[`${originTerm}Seiz`] || 0,
+      lineFunc: (d, originTerm) => 100*d.completed/d[`${originTerm}AsrmSeiz`] || 0,
+      maxGraphHeight: (data, originTerm) => d3.max(data, d => 100*d.completed/d[`${originTerm}AsrmSeiz`] || 0),
+      avgAreaFunc: (data, originTerm) => roundToFixed( d3.mean(data, d => 100*d.completed/d[`${originTerm}Seiz`] || 0) ),
+      avgLineFunc: (data, originTerm) => roundToFixed( d3.mean(data, d => 100*d.completed/d[`${originTerm}AsrmSeiz`] || 0) ),
+      currAreaFunc: (data, originTerm) => {
         var lastFullReading = data[ data.length-2 ];
-        return roundToFixed( 100*lastFullReading.completed/lastFullReading.originSeiz || 0 );
+        return roundToFixed( 100*lastFullReading.completed/lastFullReading[`${originTerm}Seiz`] || 0 );
       },
-      currLineFunc: data => {
+      currLineFunc: (data, originTerm) => {
         var lastFullReading = data[ data.length-2 ];
-        return roundToFixed( 100*lastFullReading.completed/lastFullReading.originAsrmSeiz || 0 );
+        return roundToFixed( 100*lastFullReading.completed/lastFullReading[`${originTerm}AsrmSeiz`] || 0 );
       }
     },
     ACD: {
       name: "ACD",
       areaAbbr: "ACD",
       yAxis: "Minutes",
-      areaFunc: d => d.connMinutes/d.completed || 0,
-      lineFunc: d => d.connMinutes/d.completed  || 0,
-      maxGraphHeight: data => d3.max(data, d => d.connMinutes/d.completed || 0),
-      avgAreaFunc: data => roundToFixed( d3.mean(data, d => d.connMinutes/d.completed || 0) ),
-      currAreaFunc: function(data) {
+      areaFunc: (d, originTerm) => d.connMinutes/d.completed || 0,
+      lineFunc: (d, originTerm) => d.connMinutes/d.completed  || 0,
+      maxGraphHeight: (data, originTerm) => d3.max(data, d => d.connMinutes/d.completed || 0),
+      avgAreaFunc: (data, originTerm) => roundToFixed( d3.mean(data, d => d.connMinutes/d.completed || 0) ),
+      currAreaFunc: data => {
         var lastFullReading = data[ data.length-2 ];
         return roundToFixed( lastFullReading.connMinutes/lastFullReading.completed || 0 );
       }
@@ -36,13 +36,13 @@ var graphTypes =
       name: "Answer Delay",
       areaAbbr: "Answer Delay",
       yAxis: "Seconds",
-      areaFunc: d => d.originAnsDel/d.originSeiz || 0,
-      lineFunc: d => d.originAnsDel/d.originSeiz  || 0,
-      maxGraphHeight: data => d3.max(data, d => d.originAnsDel/d.originSeiz || 0),
-      avgAreaFunc: data => roundToFixed( d3.mean(data, d => d.originAnsDel/d.originSeiz || 0) ),
-      currAreaFunc: function(data) {
+      areaFunc: (d, originTerm) => d[`${originTerm}AnsDel`]/d[`${originTerm}Seiz`] || 0,
+      lineFunc: (d, originTerm) => d[`${originTerm}AnsDel`]/d[`${originTerm}Seiz`]  || 0,
+      maxGraphHeight: (data, originTerm) => d3.max(data, d => d[`${originTerm}AnsDel`]/d[`${originTerm}Seiz`] || 0),
+      avgAreaFunc: (data, originTerm) => roundToFixed( d3.mean(data, d => d[`${originTerm}AnsDel`]/d[`${originTerm}Seiz`] || 0) ),
+      currAreaFunc: (data, originTerm) => {
         var lastFullReading = data[ data.length-2 ];
-        return roundToFixed( lastFullReading.originAnsDel/lastFullReading.originSeiz || 0 );
+        return roundToFixed( lastFullReading[`${originTerm}AnsDel`]/lastFullReading[`${originTerm}Seiz`] || 0 );
       }
     },
     Seizures: {
@@ -50,57 +50,57 @@ var graphTypes =
       areaAbbr: "Completed/Min",
       lineAbbr: "Seiz/Min",
       yAxis: "Seiz/Min",
-      lineFunc: (d, denom) => d.originSeiz/denom || 0,
-      areaFunc: (d, denom) => d.completed/denom  || 0,
-      maxGraphHeight: (data, denom) => d3.max(data, d => d.originSeiz/denom || 0),
-      avgAreaFunc: (data, denom) => roundToFixed( d3.mean(data, d => d.completed/denom  || 0) ),
-      avgLineFunc: (data, denom) => roundToFixed( d3.mean(data, d => d.originSeiz/denom  || 0) ),
-      currAreaFunc: function(data, denom) {
+      lineFunc: (d, originTerm, denom) => d[`${originTerm}Seiz`]/denom || 0,
+      areaFunc: (d, originTerm, denom) => d.completed/denom  || 0,
+      maxGraphHeight: (data, originTerm, denom) => d3.max(data, d => d[`${originTerm}Seiz`]/denom || 0),
+      avgAreaFunc: (data, originTerm, denom) => roundToFixed( d3.mean(data, d => d.completed/denom  || 0) ),
+      avgLineFunc: (data, originTerm, denom) => roundToFixed( d3.mean(data, d => d[`${originTerm}Seiz`]/denom  || 0) ),
+      currAreaFunc: (data, originTerm, denom) => {
         var lastFullReading = data[ data.length-2 ];
         return roundToFixed( lastFullReading.completed/denom || 0 );
       },
-      currLineFunc: function(data, denom) {
+      currLineFunc: (data, originTerm, denom) => {
         var lastFullReading = data[ data.length-2 ];
-        return roundToFixed( lastFullReading.originSeiz/denom || 0 );
+        return roundToFixed( lastFullReading[`${originTerm}Seiz`]/denom || 0 );
       }
     },
     NoCircuit: {
       name: "No Circuit",
       areaAbbr: "No Circuit",
       yAxis: "%",
-      lineFunc: d => 100*d.originNoCirc/d.originSeiz || 0,
-      areaFunc: d => 100*d.originNoCirc/d.originSeiz || 0,
-      maxGraphHeight: data => d3.max(data, d => 100*d.originNoCirc/d.originSeiz || 0),
-      avgAreaFunc: data => roundToFixed( d3.mean(data, d => 100*d.originNoCirc/d.originSeiz || 0) ),
-      currAreaFunc: function(data) {
+      lineFunc: (d, originTerm) => 100*d[`${originTerm}NoCirc`]/d[`${originTerm}Seiz`] || 0,
+      areaFunc: (d, originTerm) => 100*d[`${originTerm}NoCirc`]/d[`${originTerm}Seiz`] || 0,
+      maxGraphHeight: (data, originTerm) => d3.max(data, d => 100*d[`${originTerm}NoCirc`]/d[`${originTerm}Seiz`] || 0),
+      avgAreaFunc: (data, originTerm) => roundToFixed( d3.mean(data, d => 100*d[`${originTerm}NoCirc`]/d[`${originTerm}Seiz`] || 0) ),
+      currAreaFunc: (data, originTerm) => {
         var lastFullReading = data[ data.length-2 ];
-        return roundToFixed( 100*lastFullReading.originNoCirc/lastFullReading.originSeiz || 0 );
+        return roundToFixed( 100*lastFullReading[`${originTerm}NoCirc`]/lastFullReading[`${originTerm}Seiz`] || 0 );
       }
     },
     Normal: {
       name: "Normal Disc",
       areaAbbr: "Normal Disc",
       yAxis: "%",
-      lineFunc: d => 100*d.originNormalDisc/d.originSeiz || 0,
-      areaFunc: d => 100*d.originNormalDisc/d.originSeiz || 0,
-      maxGraphHeight: data => d3.max(data, d => 100*d.originNormalDisc/d.originSeiz || 0),
-      avgAreaFunc: data => roundToFixed( d3.mean(data, d => 100*d.originNormalDisc/d.originSeiz || 0) ),
-      currAreaFunc: function(data) {
+      lineFunc: (d, originTerm) => 100*d[`${originTerm}NormalDisc`]/d[`${originTerm}Seiz`] || 0,
+      areaFunc: (d, originTerm) => 100*d[`${originTerm}NormalDisc`]/d[`${originTerm}Seiz`] || 0,
+      maxGraphHeight: (data, originTerm) => d3.max(data, d => 100*d[`${originTerm}NormalDisc`]/d[`${originTerm}Seiz`] || 0),
+      avgAreaFunc: (data, originTerm) => roundToFixed( d3.mean(data, d => 100*d[`${originTerm}NormalDisc`]/d[`${originTerm}Seiz`] || 0) ),
+      currAreaFunc: (data, originTerm) => {
         var lastFullReading = data[ data.length-2 ];
-        return roundToFixed( 100*lastFullReading.originNormalDisc/lastFullReading.originSeiz || 0 );
+        return roundToFixed( 100*lastFullReading[`${originTerm}NormalDisc`]/lastFullReading[`${originTerm}Seiz`] || 0 );
       }
     },
     Failure: {
       name: "Failure Disc",
       areaAbbr: "Failure Disc",
       yAxis: "%",
-      lineFunc: d => 100*d.originFailDisc/d.originSeiz || 0,
-      areaFunc: d => 100*d.originFailDisc/d.originSeiz || 0,
-      maxGraphHeight: data => d3.max(data, d => 100*d.originFailDisc/d.originSeiz || 0),
-      avgAreaFunc: data => roundToFixed( d3.mean(data, d => 100*d.originFailDisc/d.originSeiz || 0) ),
-      currAreaFunc: function(data) {
+      lineFunc: (d, originTerm) => 100*d[`${originTerm}FailDisc`]/d[`${originTerm}Seiz`] || 0,
+      areaFunc: (d, originTerm) => 100*d[`${originTerm}FailDisc`]/d[`${originTerm}Seiz`] || 0,
+      maxGraphHeight: (data, originTerm) => d3.max(data, d => 100*d[`${originTerm}FailDisc`]/d[`${originTerm}Seiz`] || 0),
+      avgAreaFunc: (data, originTerm) => roundToFixed( d3.mean(data, d => 100*d[`${originTerm}FailDisc`]/d[`${originTerm}Seiz`] || 0) ),
+      currAreaFunc: (data, originTerm) => {
         var lastFullReading = data[ data.length-2 ];
-        return roundToFixed( 100*lastFullReading.originFailDisc/lastFullReading.originSeiz || 0 );
+        return roundToFixed( 100*lastFullReading[`${originTerm}FailDisc`]/lastFullReading[`${originTerm}Seiz`] || 0 );
       }
     }
   };

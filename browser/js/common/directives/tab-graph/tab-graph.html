@@ -4,6 +4,11 @@
     {{ graphTitle }}
   </div>
   <div class="ui breadcrumb">
+    <a ng-repeat-start="type in originTypes" ng-click="toggleOrigin(type)" class="pointer" ng-hide="isCurrentOrigin(type)">{{ type }}</a>
+    <span class="active" ng-show="isCurrentOrigin(type)">{{ type }}</span>
+    <div ng-repeat-end ng-show="$index !== originTypes.length-1" class="divider"> &#183 </div>
+  </div>
+  <div class="ui breadcrumb">
     <a ng-repeat-start="type in intervalTypes" ng-click="changeInterval(type)" class="pointer" ng-hide="isCurrentInterval(type)">{{ type }}</a>
     <span class="active" ng-show="isCurrentInterval(type)">{{ type }}</span>
     <div ng-repeat-end ng-show="$index !== intervalTypes.length-1" class="divider"> &#183 </div>
@@ -15,5 +20,5 @@
   </div>
 </div>
 <div class="ui container">
-  <graph data="data" interval="interval" type="{{currType}}" index="{{index}}"></graph>
+  <graph data="data" interval="{{interval}}" type="{{currType}}" origin-term="{{originTerm}}" index="{{index}}"></graph>
 </div>

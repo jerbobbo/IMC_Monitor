@@ -6,8 +6,9 @@ app.directive("graph", function (d3Service, $window) {
         scope: {
           data: "=",
           type: "@",
+          originTerm: "@",
           index: "@",
-          interval: '='
+          interval: '@'
         },
         templateUrl: "js/common/directives/graph/graph.html",
 
@@ -20,7 +21,9 @@ app.directive("graph", function (d3Service, $window) {
             var svg = d3.select(selector)
               .insert("svg");
 
+
             scope.currFunctions = graphTypes[ scope.type ];
+            console.log(scope);
 
 
           scope.render = (data) => {
@@ -60,7 +63,7 @@ app.directive("graph", function (d3Service, $window) {
               // yesterday.setDate(yesterday.getDate() - 1);
               // var today = new Date();
               // var now = convertDateToUTC(today);
-              scope.currInterval = intervalTypes[scope.interval.value];
+              scope.currInterval = intervalTypes[scope.interval];
 
               var now = new Date();
               now = convertDateToUTC(now);
@@ -74,7 +77,7 @@ app.directive("graph", function (d3Service, $window) {
                 .domain([oldestDate, now])
                 .rangeRound([0, width]),
               y = d3.scaleLinear()
-                .domain([0, scope.currFunctions.maxGraphHeight(data, scope.currInterval.denominator) ])
+                .domain([0, scope.currFunctions.maxGraphHeight(data, scope.originTerm, scope.currInterval.denominator) ])
                 .rangeRound([height, 0]),
               xAxis = d3.axisBottom()
                 .scale(x),
@@ -97,13 +100,13 @@ app.directive("graph", function (d3Service, $window) {
               var area = d3.area()
                 .x(d => x(parseTime(d[scope.currInterval.groupBy])))
                 .y0(height)
-                .y1(d => y(scope.currFunctions.areaFunc(d, scope.currInterval.denominator)));
+                .y1(d => y(scope.currFunctions.areaFunc(d, scope.originTerm, scope.currInterval.denominator)));
 
               var lineData = d3.line()
               .x(d => x(parseTime(d[scope.currInterval.groupBy])))
-              .y(d => y(scope.currFunctions.lineFunc(d, scope.currInterval.denominator)));
+              .y(d => y(scope.currFunctions.lineFunc(d, scope.originTerm, scope.currInterval.denominator)));
 
-              var areaAvg = scope.currFunctions.avgAreaFunc(data, scope.currInterval.denominator) || "NA";
+              var areaAvg = scope.currFunctions.avgAreaFunc(data, scope.originTerm, scope.currInterval.denominator) || "NA";
 
               svg.attr("width", width + margin.left + margin.right)
                   .attr("height", height + margin.top + margin.bottom);
@@ -181,6 +184,9 @@ app.directive("graph", function (d3Service, $window) {
                 scope.currFunctions = graphTypes[ scope.type ];
                 scope.render(scope.data);
               });
+
+              scope.$watch( 'interval', () => scope.render(scope.data) );
+              scope.$watch( 'originTerm', () => scope.render(scope.data) );
 
               var renderCount = 0;
 

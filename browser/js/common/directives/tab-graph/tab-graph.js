@@ -23,12 +23,10 @@ app.directive('tabGraph', function (GraphFactory) {
         templateUrl: 'js/common/directives/tab-graph/tab-graph.html',
 
         controller: function($scope, GraphFactory) {
-          $scope.interval = {
-            value: "daily"
-          };
+          $scope.interval = "daily";
 
           function init() {
-            var params = `country=${ $scope.params.country }&routeCodeId=${ $scope.params.routeCodeId }&originMemberId=${ $scope.params.originMemberId }&termMemberId=${ $scope.params.termMemberId }&gwId=${ $scope.params.gwId }&interval=${ $scope.interval.value }`;
+            var params = `country=${ $scope.params.country }&routeCodeId=${ $scope.params.routeCodeId }&originMemberId=${ $scope.params.originMemberId }&termMemberId=${ $scope.params.termMemberId }&gwId=${ $scope.params.gwId }&interval=${ $scope.interval }`;
 
             GraphFactory.getData(params)
             .then(function(results) {
@@ -36,20 +34,24 @@ app.directive('tabGraph', function (GraphFactory) {
 
               $scope.graphTypes = ['ASR', 'ACD', 'Seizures', 'AnswerDelay', 'NoCircuit', 'Normal', 'Failure'];
               $scope.intervalTypes = ['daily', 'weekly', 'monthly', 'yearly'];
+              $scope.originTypes = ['Origin', 'Term'];
+              $scope.currType = $scope.currType || $scope.graphTypes[0];
+              $scope.originTerm = 'origin';
 
-              $scope.currType = $scope.graphTypes[0];
             });
           }
 
           init();
 
           $scope.toggleState = (type) => $scope.currType = type;
+          $scope.toggleOrigin = (type) => $scope.originTerm = type.toLowerCase();
 
           $scope.isCurrentType = (type) => $scope.currType == type;
-          $scope.isCurrentInterval = (interval) => $scope.interval.value == interval;
+          $scope.isCurrentOrigin = (type) => $scope.originTerm == type.toLowerCase();
+          $scope.isCurrentInterval = (interval) => $scope.interval == interval;
 
           $scope.changeInterval = (interval) => {
-            $scope.interval.value = interval;
+            $scope.interval = interval;
             init();
           };
 
