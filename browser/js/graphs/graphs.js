@@ -1,4 +1,4 @@
-app.controller('GraphCtrl', ($scope, graphData, $stateParams, listCollection) => {
+app.controller('GraphCtrl', ($scope, graphData, $stateParams, listCollection, $state) => {
   $scope.graphList = [];
   $scope.listCollection = listCollection;
   $scope.twoColumns = {
@@ -13,13 +13,23 @@ app.controller('GraphCtrl', ($scope, graphData, $stateParams, listCollection) =>
     };
   }
 
-  $scope.showLists = () => {
+  $scope.clearGraphs = () => {
+    $state.go('graphs', {playlistId: null});
+    $scope.playlist = null;
+  };
+
+  $scope.showGraphGenerator = () => {
     $('.ui.sidebar')
       .sidebar('setting', 'transition', 'push')
       .sidebar('toggle');
 
     $scope.twoColumns.value = false;
   };
+
+  $('#add-to-list')
+    .popup({
+      on: 'click'
+  });
 
 });
 

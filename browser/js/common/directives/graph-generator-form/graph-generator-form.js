@@ -1,5 +1,3 @@
-"use strict";
-
 app.factory('GraphAddFactory', function($http) {
   return {
     getGateways: function() {
@@ -25,7 +23,7 @@ app.factory('GraphAddFactory', function($http) {
 app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory) {
   // $scope.graphList = [];
   $scope.currCountry = "";
-  var graphCount = 0;
+  // var graphCount = 0;
 
   var testGraph = {
     whereClause: "country=Egypt",
@@ -40,6 +38,7 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory
   };
 
   var addToList = function(graphParams) {
+    console.log($scope.graphList);
     $scope.graphList.push(graphParams);
     if ($scope.playlist) {
       PlaylistFactory.saveToList(graphParams, $scope.playlist.id);
@@ -49,8 +48,8 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory
   $scope.addGraph = function() {
     var graphTitle = "";
     var graphOrder = $scope.graphList.length;
-    // var id = new Date().getTime();
-    var graphId = graphCount++;
+    var graphId = new Date().getTime();
+    // var graphId = $scope.graphList.length+1;
 
     var titleDivider = () => {
       if (graphTitle !== "") return " | ";

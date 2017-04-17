@@ -31,8 +31,11 @@ app.factory('GraphListFactory', ($http) => {
 app.controller('GraphListCtrl', ($scope, GraphListFactory) => {
 
   $scope.removeGraph = (idx) => {
-    GraphListFactory.deleteGraph($scope.graphList[idx].id)
-    .then( () => $scope.graphList.splice(idx, 1) );
+    if ($scope.playlist) {
+      GraphListFactory.deleteGraph($scope.graphList[idx].id)
+      .then( () => $scope.graphList.splice(idx, 1) );
+    }
+    else $scope.graphList.splice(idx, 1);
   };
 
   $scope.moveUp = (idx) => {

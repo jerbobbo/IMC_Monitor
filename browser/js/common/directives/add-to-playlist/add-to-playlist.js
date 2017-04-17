@@ -8,26 +8,32 @@ app.factory('PlaylistFactory', ($http) => {
       return $http.post('/api/playlists', newList)
       .then( (results) => results.data);
     },
-    saveToList: (graph, playlistId) => {
+    saveToList: (graph, playlistId, listExists) => {
+      //if playlist exists, change order to be last item in list
+      if (listExists) {
+        return $http.get(`/api/playlists/${playlistId}`)
+        .then( (results) => {
+          console.log('results.data', results.data);
+          graph.order = results.data.playlist_graphs.length;
+          return $http.post(`/api/playlists/${playlistId}/playlist-graph`, graph);
+        })
+        .then( (results) => results.data);
+      }
       return $http.post(`/api/playlists/${playlistId}/playlist-graph`, graph)
       .then( (results) => results.data);
     }
   };
 });
 
-app.controller('PlaylistCtrl', ($scope, PlaylistFactory) => {
+app.controller('PlaylistCtrl', ($scope, PlaylistFactory, $state) => {
   // PlaylistFactory.fetchPlaylists()
   // .then( (_playlists) => {
   //   $scope.playlists = _playlists;
   // });
 
-  $('#add-to-list')
-    .popup({
-      on: 'click'
-    });
 
-  $scope.saveToPlaylist = (targetListId) => {
-    $scope.graphList.forEach( (graph) => PlaylistFactory.saveToList(graph, targetListId) );
+  $scope.saveToPlaylist = (targetListId, listExists) => {
+    $scope.graphList.forEach( (graph) => PlaylistFactory.saveToList(graph, targetListId, listExists) );
   };
 
 
@@ -44,7 +50,8 @@ app.controller('PlaylistCtrl', ($scope, PlaylistFactory) => {
         name: list.name,
       };
 
-      $scope.saveToPlaylist($scope.playlist.id);
+      $scope.saveToPlaylist($scope.playlist.id, false);
+      $state.go('graphs', { playlistId: list.id });
     });
   };
 
@@ -54,6 +61,12 @@ app.controller('PlaylistCtrl', ($scope, PlaylistFactory) => {
 
   $scope.printList = () => console.log($scope.graphList);
   $scope.printScope = () => console.log($scope);
+
+  $('#add-to-list')
+    .popup({
+      on: 'click'
+    });
+
 
 });
 

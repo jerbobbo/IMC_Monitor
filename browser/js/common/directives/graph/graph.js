@@ -23,7 +23,7 @@ app.directive("graph", function (d3Service, $window) {
 
 
             scope.currFunctions = graphTypes[ scope.type ];
-            console.log(scope);
+            // console.log(scope);
 
 
           scope.render = (data) => {
