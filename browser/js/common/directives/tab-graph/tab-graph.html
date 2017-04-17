@@ -3,21 +3,19 @@
   <div class="ui small header">
     {{ graphTitle }}
   </div>
-  <div class="ui breadcrumb">
-    <a ng-repeat-start="type in originTypes" ng-click="toggleOrigin(type)" class="pointer" ng-hide="isCurrentOrigin(type)">{{ type }}</a>
-    <span class="active" ng-show="isCurrentOrigin(type)">{{ type }}</span>
-    <div ng-repeat-end ng-show="$index !== originTypes.length-1" class="divider"> &#183 </div>
+
+  <div class="ui mini basic buttons">
+    <button ng-repeat="type in originTypes" class="ui basic button" ng-click="toggleOrigin(type)" ng-class="{ 'green': isCurrentOrigin(type) }">{{ type }}</button>
   </div>
-  <div class="ui breadcrumb">
-    <a ng-repeat-start="type in intervalTypes" ng-click="changeInterval(type)" class="pointer" ng-hide="isCurrentInterval(type)">{{ type }}</a>
-    <span class="active" ng-show="isCurrentInterval(type)">{{ type }}</span>
-    <div ng-repeat-end ng-show="$index !== intervalTypes.length-1" class="divider"> &#183 </div>
+
+  <div class="ui mini basic buttons">
+    <button ng-repeat="type in intervalTypes" class="ui basic button" ng-click="changeInterval(type)" ng-class="{ 'blue': isCurrentInterval(type) }">{{ type }}</button>
   </div>
-  <div class="ui breadcrumb">
-    <a ng-repeat-start="type in graphTypes" ng-click="toggleState(type)" class="pointer" ng-hide="isCurrentType(type)">{{ type }}</a>
-    <span class="active" ng-show="isCurrentType(type)">{{ type }}</span>
-    <div ng-repeat-end ng-show="$index !== graphTypes.length-1" class="divider"> / </div>
+
+  <div class="ui mini basic buttons">
+    <button ng-repeat="type in graphTypes" class="ui basic button" ng-click="toggleState(type)" ng-class="{ 'orange': isCurrentType(type) }">{{ type }}</button>
   </div>
+
 </div>
 <div class="ui container">
   <graph data="data" interval="{{interval}}" type="{{currType}}" origin-term="{{originTerm}}" index="{{index}}"></graph>
