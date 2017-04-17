@@ -55,7 +55,10 @@ app.directive('tabGraph', function (GraphFactory) {
             init();
           };
 
-          $scope.$watch( 'index', () => { init(); });
+          $scope.$watch( 'index', () =>  init() );
+
+          window.setInterval( () => init(), 300000 );
+
 
         }
     };
