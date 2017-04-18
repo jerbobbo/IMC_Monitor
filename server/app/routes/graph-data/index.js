@@ -1,9 +1,10 @@
 'use strict';
-var path = require('path');
-var router = require('express').Router();
-var accountingSummaryModel = require(path.join(__dirname, '../../../db/models/accounting_summary'));
-var countryPrefixModel = require(path.join(__dirname, '../../../db/models/country_prefix'));
-var Sequelize = require('sequelize');
+const path = require('path');
+const router = require('express').Router();
+const accountingSummaryModel = require(path.join(__dirname, '../../../db/models/accounting_summary'));
+const countryPrefixModel = require(path.join(__dirname, '../../../db/models/country_prefix'));
+const Sequelize = require('sequelize');
+const permission = require(path.join(__dirname, '../../configure/permission'));
 
 var ensureAuthenticated = function (req, res, next) {
     if (req.isAuthenticated()) {
@@ -13,7 +14,7 @@ var ensureAuthenticated = function (req, res, next) {
     }
 };
 
-router.get('/', ensureAuthenticated, function(req, res, next) {
+router.get('/', ensureAuthenticated, permission({ userPermission: true }), function(req, res, next) {
 
   var intervalMap = {
     daily: {
@@ -59,7 +60,6 @@ router.get('/', ensureAuthenticated, function(req, res, next) {
       $like: req.query.gwId
     }
   };
-
 
   // var now = convertDateToUTC( new Date() );
   var now = new Date();

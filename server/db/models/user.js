@@ -16,6 +16,12 @@ var User = db.define('user', {
     },
     salt: {
       type: Sequelize.STRING
+    },
+    userPermission: {
+      type: Sequelize.BOOLEAN
+    },
+    adminPermission: {
+      type: Sequelize.BOOLEAN
     }
 
   },
