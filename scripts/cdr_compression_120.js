@@ -74,6 +74,6 @@ pool.getConnection()
 .then( () => conn.query(deleteSummary120Query) )
 .then( () => {
   console.log('cdr_commpression_120 ran successfully');
-  return pool.releaseConnection(conn);
+  return pool.end();
 })
 .catch(console.log);
