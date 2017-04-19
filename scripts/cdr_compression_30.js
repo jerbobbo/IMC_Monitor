@@ -60,14 +60,14 @@ var insertQuery = `
 
 var deleteSummaryQuery = `
   delete from accounting_summary
-  where TIMESTAMPDIFF(HOUR, (select max(batch_time)
-  from accounting_summary), batch_time) < -50;
+  where TIMESTAMPDIFF(HOUR, (select max(batch_time_30)
+  from accounting_summary30), batch_time) < -50;
   `;
 
 var deleteSummary30Query = `
   delete from accounting_summary_30
   where TIMESTAMPDIFF(DAY, (select max(batch_time_30)
-  from accounting_summary_30), batch_time_30) < -15;
+  from accounting_summary), batch_time_30) < -15;
   `;
 
 var conn;
@@ -76,8 +76,8 @@ pool.getConnection()
   conn = _conn;
   return conn.query(insertQuery);
 })
-.then( () => conn.query(deleteSummaryQuery) )
 .then( () => conn.query(deleteSummary30Query) )
+.then( () => conn.query(deleteSummaryQuery) )
 .then( () => {
   console.log('cdr_commpression_30 ran successfully');
   return pool.releaseConnection(conn);
