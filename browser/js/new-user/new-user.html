@@ -1,18 +1,27 @@
-<form class="ui form" id="new-user">
-  <div class="ui dividing header">
-    Create Login
+<div class="ui grid">
+  <div class="ui centered eight wide column">
+    <form class="ui form" id="new-user">
+      <div class="ui dividing header">
+        Create Login
+      </div>
+      <div class="field">
+        <label>Name</label>
+        <input name="name" type="text" ng-model="user.name" />
+      </div>
+      <div class="field">
+        <label>E-mail Address</label>
+        <input name="email" type="text" ng-model="user.email" />
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input name="pass" type="password" ng-model="user.password" id="pass" />
+      </div>
+      <div class="field">
+        <label>Re-enter password</label>
+        <input name="passConfirm" type="password" ng-model="user.passConfirm" id="passConfirm" />
+      </div>
+      <input type="submit" class="ui submit button" value="Submit" ng-click="createUser()" />
+      <div class="ui error message"></div>
+    </form>
   </div>
-  <div class="field">
-    <label>E-mail Address</label>
-    <input name="email" type="text" />
-  </div>
-  <div class="field">
-    <label>Password</label>
-    <input name="pass" type="text" />
-  </div>
-  <div class="field">
-    <label>Re-enter password</label>
-    <input name="passConfirm" type="text" />
-  </div>
-
-</form>
+</div>

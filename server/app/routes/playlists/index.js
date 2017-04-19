@@ -22,7 +22,9 @@ router.get('/:id', ensureAuthenticated, function (req, res, next) {
 
 router.get('/', ensureAuthenticated, function(req, res, next) {
   models.Playlist.findAll({
-    id: req.user.id
+    where: {
+      user_id: req.user.id
+    }
   })
   .then(function(data) {
     res.status(200).json(data);
