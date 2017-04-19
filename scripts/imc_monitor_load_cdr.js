@@ -180,7 +180,7 @@ function importCDR (file) {
 
 					// console.log(results);
 					if (routeCode === 'NULL') return;
-					
+
 					insertData.push( "(" + [
 						seizId,
 						batchNum,
@@ -235,7 +235,8 @@ function importCDR (file) {
 				return elem !== undefined;
 			});
 			finalInsertData = finalInsertData.join(',');
-			fsp.writeFile(path.join(__dirname, '../logs/' + file + '-insertData.txt'), finalInsertData);
+			//uncomment if you want to see what insertData looks like
+			// fsp.writeFile(path.join(__dirname, '../logs/' + file + '-insertData.txt'), finalInsertData);
 			// console.log('finalInsertData:', finalInsertData);
 			return fn.insertCdrData(finalInsertData);
 		})
