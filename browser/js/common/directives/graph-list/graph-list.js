@@ -57,7 +57,7 @@ app.controller('GraphListCtrl', ($scope, GraphListFactory) => {
   };
 
   $scope.$watch( () => $scope.graphList,
-    () => { console.log($scope.graphList) } );
+    () => { console.log('graphList changed', $scope.graphList) } );
 
   function updateOrderFromSwap (idx){
     [idx, idx+1].forEach( (_idx) => GraphListFactory.updateOrder($scope.graphList[_idx]) );

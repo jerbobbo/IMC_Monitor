@@ -38,7 +38,7 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory
   };
 
   var addToList = function(graphParams) {
-    console.log($scope.graphList);
+    // console.log($scope.graphList);
     $scope.graphList.push(graphParams);
     if ($scope.playlist) {
       PlaylistFactory.saveToList(graphParams, $scope.playlist.id);
@@ -146,6 +146,10 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory
     $('.ui.dropdown').dropdown({ placeholder: false });
     // addToList(testGraph);
   });
+
+  $scope.$watch( () => $scope.graphList,
+    () => { console.log('graphList changed', $scope.graphList) } );
+
 });
 
 app.directive('graphGeneratorForm', () => {

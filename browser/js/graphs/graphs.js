@@ -1,3 +1,4 @@
+
 app.controller('GraphCtrl', ($scope, graphData, $stateParams, listCollection, $state) => {
   $scope.graphList = [];
   $scope.listCollection = listCollection;
