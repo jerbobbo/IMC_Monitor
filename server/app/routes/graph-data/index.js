@@ -1,8 +1,7 @@
 'use strict';
 const path = require('path');
 const router = require('express').Router();
-const accountingSummaryModel = require(path.join(__dirname, '../../../db/models/accounting_summary'));
-const countryPrefixModel = require(path.join(__dirname, '../../../db/models/country_prefix'));
+const models = require(path.join(__dirname, '../../../db/models'));
 const Sequelize = require('sequelize');
 const permission = require(path.join(__dirname, '../../configure/permission'));
 
@@ -22,25 +21,29 @@ router.get('/', ensureAuthenticated, permission({ userPermission: true }), funct
         date.setHours(date.getHours() - 4);
         date.setDate(date.getDate() - 1);
       },
-      groupBy: 'batch_time'
+      groupBy: 'batch_time',
+      model: 'AccountingSummary'
     },
     weekly: {
       setOldest: (date) => {
         date.setDate(date.getDate() - 8);
       },
-      groupBy: 'batch_time_30'
+      groupBy: 'batch_time_30',
+      model: 'AccountingSummary30'
     },
     monthly: {
       setOldest: (date) => {
         date.setDate(date.getDate() - 34);
       },
-      groupBy: 'batch_time_120'
+      groupBy: 'batch_time_120',
+      model: 'AccountingSummary120'
     },
     yearly: {
       setOldest: (date) => {
         date.setDate(date.getDate() - 395);
       },
-      groupBy: 'batch_time_24h'
+      groupBy: 'batch_time_24h',
+      model: 'AccountingSummary24h'
     },
   };
 
@@ -75,7 +78,7 @@ router.get('/', ensureAuthenticated, permission({ userPermission: true }), funct
     $between: ageRange
   };
 
-  accountingSummaryModel.findAll({
+  models[interval.model].findAll({
     attributes: [
       interval.groupBy,
       'country_code',
@@ -109,7 +112,7 @@ router.get('/', ensureAuthenticated, permission({ userPermission: true }), funct
 
     ],
     include: [{
-      model: countryPrefixModel,
+      model: models.CountryPrefix,
       attributes: [],
       where: {
         country: {
