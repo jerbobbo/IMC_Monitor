@@ -12,8 +12,8 @@ var pool = mysql.createPool( {
 });
 
 var insertQuery = `
-  insert into accounting_summary_30 select
-  batch_time_30,
+  insert into accounting_summary_120 select
+  batch_time_120,
   max(batch_num) as batch_num,
   origin_member_id,
   term_member_id,
@@ -49,8 +49,8 @@ var insertQuery = `
   sum(origin_fsr_seiz) as origin_fsr_seiz,
   sum(term_fsr_seiz) as term_fsr_seiz
   from accounting_summary
-  where batch_num > (select max(batch_num) from accounting_summary_30)
-  group by batch_time_30,
+  where batch_num > (select max(batch_num) from accounting_summary_120)
+  group by batch_time_120,
   origin_member_id,
   term_member_id,
   country_code,
@@ -58,16 +58,11 @@ var insertQuery = `
   gw_id;
   `;
 
-var deleteSummaryQuery = `
-  delete from accounting_summary
-  where TIMESTAMPDIFF(HOUR, (select max(batch_time_30)
-  from accounting_summary_30), batch_time) < -50;
-  `;
 
-var deleteSummary30Query = `
-  delete from accounting_summary_30
-  where TIMESTAMPDIFF(DAY, (select max(batch_time_30)
-  from accounting_summary), batch_time_30) < -15;
+var deleteSummary120Query = `
+  delete from accounting_summary_120
+  where TIMESTAMPDIFF(DAY, (select max(batch_time_120)
+  from accounting_summary), batch_time_120) < -65;
   `;
 
 var conn;
@@ -76,10 +71,9 @@ pool.getConnection()
   conn = _conn;
   return conn.query(insertQuery);
 })
-.then( () => conn.query(deleteSummary30Query) )
-.then( () => conn.query(deleteSummaryQuery) )
+.then( () => conn.query(deleteSummary120Query) )
 .then( () => {
-  console.log('cdr_commpression_30 ran successfully');
+  console.log('cdr_commpression_120 ran successfully');
   return pool.releaseConnection(conn);
 })
 .catch(console.log);
