@@ -32,7 +32,7 @@ var graphTypes =
         return roundToFixed( lastFullReading.connMinutes/lastFullReading.completed || 0 );
       }
     },
-    AnswerDelay: {
+    AnsDel: {
       name: "Answer Delay",
       areaAbbr: "Answer Delay",
       yAxis: "Seconds",
@@ -64,7 +64,7 @@ var graphTypes =
         return roundToFixed( lastFullReading[`${originTerm}Seiz`]/denom || 0 );
       }
     },
-    NoCircuit: {
+    NoCirc: {
       name: "No Circuit",
       areaAbbr: "No Circuit",
       yAxis: "%",

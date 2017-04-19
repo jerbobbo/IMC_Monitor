@@ -32,7 +32,7 @@ app.directive('tabGraph', function (GraphFactory) {
             .then(function(results) {
               $scope.data = results;
 
-              $scope.graphTypes = ['ASR', 'ACD', 'Seizures', 'AnswerDelay', 'NoCircuit', 'Normal', 'Failure'];
+              $scope.graphTypes = ['ASR', 'ACD', 'Seizures', 'AnsDel', 'NoCirc', 'Normal', 'Failure'];
               $scope.intervalTypes = ['daily', 'weekly', 'monthly', 'yearly'];
               $scope.originTypes = ['Origin', 'Term'];
               $scope.currType = $scope.currType || $scope.graphTypes[0];
