@@ -1,7 +1,7 @@
 <div id="{{index}}">
 </div>
 
-<table class="ui celled compact small collapsing grey table">
+<table class="ui celled very compact small grey collapsing unstackable four column table">
   <thead>
     <tr>
       <th colspan="2">
@@ -14,9 +14,9 @@
   </thead>
   <tbody>
     <tr>
-      <td class="two wide">{{ currFunctions.areaAbbr }}</td>
+      <td>{{ currFunctions.areaAbbr }}</td>
       <td>{{ currFunctions.currAreaFunc(data, originTerm, currInterval.denominator) }}</td>
-      <td class="two wide">{{ currFunctions.areaAbbr }}</td>
+      <td>{{ currFunctions.areaAbbr }}</td>
       <td>{{ currFunctions.avgAreaFunc(data, originTerm, currInterval.denominator) }}</td>
     </tr>
     <tr ng-show="currFunctions.avgLineFunc">
@@ -27,38 +27,3 @@
     </tr>
   </tbody>
 </table>
-
-<!-- <div class="ui two column padded grid">
-  <div class ="column">
-    <div class="ui label">
-      Avg {{ currFunctions.areaAbbr }}
-      <div class="detail">
-        {{ currFunctions.avgAreaFunc(data, originTerm, currInterval.denominator) }}
-      </div>
-    </div>
-  </div>
-  <div class="column">
-    <div class="ui label">
-      Curr {{ currFunctions.areaAbbr }}
-      <div class="detail">
-        {{ currFunctions.currAreaFunc(data, originTerm, currInterval.denominator) }}
-      </div>
-    </div>
-  </div>
-  <div class="column">
-    <div class="ui label" ng-show="currFunctions.avgLineFunc">
-      Avg {{ currFunctions.lineAbbr }}
-      <div class="detail">
-        {{ currFunctions.avgLineFunc(data, originTerm, currInterval.denominator) }}
-      </div>
-    </div>
-  </div>
-  <div class="column">
-    <div class="ui label" ng-show="currFunctions.currLineFunc">
-      Curr {{ currFunctions.lineAbbr }}
-      <div class="detail">
-        {{ currFunctions.currLineFunc(data, originTerm, currInterval.denominator) }}
-      </div>
-    </div>
-  </div>
-</div> -->
