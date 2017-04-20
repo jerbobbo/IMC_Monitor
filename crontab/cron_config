@@ -1,4 +1,4 @@
 */5 * * * * PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin /usr/local/bin/node /home/monitor/imc_monitor/scripts/imc_monitor_load_cdr.js
-*/30 * * * * PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin /usr/local/bin/node /home/monitor/imc_monitor/scripts/cdr_commpression_30.js
-0 */2 * * * PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin /usr/local/bin/node /home/monitor/imc_monitor/scripts/cdr_commpression_120.js
-00 00 * * * PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin /usr/local/bin/node /home/monitor/imc_monitor/scripts/cdr_commpression_24h.js
+*/30 * * * * PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin /usr/local/bin/node /home/monitor/imc_monitor/scripts/cdr_compression_30.js
+0 */2 * * * PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin /usr/local/bin/node /home/monitor/imc_monitor/scripts/cdr_compression_120.js
+00 00 * * * PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin /usr/local/bin/node /home/monitor/imc_monitor/scripts/cdr_compression_24h.js
