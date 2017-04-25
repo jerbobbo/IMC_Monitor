@@ -1,9 +1,14 @@
 
-app.controller('GraphCtrl', ($scope, graphData, $stateParams, listCollection, $state, GraphListFactory) => {
+app.controller('GraphsCtrl', ($scope, graphData, $stateParams, listCollection, $state, GraphListFactory) => {
   $scope.listCollection = listCollection;
   $scope.twoColumns = {
     value: true
   };
+
+  $scope.isEmpty = GraphListFactory.isEmpty;
+  $scope.existsPlaylist = () => $scope.playlist;
+
+  console.log('playlist', $scope.playlist);
 
   if (graphData) {
     GraphListFactory.setGraphList(graphData.graphList);
@@ -37,13 +42,19 @@ app.controller('GraphCtrl', ($scope, graphData, $stateParams, listCollection, $s
       on: 'click'
   });
 
+  $scope.$watch( () => $scope.existsPlaylist(),
+    () => { console.log('playlist changed', $scope.existsPlaylist()) } );
+
+  $scope.$watch( () => $scope.isEmpty(),
+    () => { console.log('isEmpty() changed', $scope.isEmpty()) } );
+
 });
 
 app.config(function ($stateProvider) {
   $stateProvider.state('graphs', {
     url: '/graphs/:playlistId',
     templateUrl: 'js/graphs/graphs.html',
-    controller: 'GraphCtrl',
+    controller: 'GraphsCtrl',
     resolve: {
       graphData: (GraphListFactory, $stateParams) => {
         if ($stateParams.playlistId) {

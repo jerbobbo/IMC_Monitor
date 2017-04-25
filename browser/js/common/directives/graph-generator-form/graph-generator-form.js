@@ -24,7 +24,7 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory
   // $scope.graphList = [];
   $scope.currCountry = "";
   // var graphCount = 0;
-  $scope.graphList = GraphListFactory.graphList;
+  // $scope.graphList = GraphListFactory.graphList;
 
   var testGraph = {
     whereClause: "country=Egypt",
@@ -40,7 +40,8 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory
 
   var addToList = function(graphParams) {
     // console.log($scope.graphList);
-    $scope.graphList.push(graphParams);
+    // $scope.graphList.push(graphParams);
+    GraphListFactory.addToGraphList(graphParams);
     if ($scope.playlist) {
       PlaylistFactory.saveToList(graphParams, $scope.playlist.id);
     }
@@ -48,7 +49,7 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory
 
   $scope.addGraph = function() {
     var graphTitle = "";
-    var graphOrder = $scope.graphList.length;
+    var graphOrder = GraphListFactory.getGraphList().length;
     var graphId = new Date().getTime();
     // var graphId = $scope.graphList.length+1;
 
@@ -56,37 +57,6 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory
       if (graphTitle !== "") return " | ";
       return "";
     };
-
-    // var addToTitle = ( parameters ) => {
-    //   parameters.forEach( (parameter) => {
-    //     if (parameter) graphTitle += titleDivider() + parameter.title + parameter.data;
-    //   });
-    // };
-    //
-    // var parameterList = [
-    //   {
-    //     title: "",
-    //     data: $scope.currCountry || ""
-    //   },
-    //   {
-    //     title: "",
-    //     data: $scope.currRegion.region_name || ""
-    //   },
-    //   {
-    //     title: "Originating: ",
-    //     data: $scope.currOrigin.name || ""
-    //   },
-    //   {
-    //     title: "Terminating: ",
-    //     data: $scope.currTerm.name || ""
-    //   },
-    //   {
-    //     title: "",
-    //     data: $scope.currGw.address || ""
-    //   }
-    // ];
-
-    // addToTitle(parameterList);
 
     var country, routeCodeId, originMemberId, termMemberId, gwId;
 
@@ -100,11 +70,11 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory
     }
     if (!!$scope.currOrigin) {
       originMemberId = $scope.currOrigin.id;
-      graphTitle += titleDivider() + 'Originating: ' + $scope.currOrigin.name;
+      graphTitle += titleDivider() + 'Origin: ' + $scope.currOrigin.name;
     }
     if (!!$scope.currTerm) {
       termMemberId = $scope.currTerm.id;
-      graphTitle += titleDivider() + 'Terminating: ' + $scope.currTerm.name;
+      graphTitle += titleDivider() + 'Term: ' + $scope.currTerm.name;
     }
     if (!!$scope.currGw) {
       gwId = $scope.currGw.id;
@@ -148,8 +118,8 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory
     // addToList(testGraph);
   });
 
-  $scope.$watch( () => $scope.graphList,
-    () => { console.log('graphList changed', $scope.graphList) } );
+  // $scope.$watch( () => $scope.graphList,
+  //   () => { console.log('graphList changed', $scope.graphList) } );
 
 });
 

@@ -26,50 +26,51 @@ app.factory('GraphListFactory', ($http) => {
       return $http.put(`/api/playlist-graphs/${graph.id}`, graph)
       .then( (graph) => graph.data);
     },
-    deleteGraph: (graphId) => $http.delete(`/api/playlist-graphs/${graphId}`),
+    deleteGraphFromList: (idx) => $http.delete(`/api/playlist-graphs/${_graphList[idx].id}`),
+    deletGraphFromView: (idx) => _graphList.splice(idx, 1),
     setGraphList: (graphData) => {
       angular.copy(graphData, _graphList);
     },
     clearGraphList: () => angular.copy([], _graphList),
-    graphList: _graphList
+    getLastGraphTitle: () => {
+      if (_graphList.length) return [_graphList.length-1].graphTitle;
+    },
+    getGraphList: () => _graphList,
+    addToGraphList: (graph) => {
+      _graphList.push(graph);
+    },
+    isEmpty: () => _graphList.length === 0,
+    swapOrder: (idx, next) => {
+      var currentGraph = _graphList[idx];
+      currentGraph.order++;
+      _graphList[idx] = _graphList[next];
+      _graphList[idx].order--;
+      _graphList[next] = currentGraph;
+      [idx, next].forEach( (_idx) => updateOrder(_graphList[_idx]) );
+    },
+
   };
 });
 
 app.controller('GraphListCtrl', ($scope, GraphListFactory) => {
-  $scope.graphList = GraphListFactory.graphList;
+  // $scope.graphList = GraphListFactory.getGraphList();
+
+  $scope.getGraphList = GraphListFactory.getGraphList;
 
   $scope.removeGraph = (idx) => {
     if ($scope.playlist) {
-      GraphListFactory.deleteGraph($scope.graphList[idx].id)
-      .then( () => $scope.graphList.splice(idx, 1) );
+      GraphListFactory.deleteGraphFromList(idx)
+      .then( () => GraphListFactory.deletGraphFromView(idx) );
     }
-    else $scope.graphList.splice(idx, 1);
+    else GraphListFactory.deletGraphFromView(idx);
   };
 
-  $scope.moveUp = (idx) => {
-    var currentGraph = $scope.graphList[idx];
-    currentGraph.order--;
-    $scope.graphList[idx] = $scope.graphList[idx-1];
-    $scope.graphList[idx].order++;
-    $scope.graphList[idx-1] = currentGraph;
-    updateOrderFromSwap(idx-1);
-  };
+  $scope.moveUp = (idx) => GraphListFactory.swapOrder(idx-1, idx);
 
-  $scope.moveDown = (idx) => {
-    var currentGraph = $scope.graphList[idx];
-    currentGraph.order++;
-    $scope.graphList[idx] = $scope.graphList[idx+1];
-    $scope.graphList[idx].order--;
-    $scope.graphList[idx+1] = currentGraph;
-    updateOrderFromSwap(idx);
-  };
+  $scope.moveDown = (idx) => GraphListFactory.swapOrder(idx, idx+1);
 
-  $scope.$watch( () => $scope.graphList,
-    () => { console.log('graphList changed', $scope.graphList) } );
-
-  function updateOrderFromSwap (idx){
-    [idx, idx+1].forEach( (_idx) => GraphListFactory.updateOrder($scope.graphList[_idx]) );
-  }
+  // $scope.$watch( () => $scope.graphList,
+  //   () => { console.log('graphList changed', $scope.graphList) } );
 
   $scope.twoColumns = {
     value: true

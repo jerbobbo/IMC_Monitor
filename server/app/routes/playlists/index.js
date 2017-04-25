@@ -39,10 +39,10 @@ router.post('/:playlistId/playlist-graph', ensureAuthenticated, function(req, re
     order: newGraph.order,
     title: newGraph.graphTitle,
     country: newGraph.params.country,
-    route_code_id: newGraph.params.routeCodeId,
-    origin_member_id: newGraph.params.originMemberId,
-    term_member_id: newGraph.params.termMemberId,
-    gw_id: newGraph.params.gwId
+    route_code_id: newGraph.params.routeCodeId === '%' ? 0 : newGraph.params.routeCodeId,
+    origin_member_id: newGraph.params.originMemberId === '%' ? 0 : newGraph.params.originMemberId,
+    term_member_id: newGraph.params.termMemberId === '%' ? 0 : newGraph.params.termMemberId,
+    gw_id: newGraph.params.gwId === '%' ? 0 : newGraph.params.gwId
   })
   .then(function(data) {
     res.status(201).json(data);

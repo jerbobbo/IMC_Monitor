@@ -1,6 +1,6 @@
   <div class="ui wide sidebar vertical menu">
     <graph-generator-form playlist="playlist" ></graph-generator-form>
-    <add-to-playlist playlist="playlist" list-collection="listCollection"></add-to-playlist>
+    <add-to-playlist playlist="playlist" list-collection="listCollection" ng-if="!isEmpty() && !playlist"></add-to-playlist>
   </div>
   <div class="pusher">
     <div class="ui grid">

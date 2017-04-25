@@ -13,7 +13,7 @@
 
   </div>
   <div ng-class="twoColumns.value ? 'ui doubling two column grid' : 'ui grid' ">
-    <div ng-class="twoColumns.value ? 'column' : 'twelve wide column' " ng-repeat="graph in graphList track by $index">
+    <div ng-class="twoColumns.value ? 'column' : 'twelve wide column' " ng-repeat="graph in getGraphList() track by $index">
       <div  class="ui fluid card">
         <div class="content">
             <i class="large right floated red remove circle icon" ng-click="removeGraph($index)"></i>

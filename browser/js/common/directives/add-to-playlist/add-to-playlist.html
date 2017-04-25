@@ -1,12 +1,12 @@
 <!-- <button class="ui blue button" ng-click="printList()">Print List</button> -->
 
-<form class="ui form" ng-show="graphList.length && !playlist">
+<form class="ui form">
   <div class="ui horizontal divider">
     SAVE TO PLAYLIST
   </div>
   <div class="fields">
     <div class="twelve wide field">
-      <input type="text" name="name" ng-model="newListName" placeholder="New Playlist Name">
+      <input type="text" name="name" ng-model="newListName" placeholder="{{ getLastGraphTitle() }}">
     </div>
     <div class="four wide field">
       <div class="ui green button" ng-click="createPlaylist()">Save</div>

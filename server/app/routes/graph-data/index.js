@@ -51,16 +51,16 @@ router.get('/', ensureAuthenticated, permission({ userPermission: true }), funct
 
   var whereClause = {
     route_code_id: {
-      $like: req.query.routeCodeId
+      $like: req.query.routeCodeId || '%'
     },
     origin_member_id: {
-      $like: req.query.originMemberId
+      $like: req.query.originMemberId || '%'
     },
     term_member_id: {
-      $like: req.query.termMemberId
+      $like: req.query.termMemberId || '%'
     },
     gw_id: {
-      $like: req.query.gwId
+      $like: req.query.gwId || '%'
     }
   };
 
