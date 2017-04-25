@@ -81,7 +81,6 @@ router.get('/', ensureAuthenticated, permission({ userPermission: true }), funct
   models[interval.model].findAll({
     attributes: [
       interval.groupBy,
-      'country_code',
       [Sequelize.fn('SUM', Sequelize.col('origin_seizures')), 'originSeiz'],
       [Sequelize.fn('SUM', Sequelize.col('completed')), 'completed'],
       [Sequelize.fn('SUM', Sequelize.col('conn_minutes')), 'connMinutes'],

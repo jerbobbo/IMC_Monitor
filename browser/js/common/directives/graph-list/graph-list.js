@@ -1,4 +1,6 @@
 app.factory('GraphListFactory', ($http) => {
+  var _graphList = [];
+
   return {
     fetchGraphs: (playlistId) => {
       return $http.get(`/api/playlists/${playlistId}`)
@@ -24,11 +26,17 @@ app.factory('GraphListFactory', ($http) => {
       return $http.put(`/api/playlist-graphs/${graph.id}`, graph)
       .then( (graph) => graph.data);
     },
-    deleteGraph: (graphId) => $http.delete(`/api/playlist-graphs/${graphId}`)
+    deleteGraph: (graphId) => $http.delete(`/api/playlist-graphs/${graphId}`),
+    setGraphList: (graphData) => {
+      angular.copy(graphData, _graphList);
+    },
+    clearGraphList: () => angular.copy([], _graphList),
+    graphList: _graphList
   };
 });
 
 app.controller('GraphListCtrl', ($scope, GraphListFactory) => {
+  $scope.graphList = GraphListFactory.graphList;
 
   $scope.removeGraph = (idx) => {
     if ($scope.playlist) {
@@ -79,7 +87,6 @@ app.directive('graphList', () => {
   return {
     restrict: 'E',
     scope: {
-      graphList: '=',
       playlist: '=',
       twoColumns: '='
     },

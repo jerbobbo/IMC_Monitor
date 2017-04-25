@@ -20,10 +20,11 @@ app.factory('GraphAddFactory', function($http) {
   };
 });
 
-app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory) {
+app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory, GraphListFactory) {
   // $scope.graphList = [];
   $scope.currCountry = "";
   // var graphCount = 0;
+  $scope.graphList = GraphListFactory.graphList;
 
   var testGraph = {
     whereClause: "country=Egypt",
@@ -156,7 +157,6 @@ app.directive('graphGeneratorForm', () => {
   return {
     restrict: 'E',
     scope: {
-      graphList: '=',
       playlist: '='
     },
     templateUrl: '/js/common/directives/graph-generator-form/graph-generator-form.html',

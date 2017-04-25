@@ -1,17 +1,22 @@
 
-app.controller('GraphCtrl', ($scope, graphData, $stateParams, listCollection, $state) => {
-  $scope.graphList = [];
+app.controller('GraphCtrl', ($scope, graphData, $stateParams, listCollection, $state, GraphListFactory) => {
   $scope.listCollection = listCollection;
   $scope.twoColumns = {
     value: true
   };
 
   if (graphData) {
-    $scope.graphList = graphData.graphList;
+    GraphListFactory.setGraphList(graphData.graphList);
+    console.log(GraphListFactory.graphList);
+
     $scope.playlist = {
       id: $stateParams.playlistId || null,
       name: graphData.playlistName || ""
     };
+  }
+  else {
+    GraphListFactory.clearGraphList();
+    console.log(GraphListFactory.graphList);
   }
 
   $scope.clearGraphs = () => {

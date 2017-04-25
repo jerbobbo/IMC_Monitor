@@ -25,13 +25,14 @@ app.factory('PlaylistFactory', ($http) => {
   };
 });
 
-app.controller('PlaylistCtrl', ($scope, PlaylistFactory, $state) => {
+app.controller('PlaylistCtrl', ($scope, PlaylistFactory, $state, GraphListFactory) => {
   // PlaylistFactory.fetchPlaylists()
   // .then( (_playlists) => {
   //   $scope.playlists = _playlists;
   // });
 
-
+  $scope.graphList = GraphListFactory.graphList;
+  
   $scope.saveToPlaylist = (targetListId, listExists) => {
     $scope.graphList.forEach( (graph) => PlaylistFactory.saveToList(graph, targetListId, listExists) );
   };
@@ -76,7 +77,6 @@ app.directive('addToPlaylist', (PlaylistFactory) => {
     templateUrl: 'js/common/directives/add-to-playlist/add-to-playlist.html',
     controller: 'PlaylistCtrl',
     scope: {
-      graphList: '=',
       playlist: '=',
       listCollection: '='
     }
