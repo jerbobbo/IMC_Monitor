@@ -60,6 +60,9 @@ app.controller('GraphListCtrl', ($scope, GraphListFactory) => {
   // $scope.graphList = GraphListFactory.getGraphList();
 
   $scope.getGraphList = GraphListFactory.getGraphList;
+  $scope.graphTypes = ['ASR', 'ACD', 'Seizures', 'AnsDel', 'NoCirc', 'Normal', 'Failure'];
+
+  $scope.spread = true;
 
   $scope.removeGraph = (idx) => {
     if ($scope.playlist) {
@@ -87,7 +90,12 @@ app.controller('GraphListCtrl', ($scope, GraphListFactory) => {
     $scope.twoColumns.value = !$scope.twoColumns.value;
   };
 
+  $scope.spreadToggle = () => {
+    $scope.spread = !$scope.spread;
+  };
+
   $scope.columnText = () => $scope.twoColumns.value ? "Single Column" : "Two Columns";
+  $scope.spreadText = () => $scope.spread ? "Collapse" : "Expand";
 
 });
 

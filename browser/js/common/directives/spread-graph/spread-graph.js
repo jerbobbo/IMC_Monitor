@@ -1,19 +1,5 @@
-app.factory('GraphFactory', function($http) {
-  return {
-    getData: function(params) {
-      return $http.get('/api/graph-data?' + params)
-      .then(function(response) {
-        return response.data;
-      });
-    },
-    graphTypes: ['ASR', 'ACD', 'Seizures', 'AnsDel', 'NoCirc', 'Normal', 'Failure'],
-    intervalTypes: ['daily', 'weekly', 'monthly', 'yearly'],
-    originTypes: ['Origin', 'Term']
-  };
-});
-
-//will be tab-graph in html tag
-app.directive('tabGraph', function (GraphFactory) {
+//will be spread-graph in html tag
+app.directive('spreadGraph', function (GraphFactory) {
 
     return {
         restrict: 'E',
@@ -23,7 +9,7 @@ app.directive('tabGraph', function (GraphFactory) {
           name: '@',
           index: '@'
         },
-        templateUrl: 'js/common/directives/tab-graph/tab-graph.html',
+        templateUrl: 'js/common/directives/spread-graph/spread-graph.html',
 
         controller: function($scope, GraphFactory) {
           $scope.interval = "daily";

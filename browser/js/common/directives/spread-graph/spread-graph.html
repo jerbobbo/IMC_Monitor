@@ -1,0 +1,19 @@
+<div class="ui fluid card" ng-repeat="currType in graphTypes">
+  <div class="ui container">
+    <div class="ui top attached small header">
+      {{ graphTitle }} | {{ originTerm }} {{ currType }} | {{ interval }}
+    </div>
+
+    <div ng-if=" currType == 'ASR' " class="ui mini basic buttons">
+      <button ng-repeat="type in originTypes" class="ui basic button" ng-click="toggleOrigin(type)" ng-class="{ 'green': isCurrentOrigin(type) }">{{ type }}</button>
+    </div>
+
+    <div ng-if=" currType == 'ASR' " class="ui mini basic buttons">
+      <button ng-repeat="type in intervalTypes" class="ui basic button" ng-click="changeInterval(type)" ng-class="{ 'blue': isCurrentInterval(type) }">{{ type }}</button>
+    </div>
+
+  </div>
+  <div class="ui container">
+    <graph data="data" interval="{{interval}}" type="{{currType}}" origin-term="{{originTerm}}" index="{{currType}}{{index}}"></graph>
+  </div>
+</div>

@@ -8,13 +8,13 @@
     </div>
     <div class="column">
       <button class="ui right floated black basic button" ng-click="columnToggle()">{{ columnText() }}</button>
+      <button class="ui right floated red basic button" ng-click="spreadToggle()">{{ spreadText() }}</button>
     </div>
   </div>
 
-  </div>
   <div ng-class="twoColumns.value ? 'ui doubling two column grid' : 'ui grid' ">
     <div ng-class="twoColumns.value ? 'column' : 'twelve wide column' " ng-repeat="graph in getGraphList() track by $index">
-      <div  class="ui fluid card">
+      <div ng-if="!spread" class="ui fluid card">
         <div class="content">
             <i class="large right floated red remove circle icon" ng-click="removeGraph($index)"></i>
             <i class="large right floated blue chevron circle up icon"  ng-show="$index !== 0" ng-click="moveUp($index)"></i>
@@ -22,8 +22,10 @@
           <tab-graph params="graph.params" graph-title="{{ graph.graphTitle }}" index="graph{{ graph.id }}"></tab-graph>
         </div>
       </div>
+      <spread-graph ng-if="spread" params="graph.params" graph-title="{{ graph.graphTitle }}" index="graph{{ graph.id }}"></spread-graph>
     </div>
   </div>
+</div>
 
   <!-- <div class="ui cards">
 
