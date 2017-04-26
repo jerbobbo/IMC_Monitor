@@ -1,7 +1,8 @@
 app.factory('GraphListFactory', ($http) => {
   var _graphList = [];
+  var _lastGraphTitle = { value: '' };
 
-  return {
+  var GraphListFactory = {
     fetchGraphs: (playlistId) => {
       return $http.get(`/api/playlists/${playlistId}`)
       .then( (results) => {
@@ -22,8 +23,8 @@ app.factory('GraphListFactory', ($http) => {
         };
       });
     },
-    updateOrder: (graph) => {
-      return $http.put(`/api/playlist-graphs/${graph.id}`, graph)
+    updateOrder: (idx) => {
+      return $http.put(`/api/playlist-graphs/${_graphList[idx].id}`, graph)
       .then( (graph) => graph.data);
     },
     deleteGraphFromList: (idx) => $http.delete(`/api/playlist-graphs/${_graphList[idx].id}`),
@@ -33,11 +34,13 @@ app.factory('GraphListFactory', ($http) => {
     },
     clearGraphList: () => angular.copy([], _graphList),
     getLastGraphTitle: () => {
-      if (_graphList.length) return [_graphList.length-1].graphTitle;
+      if (_graphList.length) return _graphList[_graphList.length-1].graphTitle;
     },
     getGraphList: () => _graphList,
     addToGraphList: (graph) => {
       _graphList.push(graph);
+      console.log('graph', graph);
+      _lastGraphTitle.value = graph.graphTitle;
     },
     isEmpty: () => _graphList.length === 0,
     swapOrder: (idx, next) => {
@@ -46,10 +49,11 @@ app.factory('GraphListFactory', ($http) => {
       _graphList[idx] = _graphList[next];
       _graphList[idx].order--;
       _graphList[next] = currentGraph;
-      [idx, next].forEach( (_idx) => updateOrder(_graphList[_idx]) );
     },
-
+    lastGraphTitle: _lastGraphTitle
   };
+
+  return GraphListFactory;
 });
 
 app.controller('GraphListCtrl', ($scope, GraphListFactory) => {
@@ -65,12 +69,15 @@ app.controller('GraphListCtrl', ($scope, GraphListFactory) => {
     else GraphListFactory.deletGraphFromView(idx);
   };
 
-  $scope.moveUp = (idx) => GraphListFactory.swapOrder(idx-1, idx);
+  $scope.moveUp = (idx) => {
+    GraphListFactory.swapOrder(idx-1, idx);
+    if ($scope.playlist) [idx-1, idx].forEach( (_idx) => GraphListFactory.updateOrder(_idx) );
+  };
 
-  $scope.moveDown = (idx) => GraphListFactory.swapOrder(idx, idx+1);
-
-  // $scope.$watch( () => $scope.graphList,
-  //   () => { console.log('graphList changed', $scope.graphList) } );
+  $scope.moveDown = (idx) => {
+    GraphListFactory.swapOrder(idx, idx+1);
+    if ($scope.playlist) [idx, idx+1].forEach( (_idx) => GraphListFactory.updateOrder(_idx) );
+};
 
   $scope.twoColumns = {
     value: true

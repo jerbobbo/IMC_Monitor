@@ -27,16 +27,12 @@ app.factory('PlaylistFactory', ($http) => {
 
 app.controller('PlaylistCtrl', ($scope, PlaylistFactory, $state, GraphListFactory) => {
 
-
-
   $scope.saveToPlaylist = (targetListId, listExists) => {
     GraphListFactory.getGraphList().forEach( (graph) => PlaylistFactory.saveToList(graph, targetListId, listExists) );
   };
 
-  $scope.isEmpty = GraphListFactory.isEmpty;
-
   console.log('playlist', $scope.playlist);
-  console.log('isEmpty', $scope.isEmpty());
+  // console.log('isEmpty', $scope.isEmpty());
 
   $scope.createPlaylist = () => {
     var newList = {
@@ -52,6 +48,7 @@ app.controller('PlaylistCtrl', ($scope, PlaylistFactory, $state, GraphListFactor
       };
 
       $scope.saveToPlaylist($scope.playlist.id, false);
+      $scope.newListName = null;
       $state.go('graphs', { playlistId: list.id });
     });
   };
@@ -61,6 +58,11 @@ app.controller('PlaylistCtrl', ($scope, PlaylistFactory, $state, GraphListFactor
   };
 
   $scope.printScope = () => console.log($scope);
+
+  $scope.$watch( GraphListFactory.lastGraphTitle.value,
+    () => {
+      $scope.newListName = GraphListFactory.lastGraphTitle.value;
+  });
 
   $('#add-to-list')
     .popup({
