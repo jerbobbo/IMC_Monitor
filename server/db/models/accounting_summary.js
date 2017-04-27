@@ -1,12 +1,15 @@
 /* jshint indent: 2 */
 
 'use strict';
-var path = require('path');
-var db = require(path.join(__dirname, '../')).db;
-var Sequelize = require('sequelize');
-var CountryPrefix = require(path.join(__dirname, 'country_prefix'));
+const path = require('path');
+const db = require(path.join(__dirname, '../')).db;
+const Sequelize = require('sequelize');
+const CountryPrefix = require(path.join(__dirname, 'country_prefix'));
+const AccountingRegionName = require(path.join(__dirname, 'accounting_region_name'));
+const AccountingMembersName = require(path.join(__dirname, 'accounting_members_name'));
+const AccountingGateway = require(path.join(__dirname, 'accounting_gateway'));
 
-var AccountingSummary = db.define('accounting_summary', {
+const AccountingSummary = db.define('accounting_summary', {
     batch_time: {
       type: Sequelize.TIME,
       allowNull: false,
@@ -206,5 +209,9 @@ var AccountingSummary = db.define('accounting_summary', {
   });
 
   AccountingSummary.belongsTo(CountryPrefix, {foreignKey: 'country_code'} );
+  AccountingSummary.belongsTo(AccountingRegionName, {foreignKey: 'route_code_id'} );
+  AccountingSummary.belongsTo(AccountingMembersName, {as: 'OriginMemberName', foreignKey: 'origin_member_id'} );
+  AccountingSummary.belongsTo(AccountingMembersName, {as: 'TermMemberName', foreignKey: 'term_member_id'} );
+  AccountingSummary.belongsTo(AccountingGateway, {foreignKey: 'gw_id'} );
 
   module.exports = AccountingSummary;

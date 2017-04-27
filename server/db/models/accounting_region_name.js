@@ -1,11 +1,11 @@
 'use strict';
-var path = require('path');
-var db = require(path.join(__dirname, '../')).db;
-var Sequelize = require('sequelize');
-var AccountingRegion = require(path.join(__dirname, 'accounting_region'));
-var CountryPrefix = require(path.join(__dirname, 'country_prefix'));
+const path = require('path');
+const db = require(path.join(__dirname, '../')).db;
+const Sequelize = require('sequelize');
+const AccountingRegion = require(path.join(__dirname, 'accounting_region'));
+const CountryPrefix = require(path.join(__dirname, 'country_prefix'));
 
-var AccountingRegionName = db.define('accounting_region_name', {
+const AccountingRegionName = db.define('accounting_region_name', {
     id: {
       type:Sequelize.INTEGER,
       allowNull: false,
