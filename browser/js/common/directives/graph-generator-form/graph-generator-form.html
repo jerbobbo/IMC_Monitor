@@ -11,7 +11,7 @@
       <div class="field" ng-class="{ 'disabled': noCurrCountry() }">
         <label>Region</label>
         <select class="ui fluid search selection dropdown" ng-model="currRegion" id="currRegion">
-          <option class="default text" value="">All Regions</option>
+          <option class="default text">{{ currRegion.region_name }}</option>
           <option ng-repeat="region in currRegionList" ng-value="{{ region }}">{{ region.region_name }}</option>
         </select>
       </div>
@@ -19,7 +19,7 @@
       <div class="field">
         <label>Originating Client</label>
         <select class="ui fluid search selection dropdown" ng-model="currOrigin" id="currOrigin">
-          <option class="default text" value="">All Clients</option>
+          <option class="default text">{{ currOrigin.name }}</option>
           <option ng-repeat="member in memberList" ng-value="{{ member }}">{{ member.name }}</option>
         </select>
       </div>

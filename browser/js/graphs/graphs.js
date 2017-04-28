@@ -6,13 +6,9 @@ app.controller('GraphsCtrl', ($scope, graphData, $stateParams, listCollection, $
   };
 
   $scope.isEmpty = GraphListFactory.isEmpty;
-  //$scope.getGraphList = GraphListFactory.getGraphList;
-
-  // console.log('playlist', $scope.playlist);
 
   if (graphData) {
     GraphListFactory.setGraphList(graphData.graphList);
-    console.log(GraphListFactory.graphList);
 
     $scope.playlist = {
       id: $stateParams.playlistId || null,
@@ -22,8 +18,6 @@ app.controller('GraphsCtrl', ($scope, graphData, $stateParams, listCollection, $
   else {
     GraphListFactory.clearGraphList();
     $scope.playlist = null;
-    console.log('isEmpty', GraphListFactory.isEmpty());
-    console.log('playlist', $scope.playlist);
   }
 
   $scope.clearGraphs = () => {
@@ -42,12 +36,6 @@ app.controller('GraphsCtrl', ($scope, graphData, $stateParams, listCollection, $
     .popup({
       on: 'click'
   });
-
-  // $scope.$watch( () => $scope.existsPlaylist(),
-  //   () => { console.log('playlist changed', $scope.existsPlaylist()) } );
-
-  // $scope.$watch( () => $scope.isEmpty(),
-  //   () => { console.log('isEmpty() changed', $scope.isEmpty()) } );
 
 });
 

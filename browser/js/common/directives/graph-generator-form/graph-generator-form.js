@@ -21,15 +21,8 @@ app.factory('GraphAddFactory', function($http) {
 });
 
 app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory, GraphListFactory) {
-  // $scope.graphList = [];
-  $scope.currCountry = "";
-  // var graphCount = 0;
-  // $scope.graphList = GraphListFactory.graphList;
 
-  var testGraph = {
-    whereClause: "country=Egypt",
-    graphTitle: 'Egypt'
-  };
+  $scope.currCountry = "";
 
   $scope.getRegionList = function(countryName) {
     GraphAddFactory.getRegionNames(countryName)
@@ -39,63 +32,45 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory
   };
 
   var addToList = function(graphParams) {
-    // console.log($scope.graphList);
-    // $scope.graphList.push(graphParams);
     GraphListFactory.addToGraphList(graphParams);
     if ($scope.playlist) {
-      PlaylistFactory.saveToList(graphParams, $scope.playlist.id);
+      PlaylistFactory.saveToList(
+        GraphListFactory.getLastGraph(),
+        $scope.playlist.id
+      );
     }
   };
 
+  $scope.currRegion = { id: '%', region_name: 'All Regions' };
+  $scope.currOrigin = { id: '%', name: 'All Clients' };
+  $scope.currTerm = { id: '%', name: 'All Clients' };
+  $scope.currGw = { id: '%', address: 'All Gateways' };
+
   $scope.addGraph = function() {
-    var graphTitle = "";
-    var graphOrder = GraphListFactory.getGraphList().length;
-    var graphId = new Date().getTime();
-    // var graphId = $scope.graphList.length+1;
 
-    var titleDivider = () => {
-      if (graphTitle !== "") return " | ";
-      return "";
-    };
-
-    var country, routeCodeId, originMemberId, termMemberId, gwId;
-
-    if (!!$scope.currCountry) {
-      country = $scope.currCountry;
-      graphTitle = $scope.currCountry;
-    }
-    if (!!$scope.currRegion) {
-      routeCodeId = $scope.currRegion.id;
-      graphTitle += titleDivider() + $scope.currRegion.region_name;
-    }
-    if (!!$scope.currOrigin) {
-      originMemberId = $scope.currOrigin.id;
-      graphTitle += titleDivider() + 'Origin: ' + $scope.currOrigin.name;
-    }
-    if (!!$scope.currTerm) {
-      termMemberId = $scope.currTerm.id;
-      graphTitle += titleDivider() + 'Term: ' + $scope.currTerm.name;
-    }
-    if (!!$scope.currGw) {
-      gwId = $scope.currGw.id;
-      graphTitle += titleDivider() + $scope.currGw.address;
-    }
-
-
-    var newGraph = {
-      params: {
-        country: country || '%',
-        routeCodeId: routeCodeId || '%',
-        originMemberId: originMemberId || '%',
-        termMemberId: termMemberId || '%',
-        gwId: gwId || '%'
+    var newGraphParams = {
+      country: {
+        name: $scope.currCountry
       },
-      graphTitle: graphTitle,
-      id: graphId,
-      order: graphOrder
+      routeCode: {
+        id: $scope.currRegion.id,
+        name: $scope.currRegion.region_name
+      },
+      originMember: {
+        id: $scope.currOrigin.id,
+        name: $scope.currOrigin.name
+      },
+      termMember: {
+        id: $scope.currTerm.id,
+        name: $scope.currTerm.name
+      },
+      gw: {
+        id: $scope.currGw.id,
+        name: $scope.currGw.address
+      }
     };
 
-    addToList(newGraph);
+    addToList(newGraphParams);
   };
 
   $scope.noCurrCountry = function() {
@@ -113,13 +88,8 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory
   })
   .then(function(_result) {
     $scope.memberList = _result;
-    // $('.ui.dropdown').dropdown();
     $('.ui.dropdown').dropdown({ placeholder: false });
-    // addToList(testGraph);
   });
-
-  // $scope.$watch( () => $scope.graphList,
-  //   () => { console.log('graphList changed', $scope.graphList) } );
 
 });
 

@@ -37,9 +37,31 @@ app.factory('GraphListFactory', ($http) => {
       if (_graphList.length) return _graphList[_graphList.length-1].graphTitle;
     },
     getGraphList: () => _graphList,
-    addToGraphList: (graph) => {
-      _graphList.push(graph);
-      console.log('graph', graph);
+    getLastGraph: () => _graphList[_graphList.length-1],
+    addToGraphList: (graphParams) => {
+      var graphId = new Date().getTime();
+      var graphOrder = _graphList.length;
+      var graphTitle = "";
+
+      for ( var key in graphParams) {
+        if ( graphParams[key].name ) {
+          if (graphTitle !== "") graphTitle += " | ";
+          graphTitle += graphParams[key].name;
+        }
+      }
+
+      _graphList.push({
+        params: {
+          country: graphParams.country.name || '%',
+          routeCodeId: graphParams.routeCode.id || '%',
+          originMemberId: graphParams.originMember.id || '%',
+          termMemberId: graphParams.termMember.id || '%',
+          gwId: graphParams.gw.id || '%'
+        },
+        graphTitle: graphTitle,
+        id: graphId,
+        order: graphOrder
+      });
       _lastGraphTitle.value = graph.graphTitle;
     },
     isEmpty: () => _graphList.length === 0,
@@ -57,7 +79,6 @@ app.factory('GraphListFactory', ($http) => {
 });
 
 app.controller('GraphListCtrl', ($scope, GraphListFactory) => {
-  // $scope.graphList = GraphListFactory.getGraphList();
 
   $scope.getGraphList = GraphListFactory.getGraphList;
   $scope.graphTypes = ['ASR', 'ACD', 'Seizures', 'AnsDel', 'NoCirc', 'Normal', 'Failure'];
