@@ -46,6 +46,8 @@ app.factory('GraphListFactory', ($http) => {
       for ( var key in graphParams) {
         if ( graphParams[key].name ) {
           if (graphTitle !== "") graphTitle += " | ";
+          if (key === 'originMember') graphTitle += 'Origin: ';
+          if (key === 'termMember') graphTitle += 'Term: ';
           graphTitle += graphParams[key].name;
         }
       }
@@ -62,7 +64,7 @@ app.factory('GraphListFactory', ($http) => {
         id: graphId,
         order: graphOrder
       });
-      _lastGraphTitle.value = graph.graphTitle;
+      _lastGraphTitle.value = graphTitle;
     },
     isEmpty: () => _graphList.length === 0,
     swapOrder: (idx, next) => {

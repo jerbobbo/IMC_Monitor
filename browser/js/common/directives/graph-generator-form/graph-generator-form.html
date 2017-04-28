@@ -11,7 +11,7 @@
       <div class="field" ng-class="{ 'disabled': noCurrCountry() }">
         <label>Region</label>
         <select class="ui fluid search selection dropdown" ng-model="currRegion" id="currRegion">
-          <option class="default text">{{ currRegion.region_name }}</option>
+          <option class="default text" value="defaults.region">{{ defaults.region.region_name }}</option>
           <option ng-repeat="region in currRegionList" ng-value="{{ region }}">{{ region.region_name }}</option>
         </select>
       </div>
@@ -19,14 +19,14 @@
       <div class="field">
         <label>Originating Client</label>
         <select class="ui fluid search selection dropdown" ng-model="currOrigin" id="currOrigin">
-          <option class="default text">{{ currOrigin.name }}</option>
+          <option class="default text" value="defaults.origin">{{ defaults.origin.name }}</option>
           <option ng-repeat="member in memberList" ng-value="{{ member }}">{{ member.name }}</option>
         </select>
       </div>
       <div class="field">
         <label>Terminating Client</label>
         <select class="ui fluid search selection dropdown" ng-model="currTerm" id="currTerm">
-          <option class="default text" value="">All Clients</option>
+          <option class="default text" value="defaults.term">{{ defaults.term.name }}</option>
           <option ng-repeat="member in memberList" ng-value="{{ member }}">{{ member.name }}</option>
         </select>
       </div>
@@ -35,7 +35,7 @@
       <div class="field">
         <label>Gateway</label>
         <select class="ui fluid dropdown" ng-model="currGw" id="currGw">
-          <option class="default text" value="">All Gateways</option>
+          <option class="default text" value="defaults.gw">{{ defaults.gw.address }}</option>
           <option ng-repeat="gateway in gatewayList" ng-value="{{ gateway }}">{{ gateway.address }}</option>
         </select>
 
