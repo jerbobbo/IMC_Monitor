@@ -41,10 +41,20 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory
     }
   };
 
-  $scope.currRegion = { id: '%', region_name: 'All Regions' };
-  $scope.currOrigin = { id: '%', name: 'All Clients' };
-  $scope.currTerm = { id: '%', name: 'All Clients' };
-  $scope.currGw = { id: '%', address: 'All Gateways' };
+  $scope.defaults = {
+    region: { id: '%', region_name: 'All Regions' },
+    origin: { id: '%', name: 'All Clients' },
+    term: { id: '%', name: 'All Clients' },
+    gw: { id: '%', address: 'All Gateways' }
+  };
+
+  console.log($scope.defaults);
+
+  $scope.currRegion = $scope.defaults.region;
+  $scope.currOrigin = $scope.defaults.origin;
+  $scope.currTerm = $scope.defaults.term;
+  $scope.currGw = $scope.defaults.gw;
+
 
   $scope.addGraph = function() {
 
