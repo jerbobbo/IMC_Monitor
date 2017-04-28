@@ -8,15 +8,19 @@ var graphTypes =
       areaFunc: (d, originTerm) => 100*d.completed/d[`${originTerm}Seiz`] || 0,
       lineFunc: (d, originTerm) => 100*d.completed/d[`${originTerm}AsrmSeiz`] || 0,
       maxGraphHeight: (data, originTerm) => d3.max(data, d => 100*d.completed/d[`${originTerm}AsrmSeiz`] || 0),
-      avgAreaFunc: (data, originTerm) => roundToFixed( d3.mean(data, d => 100*d.completed/d[`${originTerm}Seiz`] || 0) ),
-      avgLineFunc: (data, originTerm) => roundToFixed( d3.mean(data, d => 100*d.completed/d[`${originTerm}AsrmSeiz`] || 0) ),
+      avgAreaFunc: (data, originTerm) => { if (data) return roundToFixed( d3.mean(data, d => 100*d.completed/d[`${originTerm}Seiz`] || 0) ); },
+      avgLineFunc: (data, originTerm) => { if (data) return roundToFixed( d3.mean(data, d => 100*d.completed/d[`${originTerm}AsrmSeiz`] || 0) ); },
       currAreaFunc: (data, originTerm) => {
-        var lastFullReading = data[ data.length-2 ];
-        return roundToFixed( 100*lastFullReading.completed/lastFullReading[`${originTerm}Seiz`] || 0 );
+        if (data) {
+          var lastFullReading = data[ data.length-2 ];
+          return roundToFixed(100*lastFullReading.completed/lastFullReading[`${originTerm}Seiz`] || 0 );
+        }
       },
       currLineFunc: (data, originTerm) => {
-        var lastFullReading = data[ data.length-2 ];
-        return roundToFixed( 100*lastFullReading.completed/lastFullReading[`${originTerm}AsrmSeiz`] || 0 );
+        if (data) {
+          var lastFullReading = data[ data.length-2 ];
+          return roundToFixed(100*lastFullReading.completed/lastFullReading[`${originTerm}AsrmSeiz`] || 0 );
+        }
       }
     },
     ACD: {
@@ -26,10 +30,12 @@ var graphTypes =
       areaFunc: (d, originTerm) => d.connMinutes/d.completed || 0,
       lineFunc: (d, originTerm) => d.connMinutes/d.completed  || 0,
       maxGraphHeight: (data, originTerm) => d3.max(data, d => d.connMinutes/d.completed || 0),
-      avgAreaFunc: (data, originTerm) => roundToFixed( d3.mean(data, d => d.connMinutes/d.completed || 0) ),
-      currAreaFunc: data => {
-        var lastFullReading = data[ data.length-2 ];
-        return roundToFixed( lastFullReading.connMinutes/lastFullReading.completed || 0 );
+      avgAreaFunc: (data, originTerm) => { if (data) return roundToFixed(d3.mean(data, d => d.connMinutes/d.completed || 0) ); },
+      currAreaFunc: (data) => {
+        if (data) {
+          var lastFullReading = data[ data.length-2 ];
+          return roundToFixed(lastFullReading.connMinutes/lastFullReading.completed || 0 );
+        }
       }
     },
     AnsDel: {
@@ -39,10 +45,12 @@ var graphTypes =
       areaFunc: (d, originTerm) => d[`${originTerm}AnsDel`]/d[`${originTerm}Seiz`] || 0,
       lineFunc: (d, originTerm) => d[`${originTerm}AnsDel`]/d[`${originTerm}Seiz`]  || 0,
       maxGraphHeight: (data, originTerm) => d3.max(data, d => d[`${originTerm}AnsDel`]/d[`${originTerm}Seiz`] || 0),
-      avgAreaFunc: (data, originTerm) => roundToFixed( d3.mean(data, d => d[`${originTerm}AnsDel`]/d[`${originTerm}Seiz`] || 0) ),
+      avgAreaFunc: (data, originTerm) => { if (data) return roundToFixed(d3.mean(data, d => d[`${originTerm}AnsDel`]/d[`${originTerm}Seiz`] || 0) ); },
       currAreaFunc: (data, originTerm) => {
-        var lastFullReading = data[ data.length-2 ];
-        return roundToFixed( lastFullReading[`${originTerm}AnsDel`]/lastFullReading[`${originTerm}Seiz`] || 0 );
+        if (data) {
+          var lastFullReading = data[ data.length-2 ];
+          return roundToFixed(lastFullReading[`${originTerm}AnsDel`]/lastFullReading[`${originTerm}Seiz`] || 0 );
+        }
       }
     },
     Seizures: {
@@ -53,15 +61,19 @@ var graphTypes =
       lineFunc: (d, originTerm, denom) => d[`${originTerm}Seiz`]/denom || 0,
       areaFunc: (d, originTerm, denom) => d.completed/denom  || 0,
       maxGraphHeight: (data, originTerm, denom) => d3.max(data, d => d[`${originTerm}Seiz`]/denom || 0),
-      avgAreaFunc: (data, originTerm, denom) => roundToFixed( d3.mean(data, d => d.completed/denom  || 0) ),
-      avgLineFunc: (data, originTerm, denom) => roundToFixed( d3.mean(data, d => d[`${originTerm}Seiz`]/denom  || 0) ),
+      avgAreaFunc: (data, originTerm, denom) => { if (data) return roundToFixed(d3.mean(data, d => d.completed/denom  || 0) ); },
+      avgLineFunc: (data, originTerm, denom) => { if (data) return roundToFixed(d3.mean(data, d => d[`${originTerm}Seiz`]/denom  || 0) ); },
       currAreaFunc: (data, originTerm, denom) => {
-        var lastFullReading = data[ data.length-2 ];
-        return roundToFixed( lastFullReading.completed/denom || 0 );
+        if (data) {
+          var lastFullReading = data[ data.length-2 ];
+          return roundToFixed(lastFullReading.completed/denom || 0 );
+        }
       },
       currLineFunc: (data, originTerm, denom) => {
-        var lastFullReading = data[ data.length-2 ];
-        return roundToFixed( lastFullReading[`${originTerm}Seiz`]/denom || 0 );
+        if (data) {
+          var lastFullReading = data[ data.length-2 ];
+          return roundToFixed(lastFullReading[`${originTerm}Seiz`]/denom || 0 );
+        }
       }
     },
     NoCirc: {
@@ -71,10 +83,12 @@ var graphTypes =
       lineFunc: (d, originTerm) => 100*d[`${originTerm}NoCirc`]/d[`${originTerm}Seiz`] || 0,
       areaFunc: (d, originTerm) => 100*d[`${originTerm}NoCirc`]/d[`${originTerm}Seiz`] || 0,
       maxGraphHeight: (data, originTerm) => d3.max(data, d => 100*d[`${originTerm}NoCirc`]/d[`${originTerm}Seiz`] || 0),
-      avgAreaFunc: (data, originTerm) => roundToFixed( d3.mean(data, d => 100*d[`${originTerm}NoCirc`]/d[`${originTerm}Seiz`] || 0) ),
+      avgAreaFunc: (data, originTerm) => { if (data) return roundToFixed(d3.mean(data, d => 100*d[`${originTerm}NoCirc`]/d[`${originTerm}Seiz`] || 0) ); },
       currAreaFunc: (data, originTerm) => {
-        var lastFullReading = data[ data.length-2 ];
-        return roundToFixed( 100*lastFullReading[`${originTerm}NoCirc`]/lastFullReading[`${originTerm}Seiz`] || 0 );
+        if (data) {
+          var lastFullReading = data[ data.length-2 ];
+          return roundToFixed(100*lastFullReading[`${originTerm}NoCirc`]/lastFullReading[`${originTerm}Seiz`] || 0 );
+        }
       }
     },
     Normal: {
@@ -84,10 +98,12 @@ var graphTypes =
       lineFunc: (d, originTerm) => 100*d[`${originTerm}NormalDisc`]/d[`${originTerm}Seiz`] || 0,
       areaFunc: (d, originTerm) => 100*d[`${originTerm}NormalDisc`]/d[`${originTerm}Seiz`] || 0,
       maxGraphHeight: (data, originTerm) => d3.max(data, d => 100*d[`${originTerm}NormalDisc`]/d[`${originTerm}Seiz`] || 0),
-      avgAreaFunc: (data, originTerm) => roundToFixed( d3.mean(data, d => 100*d[`${originTerm}NormalDisc`]/d[`${originTerm}Seiz`] || 0) ),
+      avgAreaFunc: (data, originTerm) => { if (data) return roundToFixed(d3.mean(data, d => 100*d[`${originTerm}NormalDisc`]/d[`${originTerm}Seiz`] || 0) ); },
       currAreaFunc: (data, originTerm) => {
-        var lastFullReading = data[ data.length-2 ];
-        return roundToFixed( 100*lastFullReading[`${originTerm}NormalDisc`]/lastFullReading[`${originTerm}Seiz`] || 0 );
+        if (data) {
+          var lastFullReading = data[ data.length-2 ];
+          return roundToFixed(100*lastFullReading[`${originTerm}NormalDisc`]/lastFullReading[`${originTerm}Seiz`] || 0 );
+        }
       }
     },
     Failure: {
@@ -97,10 +113,12 @@ var graphTypes =
       lineFunc: (d, originTerm) => 100*d[`${originTerm}FailDisc`]/d[`${originTerm}Seiz`] || 0,
       areaFunc: (d, originTerm) => 100*d[`${originTerm}FailDisc`]/d[`${originTerm}Seiz`] || 0,
       maxGraphHeight: (data, originTerm) => d3.max(data, d => 100*d[`${originTerm}FailDisc`]/d[`${originTerm}Seiz`] || 0),
-      avgAreaFunc: (data, originTerm) => roundToFixed( d3.mean(data, d => 100*d[`${originTerm}FailDisc`]/d[`${originTerm}Seiz`] || 0) ),
+      avgAreaFunc: (data, originTerm) => { if (data) return roundToFixed(d3.mean(data, d => 100*d[`${originTerm}FailDisc`]/d[`${originTerm}Seiz`] || 0) ); },
       currAreaFunc: (data, originTerm) => {
-        var lastFullReading = data[ data.length-2 ];
-        return roundToFixed( 100*lastFullReading[`${originTerm}FailDisc`]/lastFullReading[`${originTerm}Seiz`] || 0 );
+        if (data) {
+          var lastFullReading = data[ data.length-2 ];
+          return roundToFixed(100*lastFullReading[`${originTerm}FailDisc`]/lastFullReading[`${originTerm}Seiz`] || 0 );
+        }
       }
     }
   };
