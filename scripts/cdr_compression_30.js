@@ -60,8 +60,8 @@ var insertQuery = `
 
 var deleteSummaryQuery = `
   delete from accounting_summary
-  where TIMESTAMPDIFF(HOUR, (select max(batch_time_30)
-  from accounting_summary_30), batch_time) < -50;
+  where TIMESTAMPDIFF(DAY, (select max(batch_time_30)
+  from accounting_summary_30), batch_time) < -7;
   `;
 
 var deleteSummary30Query = `
