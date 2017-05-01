@@ -29,6 +29,16 @@ var AccountingSummary120 = db.define('accounting_summary_120', {
       allowNull: false,
       primaryKey: true
     },
+    origin_address_id: {
+      type: Sequelize.INTEGER(11),
+      allowNull: false,
+      primaryKey: true
+    },
+    term_address_id: {
+      type: Sequelize.INTEGER(11),
+      allowNull: false,
+      primaryKey: true
+    },
     country_code: {
       type: Sequelize.STRING,
       allowNull: false,
@@ -44,6 +54,11 @@ var AccountingSummary120 = db.define('accounting_summary_120', {
       type: Sequelize.INTEGER(11),
       allowNull: false,
       primaryKey: true
+    },
+    raw_seizures: {
+      type: Sequelize.INTEGER(11),
+      allowNull: false,
+      defaultValue: "0"
     },
     origin_seizures: {
       type: Sequelize.INTEGER(11),
