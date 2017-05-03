@@ -38,8 +38,8 @@ Seed DB:
 - npm run seed
 ```
 
-Crontab Installation
-====================
+###Crontab Installation
+=======================
 ```
 - modify crontab jobs for with your correct environment paths in crontab/cron_config
 $ crontab crontab/cron_config
