@@ -59,6 +59,12 @@ router.get('/', ensureAuthenticated, permission({ userPermission: true }), funct
     term_member_id: {
       $like: req.query.termMemberId || '%'
     },
+    origin_address_id: {
+      $like: req.query.originAddressId || '%'
+    },
+    term_address_id: {
+      $like: req.query.termAddressId || '%'
+    },
     gw_id: {
       $like: req.query.gwId || '%'
     }

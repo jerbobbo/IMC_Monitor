@@ -10,6 +10,7 @@ Playlist.hasMany(PlaylistGraph, { foreignKey: 'playlist_id' });
 module.exports = {
   User: User,
   AccountingGateway: require('./accounting_gateway'),
+  AccountingIp: require('./accounting_ip'),
   AccountingMembersName: require('./accounting_members_name'),
   AccountingRegionName: require('./accounting_region_name'),
   AccountingRegion: require('./accounting_region'),
@@ -17,6 +18,7 @@ module.exports = {
   AccountingSummary30: require('./accounting_summary_30'),
   AccountingSummary120: require('./accounting_summary_120'),
   AccountingSummary24h: require('./accounting_summary_24h'),
+  AccountingSummaryPrimary: require('./accounting_summary_primary'),
   CountryPrefix: require('./country_prefix'),
   CountryDistinct: require('./country_distinct'),
   PlaylistGraph: PlaylistGraph,

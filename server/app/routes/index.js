@@ -6,6 +6,7 @@ router.use('/members', require('./members'));
 router.use('/graph-data', require('./graph-data'));
 router.use('/table-data', require('./table-data'));
 router.use('/gateways', require('./gateways'));
+router.use('/address', require('./address'));
 router.use('/countries', require('./countries'));
 router.use('/region-names', require('./region-names'));
 router.use('/playlists', require('./playlists'));

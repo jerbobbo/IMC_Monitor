@@ -18,16 +18,31 @@
 
       <div class="field">
         <label>Originating Client</label>
-        <select class="ui fluid search selection dropdown" ng-model="currOrigin" id="currOrigin">
+        <select class="ui fluid search selection dropdown" ng-model="currOrigin" id="currOriginMemberId">
           <option class="default text" value="defaults.origin">{{ defaults.origin.name }}</option>
-          <option ng-repeat="member in memberList" ng-value="{{ member }}">{{ member.name }}</option>
+          <option ng-repeat="member in originMemberList" ng-value="{{ member }}">{{ member.name }}</option>
         </select>
       </div>
       <div class="field">
         <label>Terminating Client</label>
-        <select class="ui fluid search selection dropdown" ng-model="currTerm" id="currTerm">
+        <select class="ui fluid search selection dropdown" ng-model="currTerm" id="currTermMemberId">
           <option class="default text" value="defaults.term">{{ defaults.term.name }}</option>
-          <option ng-repeat="member in memberList" ng-value="{{ member }}">{{ member.name }}</option>
+          <option ng-repeat="member in termMemberList" ng-value="{{ member }}">{{ member.name }}</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Originating Address</label>
+        <select class="ui fluid search selection dropdown" ng-model="currOrigin" id="currOriginMemberId">
+          <option class="default text" value="defaults.origin">{{ defaults.origin.name }}</option>
+          <option ng-repeat="address in originAddressList" ng-value="{{ member }}">{{ member.name }}</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Terminating Address</label>
+        <select class="ui fluid search selection dropdown" ng-model="currTerm" id="currTermMemberId">
+          <option class="default text" value="defaults.term">{{ defaults.term.name }}</option>
+          <option ng-repeat="address in termAddressList" ng-value="{{ member }}">{{ member.name }}</option>
         </select>
       </div>
 

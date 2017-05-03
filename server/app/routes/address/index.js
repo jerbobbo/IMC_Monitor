@@ -25,19 +25,20 @@ router.get('/origin', ensureAuthenticated, (req, res, next) => {
         where: { country: { $like: req.query.country || '%'} }
       },
       {
-        model: models.AccountingMembersName,
-        as: 'OriginMemberName',
-        attributes: ['id', 'name']
+        model: models.AccountingIp,
+        as: 'OriginAddress',
+        attributes: ['id', 'address']
       }
     ],
     where: {
+      origin_member_id: { $like: query.originMemberId || '%' },
       term_member_id: { $like: query.termMemberId || '%' },
       term_address_id: { $like: query.termAddressId || '%' },
       gw_id: { $like: query.gwId || '%' },
       route_code_id: { $like: query.routeCodeId || '%' }
     },
-    group: ['OriginMemberName.id', 'name'],
-    order: ['name'],
+    group: ['OriginAddress.id', 'address'],
+    order: ['address'],
     raw: true
   })
   .then(function(data) {
@@ -58,18 +59,20 @@ router.get('/term', ensureAuthenticated, (req, res, next) => {
         where: { country: { $like: req.query.country || '%'} }
       },
       {
-        model: models.AccountingMembersName,
-        as: 'TermMemberName',
-        attributes: ['id', 'name']
+        model: models.AccountingIp,
+        as: 'TermAddress',
+        attributes: ['id', 'address']
       }
     ],
     where: {
+      term_member_id: { $like: query.termMemberId || '%' },
       origin_member_id: { $like: query.originMemberId || '%' },
       origin_address_id: { $like: query.originAddressId || '%' },
-      gw_id: { $like: query.gwId || '%' }
+      gw_id: { $like: query.gwId || '%' },
+      route_code_id: { $like: query.routeCodeId || '%' }
     },
-    group: ['TermMemberName.id', 'name'],
-    order: ['name'],
+    group: ['TermAddress.id', 'address'],
+    order: ['address'],
     raw: true
   })
   .then(function(data) {
@@ -77,13 +80,5 @@ router.get('/term', ensureAuthenticated, (req, res, next) => {
   }, next);
 });
 
-
-
-// router.get('/', ensureAuthenticated, function(req, res, next) {
-//   accountingMembersNameModel.findAll({})
-//   .then(function(data) {
-//     res.status(200).json(data);
-//   }, next);
-// });
 
 module.exports = router;

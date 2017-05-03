@@ -18,6 +18,7 @@
     "angular-sanitize": ">= 1.2",
     "angular-schema-form": "^0.8.13",
     "angular-stripe": "^4.2.12",
-    "jquery-ui": "^1.11.4"
+    "jquery-ui": "^1.11.4",
+    "bluebird": "^3.5.0"
   }
 }
