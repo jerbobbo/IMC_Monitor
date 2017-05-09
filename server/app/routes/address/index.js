@@ -3,6 +3,7 @@ const path = require('path');
 const router = require('express').Router();
 const models = require(path.join(__dirname, '../../../db/models/'));
 const Sequelize = require('sequelize');
+const stripTableName = require(path.join(__dirname, '../../../helper/stripTableName'));
 
 const ensureAuthenticated = (req, res, next) => {
     if (req.isAuthenticated()) {
@@ -26,8 +27,7 @@ router.get('/origin', ensureAuthenticated, (req, res, next) => {
       },
       {
         model: models.AccountingIp,
-        as: 'OriginAddress',
-        attributes: ['id', 'address']
+        as: 'OriginAddress'
       }
     ],
     where: {
@@ -42,6 +42,7 @@ router.get('/origin', ensureAuthenticated, (req, res, next) => {
     raw: true
   })
   .then(function(data) {
+    data = stripTableName(data, 'address');
     res.status(200).json(data);
   }, next);
 });
@@ -60,8 +61,7 @@ router.get('/term', ensureAuthenticated, (req, res, next) => {
       },
       {
         model: models.AccountingIp,
-        as: 'TermAddress',
-        attributes: ['id', 'address']
+        as: 'TermAddress'
       }
     ],
     where: {
@@ -76,6 +76,7 @@ router.get('/term', ensureAuthenticated, (req, res, next) => {
     raw: true
   })
   .then(function(data) {
+    data = stripTableName(data, 'address');
     res.status(200).json(data);
   }, next);
 });

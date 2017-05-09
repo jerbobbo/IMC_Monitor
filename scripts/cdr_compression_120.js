@@ -1,9 +1,9 @@
 'use strict';
-var mysql = require('promise-mysql');
-var config = require('../config/db-config');
-var Promise = require('bluebird');
+const mysql = require('promise-mysql');
+const config = require('../config/db-config');
+const Promise = require('bluebird');
 
-var pool = mysql.createPool( {
+const pool = mysql.createPool( {
 	host: 'localhost',
 	user: config.DATABASE_USER,
 	password: config.DATABASE_PASS,
@@ -11,7 +11,7 @@ var pool = mysql.createPool( {
   connectionLimt: 10
 });
 
-var insertQuery = `
+const insertQuery = `
 insert into accounting_summary_120 select
 batch_time_120,
 max(batch_num) as batch_num,
@@ -64,11 +64,27 @@ gw_id;
 `;
 
 
-var deleteSummary120Query = `
+const deleteSummary120Query = `
   delete from accounting_summary_120
   where TIMESTAMPDIFF(DAY, (select max(batch_time_120)
   from accounting_summary), batch_time_120) < -65;
   `;
+
+
+const summaryPrimaryTruncate = `
+	truncate table accounting_summary_primary
+	`;
+
+const summaryPrimaryRegen = `
+	insert into accounting_summary_primary
+	(origin_member_id, term_member_id, origin_address_id,
+		term_address_id, country_code, route_code_id, gw_id)
+	select origin_member_id, term_member_id, origin_address_id,
+	term_address_id, country_code, route_code_id, gw_id
+	from accounting_summary_120 group by origin_member_id,
+	term_member_id, origin_address_id, term_address_id,
+	country_code, route_code_id, gw_id
+	`;
 
 var conn;
 pool.getConnection()
@@ -77,6 +93,8 @@ pool.getConnection()
   return conn.query(insertQuery);
 })
 .then( () => conn.query(deleteSummary120Query) )
+.then( () => conn.query(summaryPrimaryTruncate) )
+.then( () => conn.query(summaryPrimaryRegen) )
 .then( () => {
   console.log('cdr_commpression_120 ran successfully');
   return pool.end();

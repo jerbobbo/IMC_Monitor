@@ -3,54 +3,54 @@
 
       <div class="field">
         <label>Country</label>
-        <select class="ui fluid search selection dropdown" ng-model="currCountry" ng-change="getRegionList(currCountry)" id="currCountry">
-          <option class="default text" value="">All Countries</option>
-          <option ng-repeat="country in countryList" value="{{ country.country }}">{{ country.country }}</option>
+        <select class="ui fluid search selection dropdown" ng-model="currCountry" ng-change="updateLists()" id="currCountry">
+          <option class="default text" value="defaults.country">All Countries</option>
+          <option ng-repeat="country in countryList" ng-value="country.country">{{ country.country }}</option>
         </select>
       </div>
       <div class="field" ng-class="{ 'disabled': noCurrCountry() }">
         <label>Region</label>
-        <select class="ui fluid search selection dropdown" ng-model="currRegion" id="currRegion">
-          <option class="default text" value="defaults.region">{{ defaults.region.region_name }}</option>
-          <option ng-repeat="region in currRegionList" ng-value="{{ region }}">{{ region.region_name }}</option>
+        <select class="ui fluid search selection dropdown" ng-model="currRegion" ng-change="updateLists()" id="currRegion">
+          <option class="default text" ng-value="{{defaults.region}}">{{ defaults.region.region_name }}</option>
+          <option ng-repeat="region in regionList" ng-value="{{ region }}">{{ region.region_name }}</option>
         </select>
       </div>
 
       <div class="field">
         <label>Originating Client</label>
-        <select class="ui fluid search selection dropdown" ng-model="currOrigin" id="currOriginMemberId">
-          <option class="default text" value="defaults.origin">{{ defaults.origin.name }}</option>
+        <select class="ui fluid search selection dropdown" ng-model="currOrigin" ng-change="updateLists()" id="currOriginMemberId">
+          <option class="default text" ng-value="{{defaults.origin}}">{{ defaults.origin.name }}</option>
           <option ng-repeat="member in originMemberList" ng-value="{{ member }}">{{ member.name }}</option>
         </select>
       </div>
       <div class="field">
         <label>Terminating Client</label>
-        <select class="ui fluid search selection dropdown" ng-model="currTerm" id="currTermMemberId">
-          <option class="default text" value="defaults.term">{{ defaults.term.name }}</option>
+        <select class="ui fluid search selection dropdown" ng-model="currTerm" ng-change="updateLists()" id="currTermMemberId">
+          <option class="default text" ng-value="{{defaults.term}}">{{ defaults.term.name }}</option>
           <option ng-repeat="member in termMemberList" ng-value="{{ member }}">{{ member.name }}</option>
         </select>
       </div>
 
       <div class="field">
         <label>Originating Address</label>
-        <select class="ui fluid search selection dropdown" ng-model="currOrigin" id="currOriginMemberId">
-          <option class="default text" value="defaults.origin">{{ defaults.origin.name }}</option>
-          <option ng-repeat="address in originAddressList" ng-value="{{ member }}">{{ member.name }}</option>
+        <select class="ui fluid search selection dropdown" ng-model="currOriginAddress" ng-change="updateLists()" id="currOriginMemberId">
+          <option class="default text" ng-value="{{defaults.originAddress}}">{{ defaults.origin.name }}</option>
+          <option ng-repeat="address in originAddressList" ng-value="{{ address }}">{{ address.address }}</option>
         </select>
       </div>
       <div class="field">
         <label>Terminating Address</label>
-        <select class="ui fluid search selection dropdown" ng-model="currTerm" id="currTermMemberId">
-          <option class="default text" value="defaults.term">{{ defaults.term.name }}</option>
-          <option ng-repeat="address in termAddressList" ng-value="{{ member }}">{{ member.name }}</option>
+        <select class="ui fluid search selection dropdown" ng-model="currTermAddress" ng-change="updateLists()" id="currTermMemberId">
+          <option class="default text" ng-value="{{defaults.termAddress}}">{{ defaults.term.name }}</option>
+          <option ng-repeat="address in termAddressList" ng-value="{{ address }}">{{ address.address }}</option>
         </select>
       </div>
 
 
       <div class="field">
         <label>Gateway</label>
-        <select class="ui fluid dropdown" ng-model="currGw" id="currGw">
-          <option class="default text" value="defaults.gw">{{ defaults.gw.address }}</option>
+        <select class="ui fluid dropdown" ng-model="currGw" ng-change="updateLists()" id="currGw">
+          <option class="default text" ng-value="{{defaults.gw}}">{{ defaults.gw.address }}</option>
           <option ng-repeat="gateway in gatewayList" ng-value="{{ gateway }}">{{ gateway.address }}</option>
         </select>
 

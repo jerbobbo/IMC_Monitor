@@ -3,6 +3,7 @@ const path = require('path');
 const router = require('express').Router();
 const models = require(path.join(__dirname, '../../../db/models/'));
 const Sequelize = require('sequelize');
+const stripTableName = require(path.join(__dirname, '../../../helper/stripTableName'));
 
 const ensureAuthenticated = (req, res, next) => {
     if (req.isAuthenticated()) {
@@ -27,7 +28,8 @@ router.get('/origin', ensureAuthenticated, (req, res, next) => {
       {
         model: models.AccountingMembersName,
         as: 'OriginMemberName',
-        attributes: ['id', 'name']
+        attributes: ['id', 'name'],
+        where: { name: { $ne: null }}
       }
     ],
     where: {
@@ -41,6 +43,7 @@ router.get('/origin', ensureAuthenticated, (req, res, next) => {
     raw: true
   })
   .then(function(data) {
+    data = stripTableName(data, 'name');
     res.status(200).json(data);
   }, next);
 });
@@ -73,17 +76,18 @@ router.get('/term', ensureAuthenticated, (req, res, next) => {
     raw: true
   })
   .then(function(data) {
+    data = stripTableName(data, 'name');
     res.status(200).json(data);
   }, next);
 });
 
 
 
-// router.get('/', ensureAuthenticated, function(req, res, next) {
-//   accountingMembersNameModel.findAll({})
-//   .then(function(data) {
-//     res.status(200).json(data);
-//   }, next);
-// });
+router.get('/', ensureAuthenticated, function(req, res, next) {
+  models.AccountingMembersName.findAll({})
+  .then(function(data) {
+    res.status(200).json(data);
+  }, next);
+});
 
 module.exports = router;

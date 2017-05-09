@@ -3,6 +3,7 @@ const path = require('path');
 const router = require('express').Router();
 const models = require(path.join(__dirname, '../../../db/models/'));
 const Sequelize = require('sequelize');
+const stripTableName = require(path.join(__dirname, '../../../helper/stripTableName'));
 
 const ensureAuthenticated = (req, res, next) => {
     if (req.isAuthenticated()) {
@@ -41,6 +42,7 @@ router.get('/', ensureAuthenticated, (req, res, next) => {
     raw: true
   })
   .then(function(data) {
+    data = stripTableName(data, 'region_name');
     res.status(200).json(data);
   }, next);
 });
