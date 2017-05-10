@@ -1,79 +1,81 @@
 app.factory('GraphAddFactory', function($http) {
 
+  const _listUrls = {
+    gatewayList: '/api/gateways',
+    countryList: '/api/countries',
+    originMemberList: '/api/members/origin',
+    termMemberList: '/api/members/term',
+    originAddressList: '/api/address/origin',
+    termAddressList: '/api/address/term',
+    regionList: '/api/region-names'
+  };
+
+  const _defaultVals = {
+    countryList: { country: '%' },
+    regionList: { id: '%', region_name: 'All Regions' },
+    originMemberList: { id: '%', name: 'All' },
+    termMemberList: { id: '%', name: 'All' },
+    originAddressList: { id: '%', address: 'All' },
+    termAddressList: { id: '%', address: 'All' },
+    gatewayList: { id: '%', address: 'All Switches' }
+  };
+
   return {
 
-    getGateways: (queryParams) => {
-      return $http.get('/api/gateways', { params: queryParams })
-      .then( response => response.data );
+    getList: (listName, queryParams, targetArr) => {
+      return $http.get(_listUrls[listName], {params: queryParams})
+      .then( response => {
+        angular.copy(response.data, targetArr);
+        targetArr.unshift(_defaultVals[listName]);
+      })
+      .catch(console.log);
     },
-    getCountries: (queryParams) => {
-      return $http.get('/api/countries', { params: queryParams })
-      .then( response => response.data );
-    },
-    getOriginMembers: (queryParams) => {
-      return $http.get('/api/members/origin', { params: queryParams })
-      .then( response => response.data );
-    },
-    getTermMembers: (queryParams) => {
-      return $http.get('/api/members/term', { params: queryParams })
-      .then( response => response.data );
-    },
-    getOriginAddresses: (queryParams) => {
-      return $http.get('/api/address/origin', { params: queryParams })
-      .then( response => response.data );
-    },
-    getTermAddresses: (queryParams) => {
-      return $http.get('/api/address/term', { params: queryParams })
-      .then( response => response.data );
-    },
-    getRegionNames: (queryParams) => {
-      return $http.get('/api/region-names/', { params: queryParams })
-      .then( response => response.data );
-    }
+    getListNames: (updatedField) => Object.keys(_listUrls).filter( (key) => key !== updatedField ),
+    getDefaultVal: (listName) => _defaultVals[listName]
   };
+
 });
 
 app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory, GraphListFactory) {
 
-  const currLists = [
-    'gatewayList',
-    'countryList',
-    'originMemberList',
-    'termMemberList',
-    'originAddressList',
-    'termAddressList',
-    'regionList'
-  ];
-
-  //initialize lists with blank array
-  currLists.forEach( (list) => $scope[list] = [] );
+  $scope.currCountry = GraphAddFactory.getDefaultVal('countryList');
+  $scope.currRegion = GraphAddFactory.getDefaultVal('regionList');
+  $scope.currOrigin = GraphAddFactory.getDefaultVal('originMemberList');
+  $scope.currTerm = GraphAddFactory.getDefaultVal('termMemberList');
+  $scope.currOriginAddress = GraphAddFactory.getDefaultVal('originAddressList');
+  $scope.currTermAddress = GraphAddFactory.getDefaultVal('termAddressList');
+  $scope.currGw = GraphAddFactory.getDefaultVal('gatewayList');
 
   $scope.updateLists = (updatedField) => {
-    console.log('updating...');
-    console.log($scope);
+    var queryParams = {
+      country: $scope.currCountry.country,
+      originMemberId: $scope.currOrigin.id,
+      termMemberId: $scope.currTerm.id,
+      originAddressId: $scope.currOriginAddress.id,
+      termAddressId: $scope.currOriginAddress.id,
+      routeCodeId: $scope.currRegion.id,
+      gwId: $scope.currGw.id
+    };
+
     var promiseArray = [];
-    Object.keys(GraphAddFactory).forEach( (key) => {
-      promiseArray.push(GraphAddFactory[key]( {
-        country: $scope.currCountry,
-        originMemberId: $scope.currOrigin.id,
-        termMemberId: $scope.currTerm.id,
-        originAddressId: $scope.currOriginAddress.id,
-        termAddressId: $scope.currOriginAddress.id,
-        routeCodeId: $scope.currRegion.id,
-        gwId: $scope.currGw.id
-      } ));
-    } );
+
+    GraphAddFactory.getListNames(updatedField).forEach( (listName) => {
+      var targetList = $scope[listName];
+      promiseArray.push( GraphAddFactory.getList(listName, queryParams, targetList) );
+    });
 
     return Promise.all(promiseArray)
-    .then( (results) => {
-      // console.log('results', results);
-      // results.forEach( (result, idx) => angular.copy(result, $scope[ currLists[idx] ] ) );
-      results.forEach( (result, idx) => $scope[ currLists[idx] ] = result );
-      console.log('scope after update', $scope);
-      $scope.$apply();
-    })
-    .catch(console.log);
+      .catch(console.log);
   };
+
+  //initialize lists with empty array
+  GraphAddFactory.getListNames().forEach( (listName) => $scope[listName] = []);
+
+  $scope.updateLists()
+  .then( () => {
+    console.log($scope);
+    $('.ui.dropdown').dropdown({ placeholder: false });
+  });
 
   var addToList = function(graphParams) {
     GraphListFactory.addToGraphList(graphParams);
@@ -85,32 +87,11 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory
     }
   };
 
-  $scope.defaults = {
-    country: { country: '%' },
-    region: { id: '%', region_name: 'All Regions' },
-    origin: { id: '%', name: 'All' },
-    term: { id: '%', name: 'All' },
-    originAddress: { id: '%', name: 'All' },
-    termAddress: { id: '%', name: 'All' },
-    gw: { id: '%', address: 'All Gateways' }
-  };
-
-  // console.log($scope.defaults);
-
-  $scope.currCountry = $scope.defaults.country.country;
-  $scope.currRegion = $scope.defaults.region;
-  $scope.currOrigin = $scope.defaults.origin;
-  $scope.currTerm = $scope.defaults.term;
-  $scope.currOriginAddress = $scope.defaults.originAddress;
-  $scope.currTermAddress = $scope.defaults.termAddress;
-  $scope.currGw = $scope.defaults.gw;
-
-
   $scope.addGraph = function() {
 
     var newGraphParams = {
       country: {
-        name: $scope.currCountry
+        country: $scope.currCountry.country
       },
       routeCode: {
         id: $scope.currRegion.id,
@@ -124,6 +105,14 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory
         id: $scope.currTerm.id,
         name: $scope.currTerm.name
       },
+      originAddress: {
+        id: $scope.currOriginAddress.id,
+        address: $scope.currOriginAddress.address
+      },
+      termAddress: {
+        id: $scope.currTermAddress.id,
+        address: $scope.currTermAddress.name
+      },
       gw: {
         id: $scope.currGw.id,
         name: $scope.currGw.address
@@ -133,15 +122,7 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory
     addToList(newGraphParams);
   };
 
-  $scope.noCurrCountry = function() {
-    return $scope.currCountry === "";
-  };
-
-  $scope.updateLists()
-  .then( () => {
-    // console.log('scopey', $scope);
-    $('.ui.dropdown').dropdown({ placeholder: false });
-  });
+  $scope.noCurrCountry = () => $scope.currCountry.country === "%";
 
 });
 

@@ -26,6 +26,9 @@ app.controller('GraphsCtrl', ($scope, graphData, $stateParams, listCollection, $
 
   $scope.showGraphGenerator = () => {
     $('.ui.sidebar')
+      .sidebar({
+        context: $('#sidebar-div')
+      })
       .sidebar('setting', 'transition', 'push')
       .sidebar('toggle');
 

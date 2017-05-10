@@ -3,56 +3,56 @@
 
       <div class="field">
         <label>Country</label>
-        <select class="ui fluid search selection dropdown" ng-model="currCountry" ng-change="updateLists()" id="currCountry">
-          <option class="default text" value="defaults.country">All Countries</option>
-          <option ng-repeat="country in countryList" ng-value="country.country">{{ country.country }}</option>
-        </select>
+        <select class="ui fluid search selection dropdown" ng-model="currCountry" ng-change="updateLists('countryList')" id="countryList" ng-options="country.country for country in countryList track by country.country"></select>
+          <!-- <option class="default text" ng-value="defaults.country">All Countries</option>
+          <option >{{ country.country }}</option>
+        </select> -->
       </div>
       <div class="field" ng-class="{ 'disabled': noCurrCountry() }">
         <label>Region</label>
-        <select class="ui fluid search selection dropdown" ng-model="currRegion" ng-change="updateLists()" id="currRegion">
-          <option class="default text" ng-value="{{defaults.region}}">{{ defaults.region.region_name }}</option>
-          <option ng-repeat="region in regionList" ng-value="{{ region }}">{{ region.region_name }}</option>
-        </select>
+        <select class="ui fluid search selection dropdown" ng-model="currRegion" ng-change="updateLists('regionList')" id="regionList" ng-options="region.region_name for region in regionList track by region.id"></select>
+        <!-- <option class="default text" ng-value="defaults.region">{{ defaults.region.region_name }}</option> -->
+          <!-- <option ng-repeat="region in regionList" ng-value="region">{{ region.region_name }}</option> -->
+        <!-- </select> -->
       </div>
 
       <div class="field">
         <label>Originating Client</label>
-        <select class="ui fluid search selection dropdown" ng-model="currOrigin" ng-change="updateLists()" id="currOriginMemberId">
-          <option class="default text" ng-value="{{defaults.origin}}">{{ defaults.origin.name }}</option>
-          <option ng-repeat="member in originMemberList" ng-value="{{ member }}">{{ member.name }}</option>
-        </select>
+        <select class="ui fluid search selection dropdown" ng-model="currOrigin" ng-change="updateLists('originMemberList')" id="originMemberList" ng-options="member.name for member in originMemberList track by member.id"></select>
+          <!-- <option class="default text" ng-value="defaults.origin">{{ defaults.origin.name }}</option>
+          <option ng-repeat="member in originMemberList" ng-value="member">{{ member.name }}</option>
+        </select> -->
       </div>
       <div class="field">
         <label>Terminating Client</label>
-        <select class="ui fluid search selection dropdown" ng-model="currTerm" ng-change="updateLists()" id="currTermMemberId">
-          <option class="default text" ng-value="{{defaults.term}}">{{ defaults.term.name }}</option>
-          <option ng-repeat="member in termMemberList" ng-value="{{ member }}">{{ member.name }}</option>
-        </select>
+        <select class="ui fluid search selection dropdown" ng-model="currTerm" ng-change="updateLists('termMemberList')" id="termMemberList" ng-options="member.name for member in termMemberList track by member.id"></select>
+          <!-- <option class="default text" ng-value="defaults.term">{{ defaults.term.name }}</option>
+          <option ng-repeat="member in termMemberList" ng-value="member">{{ member.name }}</option>
+        </select> -->
       </div>
 
       <div class="field">
         <label>Originating Address</label>
-        <select class="ui fluid search selection dropdown" ng-model="currOriginAddress" ng-change="updateLists()" id="currOriginMemberId">
-          <option class="default text" ng-value="{{defaults.originAddress}}">{{ defaults.origin.name }}</option>
-          <option ng-repeat="address in originAddressList" ng-value="{{ address }}">{{ address.address }}</option>
-        </select>
+        <select class="ui fluid search selection dropdown" ng-model="currOriginAddress" ng-change="updateLists('originAddressList')" id="originAddressList" ng-options="address.address for address in originAddressList track by address.id"></select>
+          <!-- <option class="default text" ng-value="defaults.originAddress">{{ defaults.origin.name }}</option>
+          <option ng-repeat="address in originAddressList" ng-value="address">{{ address.address }}</option>
+        </select> -->
       </div>
       <div class="field">
         <label>Terminating Address</label>
-        <select class="ui fluid search selection dropdown" ng-model="currTermAddress" ng-change="updateLists()" id="currTermMemberId">
-          <option class="default text" ng-value="{{defaults.termAddress}}">{{ defaults.term.name }}</option>
-          <option ng-repeat="address in termAddressList" ng-value="{{ address }}">{{ address.address }}</option>
-        </select>
+        <select class="ui fluid search selection dropdown" ng-model="currTermAddress" ng-change="updateLists('termAddressList')" id="termAddressList" ng-options="address.address for address in termAddressList track by address.id"></select>
+          <!-- <option class="default text" ng-value="defaults.termAddress">{{ defaults.term.name }}</option>
+          <option ng-repeat="address in getList('termAddressList')" ng-value="address">{{ address.address }}</option>
+        </select> -->
       </div>
 
 
       <div class="field">
-        <label>Gateway</label>
-        <select class="ui fluid dropdown" ng-model="currGw" ng-change="updateLists()" id="currGw">
-          <option class="default text" ng-value="{{defaults.gw}}">{{ defaults.gw.address }}</option>
-          <option ng-repeat="gateway in gatewayList" ng-value="{{ gateway }}">{{ gateway.address }}</option>
-        </select>
+        <label>Sansay Switch</label>
+        <select class="ui fluid dropdown" ng-model="currGw" ng-change="updateLists('gatewayList')" id="gatewayList" ng-options="gateway as gateway.address for gateway in gatewayList track by gateway.id"></select>
+          <!-- <option class="default text" ng-value="defaults.gw">{{ defaults.gw.address }}</option>
+          <option ng-repeat="gateway in gatewayList" ng-value="gateway">{{ gateway.address }}</option>
+        </select> -->
 
     </div>
     <div class="ui button" type="submit" tabindex="0" ng-click="addGraph()">Add Graph</div>

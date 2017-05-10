@@ -54,11 +54,13 @@ app.factory('GraphListFactory', ($http) => {
 
       _graphList.push({
         params: {
-          country: graphParams.country.name || '%',
-          routeCodeId: graphParams.routeCode.id || '%',
-          originMemberId: graphParams.originMember.id || '%',
-          termMemberId: graphParams.termMember.id || '%',
-          gwId: graphParams.gw.id || '%'
+          country: graphParams.country.country,
+          routeCodeId: graphParams.routeCode.id,
+          originMemberId: graphParams.originMember.id,
+          termMemberId: graphParams.termMember.id,
+          originAddressId: graphParams.originAddress.id,
+          termAddressId: graphParams.termAddress.id,
+          gwId: graphParams.gw.id
         },
         graphTitle: graphTitle,
         id: graphId,
