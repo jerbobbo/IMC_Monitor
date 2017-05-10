@@ -88,7 +88,7 @@ app.directive("graph", function (d3Service, $window) {
               // gridlines in x axis function
               function make_x_gridlines() {
                   return d3.axisBottom(x)
-                      .ticks(10);
+                      .ticks(30);
               }
 
               // gridlines in y axis function

@@ -12,18 +12,30 @@ app.directive('spreadGraph', function (GraphFactory) {
         templateUrl: 'js/common/directives/spread-graph/spread-graph.html',
 
         controller: function($scope, GraphFactory) {
-          $scope.interval = "daily";
+          $scope.params.interval = "daily";
+
+          angular.extend($scope, GraphFactory);
 
           function init() {
-            var params = `country=${ $scope.params.country }&routeCodeId=${ $scope.params.routeCodeId }&originMemberId=${ $scope.params.originMemberId }&termMemberId=${ $scope.params.termMemberId }&gwId=${ $scope.params.gwId }&interval=${ $scope.interval }`;
 
-            angular.extend($scope, GraphFactory);
+            // var params = {
+            //   country: $scope.params.country,
+            //   routeCodeId: $scope.params.routeCodeId,
+            //   originMemberId: $scope.params.originMemberId,
+            //   termMemberId: $scope.params.termMemberId,
+            //   originAddressId: $scope.params.originAddressId,
+            //   termAddressId: $scope.params.termAddressId,
+            //   gwId: $scope.params.gwId,
+            //   fromDate: $scope.params.fromDate,
+            //   toDate: $scope.params.toDate,
+            //   interval: $scope.interval
+            // };
 
-            $scope.getData(params)
-            .then(function(results) {
+            $scope.getData($scope.params)
+            .then( (results) => {
               $scope.data = results;
               $scope.currType = $scope.currType || $scope.graphTypes[0];
-              $scope.originTerm = 'origin';
+              $scope.originTerm = $scope.originTerm || 'origin';
             });
           }
 
@@ -34,10 +46,10 @@ app.directive('spreadGraph', function (GraphFactory) {
 
           $scope.isCurrentType = (type) => $scope.currType == type;
           $scope.isCurrentOrigin = (type) => $scope.originTerm == type.toLowerCase();
-          $scope.isCurrentInterval = (interval) => $scope.interval == interval;
+          $scope.isCurrentInterval = (interval) => $scope.params.interval == interval;
 
           $scope.changeInterval = (interval) => {
-            $scope.interval = interval;
+            $scope.params.interval = interval;
             init();
           };
 

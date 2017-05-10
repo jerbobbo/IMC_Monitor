@@ -13,10 +13,10 @@ app.factory('GraphAddFactory', function($http) {
   const _defaultVals = {
     countryList: { country: '%' },
     regionList: { id: '%', region_name: 'All Regions' },
-    originMemberList: { id: '%', name: 'All' },
-    termMemberList: { id: '%', name: 'All' },
-    originAddressList: { id: '%', address: 'All' },
-    termAddressList: { id: '%', address: 'All' },
+    originMemberList: { id: '%', name: 'Origin: All' },
+    termMemberList: { id: '%', name: 'Term: All' },
+    originAddressList: { id: '%', address: 'Origin IP: All' },
+    termAddressList: { id: '%', address: 'Term IP: All' },
     gatewayList: { id: '%', address: 'All Switches' }
   };
 

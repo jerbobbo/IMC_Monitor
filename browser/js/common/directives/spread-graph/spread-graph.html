@@ -1,7 +1,7 @@
 <div class="ui fluid card" ng-repeat="currType in graphTypes">
   <div class="ui container">
     <div class="ui top attached small header">
-      {{ graphTitle }} | {{ originTerm }} {{ currType }} | {{ interval }}
+      {{ graphTitle }} | {{ originTerm }} {{ currType }} | {{ params.interval }}
     </div>
 
     <div ng-if=" currType == 'ASR' " class="ui mini basic buttons">
@@ -14,6 +14,6 @@
 
   </div>
   <div class="ui container">
-    <graph data="data" interval="{{interval}}" type="{{currType}}" origin-term="{{originTerm}}" index="{{currType}}{{index}}"></graph>
+    <graph data="data" interval="{{params.interval}}" type="{{currType}}" origin-term="{{originTerm}}" index="{{currType}}{{index}}"></graph>
   </div>
 </div>

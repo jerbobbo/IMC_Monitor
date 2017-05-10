@@ -1,7 +1,8 @@
 app.factory('GraphFactory', function($http) {
   return {
     getData: function(params) {
-      return $http.get('/api/graph-data?' + params)
+      console.log('$scope.queryParams', params);
+      return $http.get('/api/graph-data', { params: params })
       .then(function(response) {
         return response.data;
       });
@@ -13,7 +14,7 @@ app.factory('GraphFactory', function($http) {
 });
 
 //will be tab-graph in html tag
-app.directive('tabGraph', function (GraphFactory) {
+app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
 
     return {
         restrict: 'E',
@@ -26,39 +27,72 @@ app.directive('tabGraph', function (GraphFactory) {
         templateUrl: 'js/common/directives/tab-graph/tab-graph.html',
 
         controller: function($scope, GraphFactory) {
-          $scope.interval = "daily";
+          $scope.params.interval = "daily";
 
-          function init() {
-            var params = `country=${ $scope.params.country }&routeCodeId=${ $scope.params.routeCodeId }&originMemberId=${ $scope.params.originMemberId }&termMemberId=${ $scope.params.termMemberId }&gwId=${ $scope.params.gwId }&interval=${ $scope.interval }`;
+          angular.extend($scope, GraphFactory);
 
-            angular.extend($scope, GraphFactory);
+          var updateLists = (updatedField) => {
 
-            $scope.getData(params)
-            .then(function(results) {
+            var promiseArray = [];
+
+            GraphAddFactory.getListNames(updatedField).forEach( (listName) => {
+              var targetList = $scope[listName];
+              promiseArray.push( GraphAddFactory.getList(listName, $scope.queryParams, targetList) );
+            });
+
+            return Promise.all(promiseArray)
+              .catch(console.log);
+          };
+
+          $scope.updateGraph = (updatedField) => {
+
+            $scope.queryParams = {
+              country: $scope.params.country.country,
+              routeCodeId: $scope.params.routeCode.id,
+              originMemberId: $scope.params.originMember.id,
+              termMemberId: $scope.params.termMember.id,
+              originAddressId: $scope.params.originAddress.id,
+              termAddressId: $scope.params.termAddress.id,
+              gwId: $scope.params.gw.id,
+              fromDate: $scope.params.fromDate,
+              toDate: $scope.params.toDate,
+              interval: $scope.params.interval
+            };
+
+            return $scope.getData($scope.queryParams)
+            .then( (results) => {
               $scope.data = results;
               $scope.currType = $scope.currType || $scope.graphTypes[0];
-              $scope.originTerm = 'origin';
+              $scope.originTerm = $scope.originTerm || 'origin';
+              if (updatedField) return updateLists(updatedField);
             });
-          }
+          };
 
-          init();
+          //initialize lists with empty array
+          GraphAddFactory.getListNames().forEach( (listName) => $scope[listName] = []);
+
+          $scope.updateGraph()
+          .then( () => updateLists() )
+          .then( () => {
+            console.log($scope);
+            $('.ui.dropdown').dropdown({ placeholder: false });
+          });
 
           $scope.toggleState = (type) => $scope.currType = type;
           $scope.toggleOrigin = (type) => $scope.originTerm = type.toLowerCase();
 
           $scope.isCurrentType = (type) => $scope.currType == type;
           $scope.isCurrentOrigin = (type) => $scope.originTerm == type.toLowerCase();
-          $scope.isCurrentInterval = (interval) => $scope.interval == interval;
+          $scope.isCurrentInterval = (interval) => $scope.params.interval == interval;
 
           $scope.changeInterval = (interval) => {
-            $scope.interval = interval;
-            init();
+            $scope.params.interval = interval;
+            $scope.updateGraph();
           };
 
-          $scope.$watch( 'index', () =>  init() );
+          $scope.$watch( 'index', () =>  $scope.updateGraph() );
 
-          window.setInterval( () => init(), 300000 );
-
+          window.setInterval( () => $scope.updateGraph(), 300000 );
 
         }
     };

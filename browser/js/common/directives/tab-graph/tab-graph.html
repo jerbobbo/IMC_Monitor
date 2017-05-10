@@ -1,7 +1,14 @@
 
 <div class="ui container">
-  <div class="ui small header">
-    {{ graphTitle }} | {{ originTerm }} {{ currType }} | {{ interval }}
+  <div class="ui tiny header">
+    <select class="ui search selection dropdown" ng-model="params.country" ng-change="updateGraph('countryList')" ng-options="country.country for country in countryList track by country.country"></select>
+    <select class="ui search selection dropdown" ng-model="params.routeCode" ng-change="updateGraph('regionList')" ng-options="region.region_name for region in regionList track by region.id"></select>
+    <select class="ui search selection dropdown" ng-model="params.originMember" ng-change="updateGraph('originMemberList')" ng-options="member.name for member in originMemberList track by member.id"></select>
+    <select class="ui search selection dropdown" ng-model="params.termMember" ng-change="updateGraph('termMemberList')" ng-options="member.name for member in termMemberList track by member.id"></select>
+    <select class="ui search selection dropdown" ng-model="params.originAddress" ng-change="updateGraph('originAddressList')" ng-options="address.address for address in originAddressList track by address.id"></select>
+    <select class="ui search selection dropdown" ng-model="params.termAddress" ng-change="updateGraph('termAddressList')" ng-options="address.address for address in termAddressList track by address.id"></select>
+    <select class="ui search selection dropdown" ng-model="params.gw" ng-change="updateGraph('gatewayList')" ng-options="gateway as gateway.address for gateway in gatewayList track by gateway.id"></select>
+    {{ originTerm }} {{ currType }} | {{ params.interval }}
   </div>
 
   <div class="ui mini basic buttons">
@@ -18,5 +25,5 @@
 
 </div>
 <div class="ui container">
-  <graph data="data" interval="{{interval}}" type="{{currType}}" origin-term="{{originTerm}}" index="{{index}}"></graph>
+  <graph data="data" interval="{{params.interval}}" type="{{currType}}" origin-term="{{originTerm}}" index="{{index}}"></graph>
 </div>

@@ -9,11 +9,13 @@ app.factory('GraphListFactory', ($http) => {
         var graphArray = results.data.playlist_graphs;
         graphArray.forEach( (graph) => {
           graph.params = {
-            country: graph.country === "" ? "%" : graph.country,
-            routeCodeId: graph.route_code_id === 0 ? "%" : graph.route_code_id,
-            originMemberId: graph.origin_member_id === 0 ? "%" : graph.origin_member_id,
-            termMemberId: graph.term_member_id === 0 ? "%" : graph.term_member_id,
-            gwId: graph.gw_id === 0 ? "%" : graph.gw_id
+            country: { country: graph.country === "" ? "%" : graph.country },
+            routeCode: { id: graph.route_code_id === 0 ? "%" : graph.route_code_id },
+            originMember: { id: graph.origin_member_id === 0 ? "%" : graph.origin_member_id },
+            termMember: { id: graph.term_member_id === 0 ? "%" : graph.term_member_id },
+            originAddress: { id: graph.origin_address_id === 0 ? "%" : graph.origin_address_id },
+            termAddress: { id: graph.term_address_id === 0 ? "%" : graph.term_address_id },
+            gw: { id: graph.gw_id === 0 ? "%" : graph.gw_id }
           };
           graph.graphTitle = graph.title;
         });
@@ -87,7 +89,7 @@ app.controller('GraphListCtrl', ($scope, GraphListFactory) => {
   $scope.getGraphList = GraphListFactory.getGraphList;
   $scope.graphTypes = ['ASR', 'ACD', 'Seizures', 'AnsDel', 'NoCirc', 'Normal', 'Failure'];
 
-  $scope.spread = true;
+  $scope.spread = false;
 
   $scope.removeGraph = (idx) => {
     if ($scope.playlist) {
