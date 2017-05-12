@@ -1,29 +1,171 @@
+<div class="ui fluid card" ng-if="!spread.value">
+    <div class="ui container">
+      <form class="ui mini form">
+        <div class="four fields">
+          <div class="field">
+            <label class="banner">Country</label>
+            <select class="ui search selection dropdown" ng-model="params.country" ng-change="updateGraph('countryList')" ng-options="country.country for country in countryList track by country.country"></select>
+          </div>
+          <div class="field">
+            <label class="banner">Region</label>
+            <select class="ui search selection dropdown" ng-model="params.routeCode" ng-change="updateGraph('regionList')" ng-options="region.region_name for region in regionList track by region.id"></select>
+          </div>
+          <div class="field">
+            <label class="banner">Originating</label>
+            <select class="ui search selection dropdown bottom" ng-model="params.originMember" ng-change="updateGraph('originMemberList')" ng-options="member.name for member in originMemberList track by member.id"></select>
+          </div>
+          <div class="field">
+            <label class="banner">Terminating</label>
+            <select class="ui search selection dropdown" ng-model="params.termMember" ng-change="updateGraph('termMemberList')" ng-options="member.name for member in termMemberList track by member.id"></select>
+          </div>
+        </div>
+        <div class="four fields">
+          <div class="field">
+            <label class="banner">Origin IP</label>
+            <select class="ui search selection dropdown" ng-model="params.originAddress" ng-change="updateGraph('originAddressList')" ng-options="address.address for address in originAddressList track by address.id"></select>
+          </div>
+          <div class="field">
+            <label class="banner">Term IP</label>
+            <select class="ui search selection dropdown" ng-model="params.termAddress" ng-change="updateGraph('termAddressList')" ng-options="address.address for address in termAddressList track by address.id"></select>
+          </div>
+          <div class="field">
+            <label class="banner">SS</label>
+            <select class="ui search selection dropdown" ng-model="params.gw" ng-change="updateGraph('gatewayList')" ng-options="gateway.address for gateway in gatewayList track by gateway.id"></select>
+          </div>
+        </div>
 
-<div class="ui container">
-  <div class="ui tiny header">
-    <select class="ui search selection dropdown" ng-model="params.country" ng-change="updateGraph('countryList')" ng-options="country.country for country in countryList track by country.country"></select>
-    <select class="ui search selection dropdown" ng-model="params.routeCode" ng-change="updateGraph('regionList')" ng-options="region.region_name for region in regionList track by region.id"></select>
-    <select class="ui search selection dropdown" ng-model="params.originMember" ng-change="updateGraph('originMemberList')" ng-options="member.name for member in originMemberList track by member.id"></select>
-    <select class="ui search selection dropdown" ng-model="params.termMember" ng-change="updateGraph('termMemberList')" ng-options="member.name for member in termMemberList track by member.id"></select>
-    <select class="ui search selection dropdown" ng-model="params.originAddress" ng-change="updateGraph('originAddressList')" ng-options="address.address for address in originAddressList track by address.id"></select>
-    <select class="ui search selection dropdown" ng-model="params.termAddress" ng-change="updateGraph('termAddressList')" ng-options="address.address for address in termAddressList track by address.id"></select>
-    <select class="ui search selection dropdown" ng-model="params.gw" ng-change="updateGraph('gatewayList')" ng-options="gateway as gateway.address for gateway in gatewayList track by gateway.id"></select>
-    {{ originTerm }} {{ currType }} | {{ params.interval }}
-  </div>
+      </form>
 
-  <div class="ui mini basic buttons">
-    <button ng-repeat="type in originTypes" class="ui basic button" ng-click="toggleOrigin(type)" ng-class="{ 'green': isCurrentOrigin(type) }">{{ type }}</button>
-  </div>
+        <div class="ui small labels">
+          <div class="ui basic label">
+            {{ originTerm }} {{ currType }}
+          </div>
+          <div class="ui basic label">
+            {{ params.interval }}
+          </div>
+          <div class="ui basic blue label" ng-if="params.country.country !== '%'">
+            {{ params.country.country }}
+          </div>
+          <div class="ui basic blue label" ng-if="hasCurrParam(params.routeCode)">
+            {{ filterLabel('','regionList', params.routeCode.id, 'region_name') }}
+          </div>
+          <div class="ui basic blue label" ng-if="hasCurrParam(params.originMember)">
+            {{ filterLabel('Origin:', 'originMemberList', params.originMember.id, 'name') }}
+          </div>
+          <div class="ui basic blue label" ng-if="hasCurrParam(params.termMember)">
+            {{ filterLabel('Term:', 'termMemberList', params.termMember.id, 'name') }}
+          </div>
+          <div class="ui basic blue label" ng-if="hasCurrParam(params.originAddress)">
+            {{ filterLabel('Origin IP:', 'originAddressList', params.originAddress.id, 'address') }}
+          </div>
+          <div class="ui basic blue label" ng-if="hasCurrParam(params.termAddress)">
+            {{ filterLabel('Term IP:', 'termAddressList', params.termAddress.id, 'address') }}
+          </div>
+          <div class="ui basic blue label" ng-if="hasCurrParam(params.gw)">
+            {{ filterLabel('SS:', 'gatewayList', params.gw.id, 'address') }}
+          </div>
 
-  <div class="ui mini basic buttons">
-    <button ng-repeat="type in intervalTypes" class="ui basic button" ng-click="changeInterval(type)" ng-class="{ 'blue': isCurrentInterval(type) }">{{ type }}</button>
-  </div>
+        </div>
+        <!-- <div class="ui top attached small header">
+          {{ params.country.country }} | {{ params.routeCode.region_name }} | {{ params.originMember.name }} | {{ params.termMember.name }} | {{ params.originAddress.address }} | {{ params.termAddress.address }} | {{ params.gw.address }} | {{ originTerm }} {{ currType
+          }} | {{ params.interval }}
+        </div> -->
 
-  <div class=" seven ui mini basic buttons">
-    <button ng-repeat="type in graphTypes" class="ui basic button" ng-click="toggleState(type)" ng-class="{ 'orange': isCurrentType(type) }">{{ type }}</button>
-  </div>
+        <div class="ui mini basic buttons">
+            <button ng-repeat="type in originTypes" class="ui basic button" ng-click="toggleOrigin(type)" ng-class="{ 'green': isCurrentOrigin(type) }">{{ type }}</button>
+        </div>
 
+        <div class="ui mini basic buttons">
+            <button ng-repeat="type in intervalTypes" class="ui basic button" ng-click="changeInterval(type)" ng-class="{ 'blue': isCurrentInterval(type) }">{{ type }}</button>
+        </div>
+
+        <div class=" seven ui mini basic buttons">
+            <button ng-repeat="type in graphTypes" class="ui basic button" ng-click="toggleState(type)" ng-class="{ 'orange': isCurrentType(type) }">{{ type }}</button>
+        </div>
+
+    </div>
+    <div class="ui container">
+        <graph data="data" interval="{{params.interval}}" type="{{currType}}" origin-term="{{originTerm}}" index="{{index}}"></graph>
+    </div>
 </div>
-<div class="ui container">
-  <graph data="data" interval="{{params.interval}}" type="{{currType}}" origin-term="{{originTerm}}" index="{{index}}"></graph>
+
+<div class="ui fluid card" ng-repeat="currType in graphTypes" ng-if="spread.value">
+    <div class="ui container">
+      <form class="ui mini form" ng-if="currType == 'ASR'">
+        <div class="four fields">
+          <div class="field">
+            <label class="banner">Country</label>
+            <select class="ui search selection dropdown" ng-model="params.country" ng-change="updateGraph('countryList')" ng-options="country.country for country in countryList track by country.country"></select>
+          </div>
+          <div class="field">
+            <label class="banner">Region</label>
+            <select class="ui search selection dropdown" ng-model="params.routeCode" ng-change="updateGraph('regionList')" ng-options="region.region_name for region in regionList track by region.id"></select>
+          </div>
+          <div class="field">
+            <label class="banner">Originating</label>
+            <select class="ui search selection dropdown bottom" ng-model="params.originMember" ng-change="updateGraph('originMemberList')" ng-options="member.name for member in originMemberList track by member.id"></select>
+          </div>
+          <div class="field">
+            <label class="banner">Terminating</label>
+            <select class="ui search selection dropdown" ng-model="params.termMember" ng-change="updateGraph('termMemberList')" ng-options="member.name for member in termMemberList track by member.id"></select>
+          </div>
+        </div>
+        <div class="four fields">
+          <div class="field">
+            <label class="banner">Origin IP</label>
+            <select class="ui search selection dropdown" ng-model="params.originAddress" ng-change="updateGraph('originAddressList')" ng-options="address.address for address in originAddressList track by address.id"></select>
+          </div>
+          <div class="field">
+            <label class="banner">Term IP</label>
+            <select class="ui search selection dropdown" ng-model="params.termAddress" ng-change="updateGraph('termAddressList')" ng-options="address.address for address in termAddressList track by address.id"></select>
+          </div>
+          <div class="field">
+            <label class="banner">SS</label>
+            <select class="ui search selection dropdown" ng-model="params.gw" ng-change="updateGraph('gatewayList')" ng-options="gateway.address for gateway in gatewayList track by gateway.id"></select>
+          </div>
+        </div>
+
+      </form>
+      <div class="ui small labels">
+        <div class="ui basic label">
+          {{ originTerm }} {{ currType }}
+        </div>
+        <div class="ui basic label">
+          {{ params.interval }}
+        </div>
+        <div class="ui basic blue label" ng-if="params.country.country !== '%'">
+          {{ params.country.country }}
+        </div>
+        <div class="ui basic blue label" ng-if="hasCurrParam(params.routeCode)">
+          {{ filterLabel('','regionList', params.routeCode.id, 'region_name') }}
+        </div>
+        <div class="ui basic blue label" ng-if="hasCurrParam(params.originMember)">
+          {{ filterLabel('Origin:', 'originMemberList', params.originMember.id, 'name') }}
+        </div>
+        <div class="ui basic blue label" ng-if="hasCurrParam(params.termMember)">
+          {{ filterLabel('Term:', 'termMemberList', params.termMember.id, 'name') }}
+        </div>
+        <div class="ui basic blue label" ng-if="hasCurrParam(params.originAddress)">
+          {{ filterLabel('Origin IP:', 'originAddressList', params.originAddress.id, 'address') }}
+        </div>
+        <div class="ui basic blue label" ng-if="hasCurrParam(params.termAddress)">
+          {{ filterLabel('Term IP:', 'termAddressList', params.termAddress.id, 'address') }}
+        </div>
+        <div class="ui basic blue label" ng-if="hasCurrParam(params.gw)">
+          {{ filterLabel('SS:', 'gatewayList', params.gw.id, 'address') }}
+        </div>
+      </div>
+
+        <div ng-if=" currType == 'ASR' " class="ui mini basic buttons">
+            <button ng-repeat="type in originTypes" class="ui basic button" ng-click="toggleOrigin(type)" ng-class="{ 'green': isCurrentOrigin(type) }">{{ type }}</button>
+        </div>
+
+        <div ng-if=" currType == 'ASR' " class="ui mini basic buttons">
+            <button ng-repeat="type in intervalTypes" class="ui basic button" ng-click="changeInterval(type)" ng-class="{ 'blue': isCurrentInterval(type) }">{{ type }}</button>
+        </div>
+
+    </div>
+    <div class="ui container">
+        <graph data="data" interval="{{params.interval}}" type="{{currType}}" origin-term="{{originTerm}}" index="{{currType}}{{index}}"></graph>
+    </div>
 </div>

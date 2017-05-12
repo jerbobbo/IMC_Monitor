@@ -20,9 +20,9 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
         restrict: 'E',
         scope: {
           params: '=',
-          graphTitle: '@',
           name: '@',
-          index: '@'
+          index: '@',
+          spread: '='
         },
         templateUrl: 'js/common/directives/tab-graph/tab-graph.html',
 
@@ -84,6 +84,15 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
           $scope.isCurrentType = (type) => $scope.currType == type;
           $scope.isCurrentOrigin = (type) => $scope.originTerm == type.toLowerCase();
           $scope.isCurrentInterval = (interval) => $scope.params.interval == interval;
+
+          $scope.hasCurrParam = (param) => param && param.id !== '%';
+
+          $scope.filterLabel = (abbr, listname, id, nameField) => {
+            if (id !== '%') {
+              var foundItem = $scope[listname].find( (item) => item.id === id );
+              if (foundItem) return `${abbr} ${foundItem[nameField]}`;
+            }
+          };
 
           $scope.changeInterval = (interval) => {
             $scope.params.interval = interval;
