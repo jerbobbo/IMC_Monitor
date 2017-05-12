@@ -13,11 +13,11 @@ app.factory('GraphAddFactory', function($http) {
   const _defaultVals = {
     countryList: { country: '%' },
     regionList: { id: '%', region_name: 'All Regions' },
-    originMemberList: { id: '%', name: 'Origin: All' },
-    termMemberList: { id: '%', name: 'Term: All' },
-    originAddressList: { id: '%', address: 'Origin IP: All' },
-    termAddressList: { id: '%', address: 'Term IP: All' },
-    gatewayList: { id: '%', address: 'All Switches' }
+    originMemberList: { id: '%', name: 'All' },
+    termMemberList: { id: '%', name: 'All' },
+    originAddressList: { id: '%', address: 'All' },
+    termAddressList: { id: '%', address: 'All' },
+    gatewayList: { id: '%', address: 'All' }
   };
 
   return {
@@ -78,6 +78,7 @@ app.controller('GraphAddCtrl', function($scope, GraphAddFactory, PlaylistFactory
   });
 
   var addToList = function(graphParams) {
+    console.log('graphParams', graphParams);
     GraphListFactory.addToGraphList(graphParams);
     if ($scope.playlist) {
       PlaylistFactory.saveToList(

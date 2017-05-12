@@ -1,7 +1,6 @@
 app.factory('GraphFactory', function($http) {
   return {
     getData: function(params) {
-      console.log('$scope.queryParams', params);
       return $http.get('/api/graph-data', { params: params })
       .then(function(response) {
         return response.data;
@@ -74,7 +73,6 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
           $scope.updateGraph()
           .then( () => updateLists() )
           .then( () => {
-            console.log($scope);
             $('.ui.dropdown').dropdown({ placeholder: false });
           });
 

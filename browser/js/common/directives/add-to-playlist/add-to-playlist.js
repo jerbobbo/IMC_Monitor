@@ -59,11 +59,6 @@ app.controller('PlaylistCtrl', ($scope, PlaylistFactory, $state, GraphListFactor
 
   $scope.printScope = () => console.log($scope);
 
-  $scope.$watch( GraphListFactory.lastGraphTitle.value,
-    () => {
-      $scope.newListName = GraphListFactory.lastGraphTitle.value;
-  });
-
   $('#add-to-list')
     .popup({
       on: 'click'

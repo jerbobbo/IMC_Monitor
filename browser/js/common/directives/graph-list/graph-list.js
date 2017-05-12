@@ -1,6 +1,5 @@
 app.factory('GraphListFactory', ($http) => {
   var _graphList = [];
-  var _lastGraphTitle = { value: '' };
 
   var GraphListFactory = {
     fetchGraphs: (playlistId) => {
@@ -17,7 +16,6 @@ app.factory('GraphListFactory', ($http) => {
             termAddress: { id: graph.term_address_id === 0 ? "%" : graph.term_address_id },
             gw: { id: graph.gw_id === 0 ? "%" : graph.gw_id }
           };
-          graph.graphTitle = graph.title;
         });
         return {
           graphList: graphArray,
@@ -35,40 +33,26 @@ app.factory('GraphListFactory', ($http) => {
       angular.copy(graphData, _graphList);
     },
     clearGraphList: () => angular.copy([], _graphList),
-    getLastGraphTitle: () => {
-      if (_graphList.length) return _graphList[_graphList.length-1].graphTitle;
-    },
     getGraphList: () => _graphList,
     getLastGraph: () => _graphList[_graphList.length-1],
     addToGraphList: (graphParams) => {
       var graphId = new Date().getTime();
       var graphOrder = _graphList.length;
-      var graphTitle = "";
-
-      for ( var key in graphParams) {
-        if ( graphParams[key].name ) {
-          if (graphTitle !== "") graphTitle += " | ";
-          if (key === 'originMember') graphTitle += 'Origin: ';
-          if (key === 'termMember') graphTitle += 'Term: ';
-          graphTitle += graphParams[key].name;
-        }
-      }
 
       _graphList.push({
-        params: {
-          country: graphParams.country.country,
-          routeCodeId: graphParams.routeCode.id,
-          originMemberId: graphParams.originMember.id,
-          termMemberId: graphParams.termMember.id,
-          originAddressId: graphParams.originAddress.id,
-          termAddressId: graphParams.termAddress.id,
-          gwId: graphParams.gw.id
-        },
-        graphTitle: graphTitle,
+        // params: {
+        //   country: graphParams.country.country,
+        //   routeCodeId: graphParams.routeCode.id,
+        //   originMemberId: graphParams.originMember.id,
+        //   termMemberId: graphParams.termMember.id,
+        //   originAddressId: graphParams.originAddress.id,
+        //   termAddressId: graphParams.termAddress.id,
+        //   gwId: graphParams.gw.id
+        // },
+        params: graphParams,
         id: graphId,
         order: graphOrder
       });
-      _lastGraphTitle.value = graphTitle;
     },
     isEmpty: () => _graphList.length === 0,
     swapOrder: (idx, next) => {
@@ -78,7 +62,6 @@ app.factory('GraphListFactory', ($http) => {
       _graphList[idx].order--;
       _graphList[next] = currentGraph;
     },
-    lastGraphTitle: _lastGraphTitle
   };
 
   return GraphListFactory;
@@ -89,7 +72,7 @@ app.controller('GraphListCtrl', ($scope, GraphListFactory) => {
   $scope.getGraphList = GraphListFactory.getGraphList;
   $scope.graphTypes = ['ASR', 'ACD', 'Seizures', 'AnsDel', 'NoCirc', 'Normal', 'Failure'];
 
-  $scope.spread = false;
+  $scope.spread = { value: false };
 
   $scope.removeGraph = (idx) => {
     if ($scope.playlist) {
@@ -118,11 +101,11 @@ app.controller('GraphListCtrl', ($scope, GraphListFactory) => {
   };
 
   $scope.spreadToggle = () => {
-    $scope.spread = !$scope.spread;
+    $scope.spread.value = !$scope.spread.value;
   };
 
   $scope.columnText = () => $scope.twoColumns.value ? "Single Column" : "Two Columns";
-  $scope.spreadText = () => $scope.spread ? "Collapse" : "Expand";
+  $scope.spreadText = () => $scope.spread.value ? "Collapse" : "Expand";
 
 });
 

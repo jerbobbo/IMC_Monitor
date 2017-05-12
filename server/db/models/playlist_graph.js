@@ -10,10 +10,6 @@ var PlaylistGraph = db.define('playlist_graph', {
       type: Sequelize.INTEGER,
       allowNull: false
     },
-    title: {
-      type: Sequelize.STRING,
-      allowNull: false
-    },
     country: {
       type: Sequelize.STRING,
       allowNull: true

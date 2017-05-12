@@ -37,14 +37,14 @@ router.post('/:playlistId/playlist-graph', ensureAuthenticated, function(req, re
   models.PlaylistGraph.create({
     playlist_id: newGraph.playlist_id,
     order: newGraph.order,
-    title: newGraph.graphTitle,
-    country: newGraph.params.country,
-    route_code_id: newGraph.params.routeCodeId === '%' ? 0 : newGraph.params.routeCodeId,
-    origin_member_id: newGraph.params.originMemberId === '%' ? 0 : newGraph.params.originMemberId,
-    term_member_id: newGraph.params.termMemberId === '%' ? 0 : newGraph.params.termMemberId,
-    origin_address_id: newGraph.params.originAddressId === '%' ? 0 : newGraph.params.originAddressId,
-    term_address_id: newGraph.params.termAddressId === '%' ? 0 : newGraph.params.termAddressId,
-    gw_id: newGraph.params.gwId === '%' ? 0 : newGraph.params.gwId
+    title: '',
+    country: newGraph.params.country.country,
+    route_code_id: newGraph.params.routeCode.id === '%' ? 0 : newGraph.params.routeCode.id,
+    origin_member_id: newGraph.params.originMember.id === '%' ? 0 : newGraph.params.originMember.id,
+    term_member_id: newGraph.params.termMember.id === '%' ? 0 : newGraph.params.termMember.id,
+    origin_address_id: newGraph.params.originAddress.id === '%' ? 0 : newGraph.params.originAddress.id,
+    term_address_id: newGraph.params.termAddress.id === '%' ? 0 : newGraph.params.termAddress.id,
+    gw_id: newGraph.params.gw.id === '%' ? 0 : newGraph.params.gw.id
   })
   .then(function(data) {
     res.status(201).json(data);
