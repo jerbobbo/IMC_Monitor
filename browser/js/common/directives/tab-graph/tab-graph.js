@@ -27,6 +27,7 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
 
         controller: function($scope, GraphFactory) {
           $scope.params.interval = "daily";
+          $scope.datePickerId = 'date-' + $scope.index;
 
           angular.extend($scope, GraphFactory);
 
@@ -101,7 +102,41 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
 
           window.setInterval( () => $scope.updateGraph(), 300000 );
 
+          function getOldestDate() {
+
+            var intervalTypes = {
+              daily: 7,
+              weekly: 15,
+              monthly: 65,
+              yearly: 740
+            };
+
+            var oldestDate = moment.utc().subtract(intervalTypes[$scope.params.interval], 'days')
+              .format('YYYY-MM-DD HH:MM');
+            console.log(oldestDate);
+            return oldestDate;
+          }
+
+           $scope.openDatePicker = () => {
+            $(`#${$scope.datePickerId}`).daterangepicker(
+              {
+                timeZone: '00:00',
+                format: 'YYYY-MM-DD HH:MM',
+                timePicker: true,
+                timePickerIncrement: 5,
+                startDate: getOldestDate(),
+                endDate: moment.utc().format('YYYY-MM-DD HH:MM')
+              },
+              function(start, end, label) {
+                console.log('date picked');
+                $scope.params.fromDate = start;
+                $scope.params.toDate = end;
+              }
+            );
+          };
+
         }
+
     };
 
 });
