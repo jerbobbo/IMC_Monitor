@@ -31,6 +31,43 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
 
           angular.extend($scope, GraphFactory);
 
+          const dateFormat = 'YYYY-MM-DD HH:mm:ss';
+
+          const ranges = {
+            daily: {
+              ranges: {
+                'Today': [moment.utc().subtract(1, 'days').subtract(6, 'hours'), moment.utc().subtract(5, 'minutes')],
+                'Yesterday': [moment.utc().subtract(2, 'days').subtract(6, 'hours'), moment.utc().subtract(1, 'days')],
+              },
+              default: 'Today',
+              minDate: moment.utc().subtract(7, 'days')
+            },
+            weekly: {
+              ranges: {
+                'This Week': [moment.utc().subtract(7, 'days').subtract(6, 'hours'), moment.utc().subtract(5, 'minutes')],
+                'Last Week': [moment.utc().subtract(14, 'days').subtract(6, 'hours'), moment.utc().subtract(7, 'days')],
+              },
+              default: 'This Week',
+              minDate: moment.utc().subtract(15, 'days')
+            },
+            monthly: {
+              ranges: {
+                'This Month': [moment.utc().subtract(31, 'days'), moment.utc().subtract(5, 'minutes')],
+                'Last Month': [moment.utc().subtract(61, 'days'), moment.utc().subtract(30, 'days')],
+              },
+              default: 'This Month',
+              minDate: moment.utc().subtract(65, 'days')
+            },
+            yearly: {
+              ranges: {
+                'This Year': [moment.utc().subtract(367, 'days'), moment.utc().subtract(5, 'minutes')],
+                'Last Year': [moment.utc().subtract(732, 'days'), moment.utc().subtract(365, 'days')],
+              },
+              default: 'This Year',
+              minDate: moment.utc().subtract(740, 'days')
+            }
+          };
+
           var updateLists = (updatedField) => {
 
             var promiseArray = [];
@@ -54,8 +91,8 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
               originAddressId: $scope.params.originAddress.id,
               termAddressId: $scope.params.termAddress.id,
               gwId: $scope.params.gw.id,
-              fromDate: $scope.params.fromDate,
-              toDate: $scope.params.toDate,
+              fromDate: $scope.params.fromDate.format(dateFormat),
+              toDate: $scope.params.toDate.format(dateFormat),
               interval: $scope.params.interval
             };
 
@@ -68,6 +105,7 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
             });
           };
 
+          setDefaultDates();
           //initialize lists with empty array
           GraphAddFactory.getListNames().forEach( (listName) => $scope[listName] = []);
 
@@ -95,6 +133,7 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
 
           $scope.changeInterval = (interval) => {
             $scope.params.interval = interval;
+            setDefaultDates();
             $scope.updateGraph();
           };
 
@@ -102,35 +141,35 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
 
           window.setInterval( () => $scope.updateGraph(), 300000 );
 
-          function getOldestDate() {
+          function setCurrentDates(range) {
+            $scope.params.fromDate = range[0];
+            $scope.params.toDate = range[1];
+          }
 
-            var intervalTypes = {
-              daily: 7,
-              weekly: 15,
-              monthly: 65,
-              yearly: 740
-            };
-
-            var oldestDate = moment.utc().subtract(intervalTypes[$scope.params.interval], 'days')
-              .format('YYYY-MM-DD HH:MM');
-            console.log(oldestDate);
-            return oldestDate;
+          function setDefaultDates() {
+            var currRange = ranges[$scope.params.interval];
+            setCurrentDates(currRange.ranges[currRange.default]);
           }
 
            $scope.openDatePicker = () => {
             $(`#${$scope.datePickerId}`).daterangepicker(
               {
                 timeZone: '00:00',
-                format: 'YYYY-MM-DD HH:MM',
                 timePicker: true,
+                timePicker24Hour: true,
                 timePickerIncrement: 5,
-                startDate: getOldestDate(),
-                endDate: moment.utc().format('YYYY-MM-DD HH:MM')
+                startDate: $scope.params.fromDate.floor(5, 'minutes'),
+                endDate: $scope.params.toDate.floor(5, 'minutes'),
+                minDate: ranges[$scope.params.interval].minDate,
+                ranges: ranges[$scope.params.interval].ranges,
+                format: 'YYYY-MM-DD HH:mm',
+                autoUpdateInput: true,
+                buttonClasses: ['ui mini button'],
+                applyClass: 'primary'
               },
               function(start, end, label) {
-                console.log('date picked');
-                $scope.params.fromDate = start;
-                $scope.params.toDate = end;
+                setCurrentDates([start, end]);
+                $scope.updateGraph();
               }
             );
           };

@@ -89,7 +89,7 @@
 
     </div>
     <div class="ui container">
-        <graph data="data" interval="{{params.interval}}" type="{{currType}}" origin-term="{{originTerm}}" index="{{index}}"></graph>
+        <graph data="data" interval="{{params.interval}}" from-date="params.fromDate" to-date="params.toDate" type="{{currType}}" origin-term="{{originTerm}}" index="{{index}}"></graph>
     </div>
 </div>
 
@@ -127,7 +127,10 @@
             <label>SS</label>
             <select class="ui search selection dropdown" ng-model="params.gw" ng-change="updateGraph('gatewayList')" ng-options="gateway.address for gateway in gatewayList track by gateway.id"></select>
           </div>
-
+          <div class="blue field">
+            <label>Date Range</label>
+            <input type="text" ng-focus="openDatePicker()" id="{{datePickerId}}"/>
+          </div>
         </div>
 
       </form>
@@ -171,6 +174,6 @@
 
     </div>
     <div class="ui container">
-        <graph data="data" interval="{{params.interval}}" type="{{currType}}" origin-term="{{originTerm}}" index="{{currType}}{{index}}"></graph>
+        <graph data="data" interval="{{params.interval}}" from-date="params.fromDate" to-date="params.toDate" type="{{currType}}" origin-term="{{originTerm}}" index="{{currType}}{{index}}"></graph>
     </div>
 </div>
