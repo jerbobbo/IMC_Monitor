@@ -15,7 +15,7 @@ var ensureAuthenticated = function (req, res, next) {
 
 router.get('/', ensureAuthenticated, permission({ userPermission: true }), function(req, res, next) {
 
-  var intervalMap = {
+  const intervalMap = {
     daily: {
       setOldest: (date) => {
         date.setHours(date.getHours() - 4);
@@ -51,32 +51,40 @@ router.get('/', ensureAuthenticated, permission({ userPermission: true }), funct
 
   var whereClause = {
     route_code_id: {
-      $like: req.query.routeCodeId || '%'
+      $like: req.query.routeCodeId
     },
     origin_member_id: {
-      $like: req.query.originMemberId || '%'
+      $like: req.query.originMemberId
     },
     term_member_id: {
-      $like: req.query.termMemberId || '%'
+      $like: req.query.termMemberId
+    },
+    origin_address_id: {
+      $like: req.query.originAddressId
+    },
+    term_address_id: {
+      $like: req.query.termAddressId
     },
     gw_id: {
-      $like: req.query.gwId || '%'
+      $like: req.query.gwId
     }
   };
 
-  // var now = convertDateToUTC( new Date() );
-  var now = new Date();
-  console.log('now', now);
-  // var oldestDate = convertDateToUTC( new Date() );
-  var oldestDate = new Date();
-  console.log('oldestDate', oldestDate);
-  interval.setOldest(oldestDate);
-  console.log('oldestDate - changed', oldestDate);
-  var ageRange = [oldestDate, now];
+  if (req.query.fromDate) {
+    whereClause[interval.groupBy] = {
+      $between: [req.query.fromDate, req.query.toDate]
+    };
+  }
+  else {
+    var now = new Date();
+    var oldestDate = new Date();
+    interval.setOldest(oldestDate);
+    var ageRange = [oldestDate, now];
 
-  whereClause[interval.groupBy] = {
-    $between: ageRange
-  };
+    whereClause[interval.groupBy] = {
+      $between: ageRange
+    };
+  }
 
   models[interval.model].findAll({
     attributes: [

@@ -1,9 +1,9 @@
 'use strict';
-var mysql = require('promise-mysql');
-var config = require('../config/db-config');
-var Promise = require('bluebird');
+const mysql = require('promise-mysql');
+const config = require('../config/db-config');
+const Promise = require('bluebird');
 
-var pool = mysql.createPool( {
+const pool = mysql.createPool( {
 	host: 'localhost',
 	user: config.DATABASE_USER,
 	password: config.DATABASE_PASS,
@@ -11,15 +11,18 @@ var pool = mysql.createPool( {
   connectionLimt: 10
 });
 
-var insertQuery = `
+const insertQuery = `
   insert into accounting_summary_30 select
   batch_time_30,
   max(batch_num) as batch_num,
   origin_member_id,
   term_member_id,
+	origin_address_id,
+	term_address_id,
   country_code,
   route_code_id,
   gw_id,
+	sum(raw_seizures) as raw_seizures,
   sum(origin_seizures) as origin_seizures,
   sum(term_seizures) as term_seizures,
   sum(completed) as completed,
@@ -53,22 +56,25 @@ var insertQuery = `
   group by batch_time_30,
   origin_member_id,
   term_member_id,
+	origin_address_id,
+	term_address_id,
   country_code,
   route_code_id,
   gw_id;
   `;
 
-var deleteSummaryQuery = `
+const deleteSummaryQuery = `
   delete from accounting_summary
   where TIMESTAMPDIFF(DAY, (select max(batch_time_30)
   from accounting_summary_30), batch_time) < -7;
   `;
 
-var deleteSummary30Query = `
+const deleteSummary30Query = `
   delete from accounting_summary_30
   where TIMESTAMPDIFF(DAY, (select max(batch_time_30)
   from accounting_summary), batch_time_30) < -15;
   `;
+
 
 var conn;
 pool.getConnection()

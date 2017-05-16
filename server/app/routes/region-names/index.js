@@ -1,11 +1,11 @@
 'use strict';
-var path = require('path');
-var router = require('express').Router();
-var regionNameModel = require(path.join(__dirname, '../../../db/models/accounting_region_name'));
-var countryPrefixModel = require(path.join(__dirname, '../../../db/models/country_prefix'));
-var Sequelize = require('sequelize');
+const path = require('path');
+const router = require('express').Router();
+const models = require(path.join(__dirname, '../../../db/models/'));
+const Sequelize = require('sequelize');
+const stripTableName = require(path.join(__dirname, '../../../helper/stripTableName'));
 
-var ensureAuthenticated = function (req, res, next) {
+const ensureAuthenticated = (req, res, next) => {
     if (req.isAuthenticated()) {
         next();
     } else {
@@ -13,28 +13,49 @@ var ensureAuthenticated = function (req, res, next) {
     }
 };
 
-router.get('/:countryName', ensureAuthenticated, function(req, res, next) {
-  regionNameModel.findAll({
-    include: [{
-      model: countryPrefixModel,
-      attributes: ['country'],
-      where: { country: req.params.countryName }
-    }]
+router.get('/', ensureAuthenticated, (req, res, next) => {
+
+  const query = req.query;
+
+  models.AccountingSummaryPrimary.findAll({
+    attributes: [],
+    include: [
+      {
+        model: models.CountryPrefix,
+        attributes: [],
+        where: { country: { $like: req.query.country || '%'} }
+      },
+      {
+        model: models.AccountingRegionName,
+        attributes: ['id', 'region_name']
+      }
+    ],
+    where: {
+      origin_member_id: { $like: query.originMemberId || '%' },
+      term_member_id: { $like: query.termMemberId || '%' },
+      origin_address_id: { $like: query.originAddressId || '%' },
+      term_address_id: { $like: query.termAddressId || '%' },
+      gw_id: { $like: query.gwId || '%' }
+    },
+    group: ['accounting_region_name.id', 'region_name'],
+    order: ['region_name'],
+    raw: true
   })
   .then(function(data) {
+    data = stripTableName(data, 'region_name');
     res.status(200).json(data);
   }, next);
 });
 
-router.get('/', ensureAuthenticated, function(req, res, next) {
-  regionNameModel.findAll({
-    attributes: ['region_name'],
-    group: ['region_name'],
-    order: ['region_name']
-  })
-  .then(function(data) {
-    res.status(200).json(data);
-  }, next);
-});
+// router.get('/', ensureAuthenticated, (req, res, next) => {
+//   models.AccountingRegionName.findAll({
+//     attributes: ['region_name'],
+//     group: ['region_name'],
+//     order: ['region_name']
+//   })
+//   .then( (data) => {
+//     res.status(200).json(data);
+//   }, next);
+// });
 
 module.exports = router;

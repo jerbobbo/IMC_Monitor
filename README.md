@@ -6,6 +6,7 @@ Installation
 ============
 
 - Run npm install
+=======
 - Run bower install
 - create mysql database
 - create db tables by running statements in scripts/db_create.sql
@@ -32,6 +33,7 @@ Installation
       '192.168.20.22',
     ]
   };
+=======
 
 Seed DB:
 ```

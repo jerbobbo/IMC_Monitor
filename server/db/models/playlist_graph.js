@@ -10,10 +10,6 @@ var PlaylistGraph = db.define('playlist_graph', {
       type: Sequelize.INTEGER,
       allowNull: false
     },
-    title: {
-      type: Sequelize.STRING,
-      allowNull: false
-    },
     country: {
       type: Sequelize.STRING,
       allowNull: true
@@ -27,6 +23,14 @@ var PlaylistGraph = db.define('playlist_graph', {
       allowNull: true
     },
     term_member_id: {
+      type: Sequelize.INTEGER,
+      allowNull: true
+    },
+    origin_address_id: {
+      type: Sequelize.INTEGER,
+      allowNull: true
+    },
+    term_address_id: {
       type: Sequelize.INTEGER,
       allowNull: true
     },

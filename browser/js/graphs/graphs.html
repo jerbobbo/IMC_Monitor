@@ -1,30 +1,32 @@
-  <div class="ui wide sidebar vertical menu">
-    <graph-generator-form playlist="playlist" ></graph-generator-form>
-    <add-to-playlist playlist="playlist" list-collection="listCollection" ng-if="!isEmpty() && !playlist"></add-to-playlist>
-  </div>
-  <div class="pusher">
-    <div class="ui grid">
-      <div class="two wide column">
-        <!-- <button class="ui basic fluid green button" ui-sref="graphs({ playlistId: null })"> -->
-        <button class="ui basic fluid green button" ng-click="clearGraphs()">
-          <i class="remove icon"></i>
-          Clear Page
-        </button>
-        <button class="ui basic fluid blue button" ng-click="showGraphGenerator()">
-          <i class="add square icon"></i>
-          Add Graphs
-        </button>
-        <h4 class="ui header">Your Lists</h4>
-        <div class="ui relaxed divided list">
-          <div class="item" ng-repeat="list in listCollection | orderBy: 'name'">
-            <div class="content">
-              <a class="header" ui-sref="graphs({ playlistId: list.id })">{{ list.name }}</a>
+  <div id="sidebar-div">
+    <div class="ui wide sidebar vertical menu">
+      <graph-generator-form playlist="playlist" ></graph-generator-form>
+      <add-to-playlist playlist="playlist" list-collection="listCollection" ng-if="!isEmpty() && !playlist"></add-to-playlist>
+    </div>
+    <div class="pusher">
+      <div class="ui grid">
+        <div class="two wide column">
+          <!-- <button class="ui basic fluid green button" ui-sref="graphs({ playlistId: null })"> -->
+          <button class="ui basic fluid green button" ng-click="clearGraphs()">
+            <i class="remove icon"></i>
+            Clear Page
+          </button>
+          <button class="ui basic fluid blue button" ng-click="showGraphGenerator()">
+            <i class="add square icon"></i>
+            Add Graphs
+          </button>
+          <h4 class="ui header">Your Lists</h4>
+          <div class="ui relaxed divided list">
+            <div class="item" ng-repeat="list in listCollection | orderBy: 'name'">
+              <div class="content">
+                <a class="header" ui-sref="graphs({ playlistId: list.id })">{{ list.name }}</a>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="fourteen wide column">
-        <graph-list playlist="playlist" two-columns="twoColumns"></graph-list>
+        <div class="fourteen wide column">
+          <graph-list playlist="playlist" two-columns="twoColumns"></graph-list>
+        </div>
       </div>
     </div>
   </div>

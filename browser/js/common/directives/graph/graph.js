@@ -8,7 +8,9 @@ app.directive("graph", function (d3Service, $window) {
           type: "@",
           originTerm: "@",
           index: "@",
-          interval: '@'
+          interval: '@',
+          fromDate: '=',
+          toDate: '='
         },
         templateUrl: "js/common/directives/graph/graph.html",
 
@@ -58,23 +60,12 @@ app.directive("graph", function (d3Service, $window) {
               // If we dont pass any data, return out of the element
               if (!data) return;
 
-              var parseTime = d3.timeParse("%Y-%m-%dT%H:%M:%S.%LZ");
-              // var yesterday = new Date();
-              // yesterday.setDate(yesterday.getDate() - 1);
-              // var today = new Date();
-              // var now = convertDateToUTC(today);
+              var parseTime = d3.utcParse("%Y-%m-%dT%H:%M:%S.%LZ");
+
               scope.currInterval = intervalTypes[scope.interval];
 
-              var now = new Date();
-              now = convertDateToUTC(now);
-              var oldestDate = new Date();
-              oldestDate = convertDateToUTC(oldestDate);
-              scope.currInterval.setOldest(oldestDate);
-
-              now.setMinutes(Math.floor(now.getMinutes()/5)*5 - 10);
-
-              var x = d3.scaleTime()
-                .domain([oldestDate, now])
+              var x = d3.scaleUtc()
+                .domain([scope.fromDate.valueOf(), scope.toDate.valueOf()])
                 .rangeRound([0, width]),
               y = d3.scaleLinear()
                 .domain([0, scope.currFunctions.maxGraphHeight(data, scope.originTerm, scope.currInterval.denominator) ])
@@ -88,7 +79,7 @@ app.directive("graph", function (d3Service, $window) {
               // gridlines in x axis function
               function make_x_gridlines() {
                   return d3.axisBottom(x)
-                      .ticks(10);
+                      .ticks(30);
               }
 
               // gridlines in y axis function

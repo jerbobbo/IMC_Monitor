@@ -1,9 +1,9 @@
 'use strict';
-var mysql = require('promise-mysql');
-var config = require('../config/db-config');
-var Promise = require('bluebird');
+const mysql = require('promise-mysql');
+const config = require('../config/db-config');
+const Promise = require('bluebird');
 
-var pool = mysql.createPool( {
+const pool = mysql.createPool( {
 	host: 'localhost',
 	user: config.DATABASE_USER,
 	password: config.DATABASE_PASS,
@@ -14,31 +14,29 @@ var pool = mysql.createPool( {
 var regionTable = {};
 
 pool.query('select prefix, CONCAT(prefix,region_code) as routing_digits, region_id, prefix, route_code from accounting_region')
-.then(function(result) {
+.then( (result) => {
 	result.forEach(function(elem) {
 		if (!regionTable[elem.prefix]) regionTable[elem.prefix] = {};
 		regionTable[elem.prefix][elem.routing_digits] = { regionId: elem.region_id, routeCode: elem.route_code };
 	});
-	//console.log(regionTable);
 });
 
 function findOrCreateGatewayId (address) {
-	// console.log('GatewayId');
 
 	var conn, foundId;
 	return pool.getConnection()
-	.then(function(_conn) {
+	.then( (_conn) => {
 		conn = _conn;
   	return conn.query("select id from accounting_gateways where address like '" + address + "' limit 1");
 	})
-	.then(function(res) {
+	.then( (res) => {
 		if (res.length === 0) {
 			console.log('no gateway_id found: ', address);
 			return conn.query("insert into accounting_gateways(address) select '" + address + "'")
-			.then(function() {
+			.then( () => {
 				return conn.query("select id from accounting_gateways where address like '" + address + "' limit 1");
 			})
-			.then(function(_res) {
+			.then( (_res) => {
 				foundId = _res[0].id;
 				return pool.releaseConnection(conn);
 			})
@@ -49,11 +47,11 @@ function findOrCreateGatewayId (address) {
 			return pool.releaseConnection(conn);
 		}
 	})
-	.then(function() {
+	.then( () => {
 		//console.log('you got here');
 		return foundId;
 	})
-	.catch(function(err) {
+	.catch( (err) => {
 		console.log('findOrCreateGatewayId ', address, err);
 	});
 }
@@ -62,18 +60,18 @@ function findOrCreateMemberId (address_id) {
 	// console.log('MemberId');
 	var conn, foundId;
 	return pool.getConnection()
-	.then(function(_conn) {
+	.then( (_conn) => {
 		conn = _conn;
   	return conn.query("select member_id from accounting_members where address_id =" + address_id + " limit 1");
 	})
-	.then(function(res) {
+	.then( (res) => {
 		if (res.length === 0) {
 			console.log('no member_id found for address_id ', address_id);
 			return conn.query("insert into accounting_members(member_id, address_id, type_id, vtr_id, intc_id) select 514, '" + address_id + "', 2, 3, 2")
-			.then(function() {
+			.then( () => {
 				return conn.query("select member_id from accounting_members where address_id =" + address_id + " limit 1");
 			})
-			.then(function(_res) {
+			.then( (_res) => {
 				foundId = _res[0].member_id;
 				return pool.releaseConnection(conn);
 			})
@@ -84,11 +82,11 @@ function findOrCreateMemberId (address_id) {
 			return pool.releaseConnection(conn);
 		}
 	})
-	.then(function() {
+	.then( () => {
 		// console.log('you got here')
 		return foundId;
 	})
-	.catch(function(err) {
+	.catch( (err) => {
 		console.log('findOrCreateMemberId ', address_id, err);
 	});
 }
@@ -97,26 +95,26 @@ function findOrCreateAddressId (address, isMediaAddress) {
 	// console.log('AddressId');
 	var conn, foundId;
 	return pool.getConnection()
-	.then(function(_conn) {
+	.then( (_conn) => {
 		conn = _conn;
 		return conn.query("select id from accounting_ip where address like '" + address + "' limit 1");
 	})
-	.then(function(res) {
+	.then( (res) => {
 		if (res.length === 0) {
 			console.log('no address_id found for address: ', address);
 			return conn.query("insert into accounting_ip(address) select '" + address + "'")
-			.then(function() {
+			.then( () => {
 				return conn.query("select id from accounting_ip where address like '" + address + "' limit 1");
 			})
-			.then(function(_res) {
+			.then( (_res) => {
 				foundId = _res[0].id;
 				return pool.releaseConnection(conn);
 			})
-			.catch(function(err) {
+			.catch( (err) => {
 				console.log(err);
 				if (err.errno === 1062) {
 					return conn.query("select id from accounting_ip where address like '" + address + "' limit 1")
-					.then(function(_res) {
+					.then( (_res) => {
 						foundId = _res[0].id;
 						return pool.releaseConnection(conn);
 					});
@@ -128,12 +126,12 @@ function findOrCreateAddressId (address, isMediaAddress) {
 			return pool.releaseConnection(conn);
 		}
 	})
-	.then(function() {
+	.then( () => {
 		// console.log('you got here');
 		if (!isMediaAddress) findOrCreateMemberId(foundId);
 		return foundId;
 	})
-	.catch(function(err) {
+	.catch( (err) => {
 		console.log('findOrCreateAddressId ', address, err);
 	});
 }
@@ -141,7 +139,7 @@ function findOrCreateAddressId (address, isMediaAddress) {
   function findProtocolId (protocolType) {
 		// console.log('protocolType');
   	return pool.query("select id from voip_protocol where protocol like '" + protocolType + "' limit 1")
-  	.then(function(res) {
+  	.then( (res) => {
   		if (res.length > 0) return res[0].id;
   	})
   	.catch(console.log)
@@ -150,7 +148,7 @@ function findOrCreateAddressId (address, isMediaAddress) {
 	function findCodecId (codec) {
 		// console.log('codecId');
 		return pool.query("select id from voip_codecs where name like '" + codec + "' limit 1")
-  	.then(function(res) {
+  	.then( (res) => {
   		if (res.length > 0) return res[0].id;
 			else return 'NULL';
   	})
@@ -190,7 +188,7 @@ function findOrCreateAddressId (address, isMediaAddress) {
 
   function getNextBatchNum () {
   	return pool.query("select max(batch_num) as max_batch from accounting_summary")
-  	.then(function(res) {
+  	.then( (res) => {
   		if (res.length > 0) return res[0].max_batch + 1;
   		else return 1;
   	})
@@ -249,18 +247,18 @@ function findOrCreateAddressId (address, isMediaAddress) {
 		// console.log('calcDestination');
 		var addressId, routingDigits;
 		return findOrCreateAddressId( originAddress )
-		.then(function(_addressId) {
+		.then( (_addressId) => {
 			addressId = _addressId;
 			return findOrCreateMemberId(_addressId);
 		})
-		.then(function(_memberId) {
+		.then( (_memberId) => {
 			return calcRoutingDigits( originCalledNum, _memberId );
 		})
-		.then(function(_routingDigits) {
+		.then( (_routingDigits) => {
 			routingDigits = _routingDigits;
 			return calcRegionIdAndCountryId(_routingDigits);
 		})
-		.then(function(results) {
+		.then( (results) => {
 			return {
 				regionId: results.regionId,
 				countryCode: results.countryCode,
@@ -293,11 +291,11 @@ function findOrCreateAddressId (address, isMediaAddress) {
   function insertCdrData (insertData) {
 		var conn;
 		return pool.getConnection()
-		.then(function(_conn) {
+		.then( (_conn) => {
 			conn = _conn;
 			return conn.query('insert into accounting_import values ' + insertData);
 		})
-		.then(function() {
+		.then( () => {
 			return pool.releaseConnection(conn);
 		})
 		.catch(console.log)
@@ -321,16 +319,15 @@ function findOrCreateAddressId (address, isMediaAddress) {
 			'SET foreign_key_checks=0',
 			'TRUNCATE TABLE accounting_import'];
 		return pool.getConnection()
-		.then(function(_conn) {
+		.then( (_conn) => {
 			conn = _conn;
-			return Promise.each(dbQueries, function(query) {
-				return conn.query(query)
-				.then(function() {
+			return Promise.each(dbQueries, (query) => conn.query(query)
+				.then( () => {
 					console.log('query succeeded: ', query);
-				});
-			});
+				})
+			);
 		})
-		.then(function() {
+		.then( () => {
 			return pool.releaseConnection(conn);
 		})
 		.catch(console.log);
@@ -347,6 +344,7 @@ function findOrCreateAddressId (address, isMediaAddress) {
 			      where b.conf_id = a.conf_id and b.origin_address_id = a.origin_address_id and b.disconnect_time in (
 			      select max(disconnect_time) from (select * from accounting_import) f where f.conf_id = a.conf_id))
 			      then 1 else 0 end)`,
+
 			`update accounting_import a
 			inner join accounting_members d on a.term_address_id = d.address_id
 			set a.last_term_attempt =
@@ -357,13 +355,16 @@ function findOrCreateAddressId (address, isMediaAddress) {
 			    and b.disconnect_time in (
 			    select max(disconnect_time) from (select * from accounting_import) f where f.conf_id = a.conf_id and f.term_address_id in (select g.address_id from accounting_members g where g.member_id = d.member_id) ))
 			    then 1 else 0 end)`,
+
 					`insert into accounting_summary select FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/300)*300) as batch_time,
 FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/1800)*1800) as batch_time_30,
 FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/7200)*7200) as batch_time_120,
 FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/86400)*86400) as batch_time_24h,
 a.batch_num,
 b.member_id as origin_member_id, c.member_id as term_member_id,
+a.origin_address_id, a.term_address_id,
 country_code, route_code_id, gw_id,
+count(*) as raw_seizures,
 sum(case when a.last_origin_attempt = true then 1 else 0 end) as origin_seizures,
 sum(case when a.last_term_attempt = true then 1 else 0 end) as term_seizures,
 sum(case when a.call_duration > 0 then 1 else 0 end) as completed,
@@ -395,9 +396,10 @@ group by FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/300)*300),
 FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/1800)*1800),
 FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/7200)*7200),
 FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(a.disconnect_time)/86400)*86400),
-batch_num, country_code, route_code_id, gw_id, b.member_id, c.member_id`,
+batch_num, country_code, route_code_id, gw_id, b.member_id, c.member_id, origin_address_id, term_address_id`,
 					// 'SET autocommit=1',
 					'SET unique_checks=1',
+
 					'SET foreign_key_checks=1'
 					];
 
@@ -405,15 +407,15 @@ batch_num, country_code, route_code_id, gw_id, b.member_id, c.member_id`,
 		.then(function(conn) {
 			return Promise.each(dbQueries, function(query) {
 				return conn.query(query)
-				.then(function() {
+				.then( () => {
 					console.log('query succeeded: ', query);
 				});
 			});
 		})
-		.then(function() {
+		.then( () => {
 			return pool.end();
 		})
-		.then(function() {
+		.then( () => {
 			console.log('database connection closed');
 		})
 		.catch(console.log)

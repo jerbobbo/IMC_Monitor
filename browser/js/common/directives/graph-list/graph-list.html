@@ -19,10 +19,10 @@
             <i class="large right floated red remove circle icon" ng-click="removeGraph($index)"></i>
             <i class="large right floated blue chevron circle up icon"  ng-show="$index !== 0" ng-click="moveUp($index)"></i>
             <i class="large right floated blue chevron circle down icon" ng-show="$index !== getGraphList().length-1" ng-click="moveDown($index)"></i>
-          <tab-graph params="graph.params" graph-title="{{ graph.graphTitle }}" index="graph{{ graph.id }}"></tab-graph>
+          <tab-graph params="graph.params" graph-title="{{ graph.graphTitle }}" index="graph{{ graph.id }}" spread="spread"></tab-graph>
         </div>
       </div>
-      <spread-graph ng-if="spread" params="graph.params" graph-title="{{ graph.graphTitle }}" index="graph{{ graph.id }}"></spread-graph>
+      <tab-graph ng-if="spread" params="graph.params" index="graph{{ graph.id }}" spread="spread"></tab-graph>
     </div>
   </div>
 </div>
