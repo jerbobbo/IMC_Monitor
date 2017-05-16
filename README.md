@@ -6,6 +6,10 @@ Installation
 ============
 
 - Run npm install
+=======
+- Run bower install
+- create mysql database
+- create db tables by running statements in scripts/db_create.sql
 - create config folder along with db-config.js, ftp-config.js:
 
   db-config.js
@@ -29,3 +33,16 @@ Installation
       '192.168.20.22',
     ]
   };
+=======
+
+Seed DB:
+```
+- npm run seed
+```
+
+###Crontab Installation
+=======================
+```
+- modify crontab jobs for with your correct environment paths in crontab/cron_config
+$ crontab crontab/cron_config
+```
