@@ -32,6 +32,7 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
           angular.extend($scope, GraphFactory);
 
           const dateFormat = 'YYYY-MM-DD HH:mm:ss';
+          const dateDisplayFormat = 'MM/DD/YY HH:mm';
 
           const ranges = {
             daily: {
@@ -131,6 +132,8 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
             }
           };
 
+          $scope.formatDate = (date) => date.format(dateDisplayFormat);
+
           $scope.changeInterval = (interval) => {
             $scope.params.interval = interval;
             setDefaultDates();
@@ -162,7 +165,7 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
                 endDate: $scope.params.toDate.floor(5, 'minutes'),
                 minDate: ranges[$scope.params.interval].minDate,
                 ranges: ranges[$scope.params.interval].ranges,
-                format: 'YYYY-MM-DD HH:mm',
+                format: dateDisplayFormat,
                 autoUpdateInput: true,
                 buttonClasses: ['ui mini button'],
                 applyClass: 'primary'

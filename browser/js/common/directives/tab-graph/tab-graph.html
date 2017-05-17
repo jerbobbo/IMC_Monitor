@@ -68,7 +68,9 @@
           <div class="ui basic blue label" ng-if="hasCurrParam(params.gw)">
             {{ filterLabel('SS:', 'gatewayList', params.gw.id, 'address') }}
           </div>
-
+          <div class="ui mini basic blue button">
+            {{ formatDate(params.fromDate) }} - {{ formatDate(params.toDate) }}
+          </div>
         </div>
         <!-- <div class="ui top attached small header">
           {{ params.country.country }} | {{ params.routeCode.region_name }} | {{ params.originMember.name }} | {{ params.termMember.name }} | {{ params.originAddress.address }} | {{ params.termAddress.address }} | {{ params.gw.address }} | {{ originTerm }} {{ currType
@@ -161,6 +163,9 @@
         </div>
         <div class="ui basic blue label" ng-if="hasCurrParam(params.gw)">
           {{ filterLabel('SS:', 'gatewayList', params.gw.id, 'address') }}
+        </div>
+        <div class="ui mini basic blue button">
+          {{ formatDate(params.fromDate) }} - {{ formatDate(params.toDate) }}
         </div>
       </div>
 
