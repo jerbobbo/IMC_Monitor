@@ -8,7 +8,41 @@ app.factory('GraphFactory', function($http) {
     },
     graphTypes: ['ASR', 'ACD', 'Seizures', 'AnsDel', 'NoCirc', 'Normal', 'Failure'],
     intervalTypes: ['daily', 'weekly', 'monthly', 'yearly'],
-    originTypes: ['Origin', 'Term']
+    originTypes: ['Origin', 'Term'],
+    ranges: {
+      daily: {
+        ranges: {
+          'Today': [moment.utc().subtract(1, 'days').subtract(6, 'hours'), moment.utc().subtract(5, 'minutes')],
+          'Yesterday': [moment.utc().subtract(2, 'days').subtract(6, 'hours'), moment.utc().subtract(1, 'days')],
+        },
+        default: 'Today',
+        minDate: moment.utc().subtract(7, 'days')
+      },
+      weekly: {
+        ranges: {
+          'This Week': [moment.utc().subtract(7, 'days').subtract(6, 'hours'), moment.utc().subtract(5, 'minutes')],
+          'Last Week': [moment.utc().subtract(14, 'days').subtract(6, 'hours'), moment.utc().subtract(7, 'days')],
+        },
+        default: 'This Week',
+        minDate: moment.utc().subtract(15, 'days')
+      },
+      monthly: {
+        ranges: {
+          'This Month': [moment.utc().subtract(31, 'days'), moment.utc().subtract(5, 'minutes')],
+          'Last Month': [moment.utc().subtract(61, 'days'), moment.utc().subtract(30, 'days')],
+        },
+        default: 'This Month',
+        minDate: moment.utc().subtract(65, 'days')
+      },
+      yearly: {
+        ranges: {
+          'This Year': [moment.utc().subtract(367, 'days'), moment.utc().subtract(5, 'minutes')],
+          'Last Year': [moment.utc().subtract(732, 'days'), moment.utc().subtract(365, 'days')],
+        },
+        default: 'This Year',
+        minDate: moment.utc().subtract(740, 'days')
+      }
+    }
   };
 });
 
@@ -31,43 +65,12 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
 
           angular.extend($scope, GraphFactory);
 
+          //format for sql query
           const dateFormat = 'YYYY-MM-DD HH:mm:ss';
+
           const dateDisplayFormat = 'MM/DD/YY HH:mm';
 
-          const ranges = {
-            daily: {
-              ranges: {
-                'Today': [moment.utc().subtract(1, 'days').subtract(6, 'hours'), moment.utc().subtract(5, 'minutes')],
-                'Yesterday': [moment.utc().subtract(2, 'days').subtract(6, 'hours'), moment.utc().subtract(1, 'days')],
-              },
-              default: 'Today',
-              minDate: moment.utc().subtract(7, 'days')
-            },
-            weekly: {
-              ranges: {
-                'This Week': [moment.utc().subtract(7, 'days').subtract(6, 'hours'), moment.utc().subtract(5, 'minutes')],
-                'Last Week': [moment.utc().subtract(14, 'days').subtract(6, 'hours'), moment.utc().subtract(7, 'days')],
-              },
-              default: 'This Week',
-              minDate: moment.utc().subtract(15, 'days')
-            },
-            monthly: {
-              ranges: {
-                'This Month': [moment.utc().subtract(31, 'days'), moment.utc().subtract(5, 'minutes')],
-                'Last Month': [moment.utc().subtract(61, 'days'), moment.utc().subtract(30, 'days')],
-              },
-              default: 'This Month',
-              minDate: moment.utc().subtract(65, 'days')
-            },
-            yearly: {
-              ranges: {
-                'This Year': [moment.utc().subtract(367, 'days'), moment.utc().subtract(5, 'minutes')],
-                'Last Year': [moment.utc().subtract(732, 'days'), moment.utc().subtract(365, 'days')],
-              },
-              default: 'This Year',
-              minDate: moment.utc().subtract(740, 'days')
-            }
-          };
+
 
           var updateLists = (updatedField) => {
 
@@ -148,7 +151,11 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
 
           $scope.$watch( 'index', () =>  $scope.updateGraph() );
 
-          window.setInterval( () => $scope.updateGraph(), 300000 );
+          window.setInterval( () => {
+            //if using default range, update start and end time before re-rendering
+            if ($scope.defaultRange) setDefaultDates();
+            $scope.updateGraph();
+          }, 300000 );
 
           function setCurrentDates(range) {
             $scope.params.fromDate = range[0];
@@ -156,8 +163,9 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
           }
 
           function setDefaultDates() {
-            var currRange = ranges[$scope.params.interval];
+            var currRange = $scope.ranges[$scope.params.interval];
             setCurrentDates(currRange.ranges[currRange.default]);
+            $scope.defaultRange = true;
           }
 
            $scope.openDatePicker = () => {
@@ -169,8 +177,8 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
                 timePickerIncrement: 5,
                 startDate: $scope.params.fromDate.floor(5, 'minutes'),
                 endDate: $scope.params.toDate.floor(5, 'minutes'),
-                minDate: ranges[$scope.params.interval].minDate,
-                ranges: ranges[$scope.params.interval].ranges,
+                minDate: $scope.ranges[$scope.params.interval].minDate,
+                ranges: $scope.ranges[$scope.params.interval].ranges,
                 format: dateDisplayFormat,
                 autoUpdateInput: true,
                 buttonClasses: ['ui mini button'],
@@ -178,6 +186,7 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
               },
               function(start, end, label) {
                 setCurrentDates([start, end]);
+                $scope.defaultRange = false;
                 $scope.updateGraph();
               }
             );
