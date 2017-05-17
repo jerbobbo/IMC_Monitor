@@ -83,6 +83,12 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
           };
 
           $scope.updateGraph = (updatedField) => {
+            //if country is changed, reset region to all
+            if (updatedField === 'countryList') $scope.params.routeCode = GraphAddFactory.getDefaultVal('regionList');
+
+            //if origin or term client is changed, reset ip to all
+            else if (updatedField === 'originMemberList') $scope.params.originAddress = GraphAddFactory.getDefaultVal('originAddressList');
+            else if (updatedField === 'termMemberList') $scope.params.termAddress = GraphAddFactory.getDefaultVal('termAddressList');
 
             $scope.queryParams = {
               country: $scope.params.country.country,
