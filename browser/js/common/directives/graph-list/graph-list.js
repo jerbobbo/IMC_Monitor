@@ -40,15 +40,6 @@ app.factory('GraphListFactory', ($http) => {
       var graphOrder = _graphList.length;
 
       _graphList.push({
-        // params: {
-        //   country: graphParams.country.country,
-        //   routeCodeId: graphParams.routeCode.id,
-        //   originMemberId: graphParams.originMember.id,
-        //   termMemberId: graphParams.termMember.id,
-        //   originAddressId: graphParams.originAddress.id,
-        //   termAddressId: graphParams.termAddress.id,
-        //   gwId: graphParams.gw.id
-        // },
         params: graphParams,
         id: graphId,
         order: graphOrder

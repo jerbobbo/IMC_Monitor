@@ -47,7 +47,7 @@ app.factory('GraphFactory', function($http) {
 });
 
 //will be tab-graph in html tag
-app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
+app.directive('tabGraph', function () {
 
     return {
         restrict: 'E',
@@ -59,7 +59,7 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
         },
         templateUrl: 'js/common/directives/tab-graph/tab-graph.html',
 
-        controller: function($scope, GraphFactory) {
+        controller: function($scope, GraphFactory, GraphAddFactory) {
           $scope.params.interval = "daily";
           $scope.datePickerId = 'date-' + $scope.index;
 
@@ -72,46 +72,40 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
 
 
 
-          var updateLists = (updatedField) => {
+          // var updateLists = (updatedField) => {
+          //
+          //   var promiseArray = [];
+          //
+          //   GraphAddFactory.getListNames(updatedField).forEach( (listName) => {
+          //     var targetList = $scope[listName];
+          //     promiseArray.push( GraphAddFactory.getList(listName, queryParams, targetList) );
+          //   });
+          //
+          //   return Promise.all(promiseArray)
+          //     .catch(console.log);
+          // };
 
-            var promiseArray = [];
+          $scope.updateGraph = (params) => {
 
-            GraphAddFactory.getListNames(updatedField).forEach( (listName) => {
-              var targetList = $scope[listName];
-              promiseArray.push( GraphAddFactory.getList(listName, $scope.queryParams, targetList) );
-            });
-
-            return Promise.all(promiseArray)
-              .catch(console.log);
-          };
-
-          $scope.updateGraph = (updatedField) => {
-            //if country is changed, reset region to all
-            if (updatedField === 'countryList') $scope.params.routeCode = GraphAddFactory.getDefaultVal('regionList');
-
-            //if origin or term client is changed, reset ip to all
-            else if (updatedField === 'originMemberList') $scope.params.originAddress = GraphAddFactory.getDefaultVal('originAddressList');
-            else if (updatedField === 'termMemberList') $scope.params.termAddress = GraphAddFactory.getDefaultVal('termAddressList');
-
-            $scope.queryParams = {
-              country: $scope.params.country.country,
-              routeCodeId: $scope.params.routeCode.id,
-              originMemberId: $scope.params.originMember.id,
-              termMemberId: $scope.params.termMember.id,
-              originAddressId: $scope.params.originAddress.id,
-              termAddressId: $scope.params.termAddress.id,
-              gwId: $scope.params.gw.id,
-              fromDate: $scope.params.fromDate.format(dateFormat),
-              toDate: $scope.params.toDate.format(dateFormat),
-              interval: $scope.params.interval
+            var queryParams = {
+              country: params.country.country,
+              routeCodeId: params.routeCode.id,
+              originMemberId: params.originMember.id,
+              termMemberId: params.termMember.id,
+              originAddressId: params.originAddress.id,
+              termAddressId: params.termAddress.id,
+              gwId: params.gw.id,
+              fromDate: params.fromDate.format(dateFormat),
+              toDate: params.toDate.format(dateFormat),
+              interval: $scope.interval
             };
 
-            return $scope.getData($scope.queryParams)
+            return $scope.getData(queryParams)
             .then( (results) => {
               $scope.data = results;
               $scope.currType = $scope.currType || $scope.graphTypes[0];
               $scope.originTerm = $scope.originTerm || 'origin';
-              if (updatedField) return updateLists(updatedField);
+              // if (updatedField) return updateLists(updatedField);
             });
           };
 
@@ -141,6 +135,9 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
             }
           };
 
+          $scope.getRanges = () => $scope.ranges[$scope.params.interval].ranges;
+          $scope.getMinDate = () => $scope.ranges[$scope.params.interval].minDate;
+
           $scope.formatDate = (date) => date.format(dateDisplayFormat);
 
           $scope.changeInterval = (interval) => {
@@ -148,6 +145,12 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
             setDefaultDates();
             $scope.updateGraph();
           };
+
+         function setDefaultDates() {
+           var currRange = $scope.ranges[$scope.params.interval];
+           setCurrentDates(currRange.ranges[currRange.default]);
+           $scope.defaultRange = true;
+         }
 
           $scope.$watch( 'index', () =>  $scope.updateGraph() );
 
@@ -157,40 +160,11 @@ app.directive('tabGraph', function (GraphFactory, GraphAddFactory) {
             $scope.updateGraph();
           }, 300000 );
 
-          function setCurrentDates(range) {
-            $scope.params.fromDate = range[0];
-            $scope.params.toDate = range[1];
-          }
 
-          function setDefaultDates() {
-            var currRange = $scope.ranges[$scope.params.interval];
-            setCurrentDates(currRange.ranges[currRange.default]);
-            $scope.defaultRange = true;
-          }
 
-           $scope.openDatePicker = () => {
-            $(`#${$scope.datePickerId}`).daterangepicker(
-              {
-                timeZone: '00:00',
-                timePicker: true,
-                timePicker24Hour: true,
-                timePickerIncrement: 5,
-                startDate: $scope.params.fromDate.floor(5, 'minutes'),
-                endDate: $scope.params.toDate.floor(5, 'minutes'),
-                minDate: $scope.ranges[$scope.params.interval].minDate,
-                ranges: $scope.ranges[$scope.params.interval].ranges,
-                format: dateDisplayFormat,
-                autoUpdateInput: true,
-                buttonClasses: ['ui mini button'],
-                applyClass: 'primary'
-              },
-              function(start, end, label) {
-                setCurrentDates([start, end]);
-                $scope.defaultRange = false;
-                $scope.updateGraph();
-              }
-            );
-          };
+
+
+
 
         }
 
