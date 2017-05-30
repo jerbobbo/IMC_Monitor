@@ -6,7 +6,7 @@ app.factory('GraphFactory', function($http) {
         return response.data;
       });
     },
-    graphTypes: ['ASR', 'ACD', 'Seizures', 'AnsDel', 'NoCirc', 'Normal', 'Failure'],
+    graphTypes: ['ASR', 'ACD', 'Min/Ch', 'Seizures', 'AnsDel', 'NoCirc', 'Normal', 'Failure'],
     intervalTypes: ['daily', 'weekly', 'monthly', 'yearly'],
     originTypes: ['Origin', 'Term'],
     ranges: {

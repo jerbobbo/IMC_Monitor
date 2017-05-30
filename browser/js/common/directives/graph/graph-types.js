@@ -120,6 +120,29 @@ var graphTypes =
           return roundToFixed(100*lastFullReading[`${originTerm}FailDisc`]/lastFullReading[`${originTerm}Seiz`] || 0 );
         }
       }
+    },
+    "Min/Ch": {
+      name: "Min/Channels",
+      areaAbbr: "Minutes/Min",
+      lineAbbr: "Ch/Min",
+      yAxis: "Ch/Min",
+      lineFunc: (d, originTerm, denom) => (d.connMinutes + (d[`${originTerm}AnsDel`]/60))/denom || 0,
+      areaFunc: (d, originTerm, denom) => d.connMinutes/denom  || 0,
+      maxGraphHeight: (data, originTerm, denom) => d3.max(data, d => (d.connMinutes + (d[`${originTerm}AnsDel`]/60))/denom || 0),
+      avgAreaFunc: (data, originTerm, denom) => { if (data) return roundToFixed(d3.mean(data, d => d.connMinutes/denom  || 0) ); },
+      avgLineFunc: (data, originTerm, denom) => { if (data) return roundToFixed(d3.mean(data, d => (d.connMinutes + (d[`${originTerm}AnsDel`]/60))/denom  || 0) ); },
+      currAreaFunc: (data, originTerm, denom) => {
+        if (data) {
+          var lastFullReading = data[ data.length-2 ];
+          return roundToFixed(lastFullReading.connMinutes/denom || 0 );
+        }
+      },
+      currLineFunc: (data, originTerm, denom) => {
+        if (data) {
+          var lastFullReading = data[ data.length-2 ];
+          return roundToFixed((lastFullReading.connMinutes + (lastFullReading[`${originTerm}AnsDel`]/60))/denom || 0 );
+        }
+      }
     }
   };
 
