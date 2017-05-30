@@ -19,6 +19,11 @@ body {
   margin: 0 auto;
 }
 
+.ui.fluid.container {
+  padding-left: 3em !important;
+  padding-right: 3em !important;
+}
+
 @import 'directives/main';
 @import 'home/main';
 @import 'about/main';
